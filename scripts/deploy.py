@@ -8,7 +8,8 @@
     modeling-display/            ← 本仓库（Git，唯一真相源）
             │ scripts/deploy.py
             ├──→ ~/.workbuddy/skills/modeling-display/
-            └──→ ~/.codex/skills/modeling-display/
+            ├──→ ~/.codex/skills/modeling-display/
+            └──→ ~/.codex/prompts/geo3d.md          （斜杠命令）
 
 改内容只改本仓库，然后跑这个脚本。不要直接改 skill 目录里的副本 —— 下次部署会被覆盖。
 
@@ -31,10 +32,18 @@ INCLUDE_DIRS = ["references", "assets", "examples"]
 # 这些扩展名跳过（图片对 agent 无直接价值，还占体积）
 SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico"}
 
-# 部署目标
+# 部署目标（skill 目录）
 TARGETS = {
     "workbuddy": os.path.join(os.path.expanduser("~"), ".workbuddy", "skills", "modeling-display"),
     "codex":     os.path.join(os.path.expanduser("~"), ".codex", "skills", "modeling-display"),
+}
+
+# 额外部署：Codex 斜杠命令要放到 ~/.codex/prompts/，不属于 skill 目录
+EXTRA = {
+    "codex-prompt": (
+        os.path.join(REPO, "prompts", "geo3d.md"),
+        os.path.join(os.path.expanduser("~"), ".codex", "prompts", "geo3d.md"),
+    ),
 }
 
 CHECK = "--check" in sys.argv
@@ -60,6 +69,22 @@ def deploy_file(rel, dest_root, changed):
     if not CHECK:
         io.open(dst, "w", encoding="utf-8", newline="").write(new)
     changed.append(rel)
+    return True
+
+
+def deploy_abs(src, dst):
+    """按绝对路径部署单个文件；返回是否发生变化"""
+    if not os.path.exists(src):
+        return False
+    parent = os.path.dirname(dst)
+    if parent and not os.path.isdir(parent):
+        if not CHECK:
+            os.makedirs(parent, exist_ok=True)
+    new = io.open(src, encoding="utf-8").read()
+    if os.path.exists(dst) and io.open(dst, encoding="utf-8").read() == new:
+        return False
+    if not CHECK:
+        io.open(dst, "w", encoding="utf-8", newline="").write(new)
     return True
 
 
@@ -113,6 +138,15 @@ def main():
                 print("    - " + c.replace("\\", "/"))
         else:
             print("[%s] 已是最新 ✓  %s" % (name, root))
+
+    # 额外：Codex 斜杠命令
+    if not ONLY or ONLY in ("codex", "codex-prompt"):
+        for name, (src, dst) in EXTRA.items():
+            if deploy_abs(src, dst):
+                any_change = True
+                print("[%s] %s → %s" % (name, "需要部署" if CHECK else "已部署", dst))
+            else:
+                print("[%s] 已是最新 ✓  %s" % (name, dst))
 
     if CHECK and any_change:
         print()

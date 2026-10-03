@@ -1,0 +1,20 @@
+# 仓库内统一 LF，避免 Windows/macOS/Linux 协作时满屏换行符 diff
+* text=auto eol=lf
+
+# 二进制文件
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+
+# 文本文件（明确标记，防止被误判）
+*.md   text eol=lf
+*.py   text eol=lf
+*.html text eol=lf
+*.css  text eol=lf
+*.js   text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
