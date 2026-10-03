@@ -1,5 +1,9 @@
 # Modeling display
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
+[![Three.js](https://img.shields.io/badge/Three.js-r146%20UMD-black.svg)](https://threejs.org/)
+
 **把一道几何题，变成学生可以自己拖着玩的三维教学模型。**
 
 输入一道题（文字或截图），输出一个**单文件 HTML** —— 可旋转缩放平移、点顶点高亮（支持多选）、**手指直接拖动动点**、实时数值读数，同一份文件同时适配电脑与平板。
@@ -31,18 +35,18 @@
 
 ```bash
 # WorkBuddy
-git clone https://github.com/<你的用户名>/modeling-display.git \
+git clone https://github.com/qqae312/modeling-display.git \
     ~/.workbuddy/skills/modeling-display
 
 # Codex
-git clone https://github.com/<你的用户名>/modeling-display.git \
+git clone https://github.com/qqae312/modeling-display.git \
     ~/.codex/skills/modeling-display
 ```
 
 **方式 B —— 仓库与部署分离**（推荐长期维护，skill 目录保持干净）
 
 ```bash
-git clone https://github.com/<你的用户名>/modeling-display.git
+git clone https://github.com/qqae312/modeling-display.git
 cd modeling-display
 python scripts/deploy.py          # 部署到 WorkBuddy 与 Codex 两处
 ```
