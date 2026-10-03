@@ -88,6 +88,42 @@ def deploy_abs(src, dst):
     return True
 
 
+def prune_target(dest_root, keep_rels, removed):
+    """删除目标目录里不在部署清单中的文件，使目标成为仓库的镜像。
+
+    skill 目录只是部署产物，不该出现 GitHub 门面文件（README/CHANGELOG/LICENSE）
+    或历史遗留文件。**绝不会碰 .git**。
+    """
+    if not os.path.isdir(dest_root):
+        return
+    keep = set(r.replace("\\", "/") for r in keep_rels)
+
+    for dirpath, dirnames, filenames in os.walk(dest_root):
+        if ".git" in dirnames:
+            dirnames.remove(".git")          # 绝不触碰 git 元数据
+        for f in filenames:
+            full = os.path.join(dirpath, f)
+            rel = os.path.relpath(full, dest_root).replace("\\", "/")
+            if rel not in keep:
+                removed.append(rel)
+                if not CHECK:
+                    try:
+                        os.remove(full)
+                    except OSError:
+                        pass
+
+    if not CHECK:
+        # 自底向上清理空目录（保留 dest_root 自身）
+        for dirpath, dirnames, filenames in os.walk(dest_root, topdown=False):
+            if ".git" in dirpath or dirpath == dest_root:
+                continue
+            try:
+                if not os.listdir(dirpath):
+                    os.rmdir(dirpath)
+            except OSError:
+                pass
+
+
 def collect():
     """返回要部署的相对路径列表"""
     rels = []
@@ -127,15 +163,24 @@ def main():
 
     any_change = False
     for name, root in targets.items():
-        changed = []
+        changed, removed = [], []
         for rel in rels:
             deploy_file(rel, root, changed)
-        if changed:
+        prune_target(root, rels, removed)
+
+        if changed or removed:
             any_change = True
-            verb = "需要部署" if CHECK else "已部署"
-            print("[%s] %s %d 个文件 → %s" % (name, verb, len(changed), root))
+            verb = "需要" if CHECK else ""
+            parts = []
+            if changed:
+                parts.append("%s部署 %d" % (verb, len(changed)))
+            if removed:
+                parts.append("%s清理 %d" % (verb, len(removed)))
+            print("[%s] %s → %s" % (name, "、".join(parts), root))
             for c in changed:
-                print("    - " + c.replace("\\", "/"))
+                print("    + " + c.replace("\\", "/"))
+            for r in removed:
+                print("    - " + r)
         else:
             print("[%s] 已是最新 ✓  %s" % (name, root))
 
