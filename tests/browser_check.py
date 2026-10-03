@@ -72,6 +72,13 @@ def exercise(page):
     point = coordinates(page)
     page.mouse.click(**point)
     check(page.evaluate("__S.selKeys.includes('P')"), "select moving point")
+    for selector in ('#labels .lab.p.sel', '#selList .chip'):
+        contrast = page.locator(selector).evaluate("""el => {
+          var s=getComputedStyle(el), rgb=x=>x.match(/[\\d.]+/g).slice(0,3).map(Number);
+          var lum=x=>rgb(x).map(v=>{v/=255;return v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4);}).reduce((a,v,i)=>a+v*[.2126,.7152,.0722][i],0);
+          var a=lum(s.color),b=lum(s.backgroundColor);return (Math.max(a,b)+.05)/(Math.min(a,b)+.05);
+        }""")
+        check(contrast >= 4.5, 'selected text meets AA contrast')
     page.mouse.click(**point)
     check(not page.evaluate("__S.selKeys.includes('P')"), "deselect moving point")
     label = page.evaluate("""() => { var l=__S.pLabelRect,r=__S.renderer.domElement.getBoundingClientRect(); return {x:r.left+(l.x0+l.x1)/2,y:r.top+(l.y0+l.y1)/2}; }""")

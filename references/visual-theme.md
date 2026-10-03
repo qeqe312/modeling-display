@@ -125,8 +125,8 @@ var SEL_COLOR = 0xFF7A45;   // 选中高亮
 |---|---|---|
 | 普通 | `.lab` | 深色胶囊 + 亮蓝字 |
 | 动点 | `.lab.p` | 深色胶囊 + 亮橙字 + ⠿ 把柄 |
-| 被选中 | `.lab.sel` | **橙底白字** + 外发光 |
-| 拖动中 | `.lab.p.hot` | 橙底白字 + 呼吸光环 |
+| 被选中 | `.lab.sel` | **橙底深色字（`#20130D`）** + 外发光 |
+| 拖动中 | `.lab.p.hot` | 橙底深色字（`#20130D`） + 呼吸光环 |
 
 **动效铁律**：呼吸/脉动动画**只能用 `box-shadow`，绝对不能碰 `transform`**——
 `syncLabels` 每帧都在写 `el.style.transform`，CSS 动画一旦也动 transform 就会互相覆盖。
@@ -202,4 +202,4 @@ function ratio(a,b){const l1=lum(hex(a)),l2=lum(hex(b));const hi=Math.max(l1,l2)
 | 代码块/行内 code | `background: var(--surface-2)`，文字 `var(--accent)` |
 | 难度标签 | `background:#3A1D1D; color:#E88B8B` |
 | 临界状态读数区 | `background: rgba(46,26,17,.97)` + 橙外发光 |
-| **白字保留** | 橙底/蓝底上的 `color:#FFFFFF` 是正确的，不要改 |
+| **高亮文字** | 橙底使用 `#20130D` 深色文字；白字对橙底的对比度不足，不要恢复成白字 |
