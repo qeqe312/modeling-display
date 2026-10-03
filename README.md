@@ -35,18 +35,18 @@
 
 ```bash
 # WorkBuddy
-git clone https://github.com/qqae312/modeling-display.git \
+git clone https://github.com/qeqe312/modeling-display.git \
     ~/.workbuddy/skills/modeling-display
 
 # Codex
-git clone https://github.com/qqae312/modeling-display.git \
+git clone https://github.com/qeqe312/modeling-display.git \
     ~/.codex/skills/modeling-display
 ```
 
 **方式 B —— 仓库与部署分离**（推荐长期维护，skill 目录保持干净）
 
 ```bash
-git clone https://github.com/qqae312/modeling-display.git
+git clone https://github.com/qeqe312/modeling-display.git
 cd modeling-display
 python scripts/deploy.py          # 部署到 WorkBuddy 与 Codex 两处
 ```
