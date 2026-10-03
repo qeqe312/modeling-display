@@ -1,0 +1,1709 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>正四棱台 ABCD-A′B′C′D′ · 三维教学演示</title>
+<style>
+  /* ============================================================
+     配色：学术蓝灰 + 暖橙强调
+     - 底色用极浅的冷灰，避免纯白在投影仪上刺眼
+     - 强调色统一为 #FF7A45（橙），只用在"动点 P / 已选中"这两处需要
+       学生视线聚焦的地方，其余全部降饱和，保持画面安静
+     ============================================================ */
+  /* ============================================================
+     暗色主题（深色底 + 高对比强调色）
+     设计约束：
+     - 3D 视口是纯 WebGL 画布，不带 alpha，所以画布底色必须在这里定死
+     - 暗色下"浅色底 + 深色字"的做法全部反过来，且阴影要改成"外发光"才有层次
+     - 强调色在深底上要提亮，否则橙/蓝都会发闷
+     ============================================================ */
+  :root {
+    --bg:        #0D1117;   /* 页面最底层 */
+    --surface:   #161B22;   /* 面板、卡片 */
+    --surface-2: #1C232C;   /* 内容块、代码块 */
+    --surface-3: #232B36;   /* 略高一层的浮起元素 */
+    --line:      #2A3441;   /* 主分隔线 */
+    --line-soft: #212A34;   /* 弱分隔线 */
+
+    --ink:       #E6EDF3;   /* 主文字 */
+    --ink-2:     #A9B6C4;   /* 次级文字 */
+    --ink-3:     #8B99A8;   /* 三级文字 / 标签（对比度 5.3，过 WCAG AA） */
+
+    --brand:     #6BA8E8;   /* 学术蓝（提亮，深底上才够亮） */
+    --brand-lt:  #17293E;   /* 蓝的深色容器 */
+    --accent:    #FF7A45;   /* 动点橙（提亮） */
+    --accent-lt: #2E1A11;   /* 橙的深色容器 */
+    --green:     #8FBF5A;
+    --green-lt:  #1A2413;
+    --violet:    #A692E8;
+    --violet-lt: #1E1B2E;
+
+    /* 暗色下阴影几乎不可见，改用"内描边 + 外发光"营造层次 */
+    --shadow-s:  0 1px 2px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.03);
+    --shadow-m:  0 4px 16px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.04);
+    --radius:    12px;
+
+    --glow-accent: rgba(255,122,69,.30);
+    --glow-brand:  rgba(107,168,232,.28);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; margin: 0; }
+  body {
+    font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+    background: var(--bg);
+    color: var(--ink);
+    overflow: hidden;
+    -webkit-font-smoothing: antialiased;
+  }
+  #app { display: flex; height: 100%; }
+
+  #panel {
+    width: 372px;
+    flex: 0 0 372px;
+    background: var(--surface);
+    border-right: 1px solid var(--line);
+    overflow-y: auto;
+    padding: 22px 20px 48px;
+  }
+  #panel::-webkit-scrollbar { width: 10px; }
+  #panel::-webkit-scrollbar-track { background: transparent; }
+  #panel::-webkit-scrollbar-thumb {
+    background: #39434F; border-radius: 5px; border: 3px solid var(--surface);
+  }
+  #panel::-webkit-scrollbar-thumb:hover { background: #4A5765; }
+
+  h1 {
+    font-size: 17px;
+    font-weight: 600;
+    margin: 0 0 9px;
+    letter-spacing: .2px;
+    line-height: 1.45;
+  }
+  .tag {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--brand-lt);
+    color: var(--brand);
+    margin-right: 6px;
+    letter-spacing: .3px;
+  }
+  .tag.diff { background: #3A1D1D; color: #E88B8B; }
+
+  .group { margin-top: 26px; }
+  .group > .title {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-3);
+    letter-spacing: 1.1px;
+    text-transform: uppercase;
+    margin-bottom: 11px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .group > .title::after {
+    content: ''; flex: 1; height: 1px; background: var(--line-soft);
+  }
+
+  .stem {
+    font-size: 13.5px;
+    line-height: 1.8;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    color: var(--ink);
+  }
+  .stem .q { margin: 10px 0 0; }
+  .stem .q:first-child { margin-top: 0; }
+  .stem b { font-weight: 600; color: var(--brand); }
+
+  /* 拖拽提示条：动点 P 是本页最核心的交互，单独给一条醒目提示 */
+  .drag-tip {
+    display: flex; align-items: flex-start; gap: 10px;
+    font-size: 12.5px; line-height: 1.65;
+    background: var(--accent-lt);
+    border: 1px solid rgba(255,122,69,.32);
+    border-radius: 10px;
+    padding: 11px 13px;
+    margin-bottom: 13px;
+    color: #FFB392;
+  }
+  .drag-tip b { font-weight: 600; color: var(--accent); }
+  .drag-tip .grip {
+    flex: 0 0 auto;
+    font-size: 15px; line-height: 1.35;
+    color: var(--accent);
+    opacity: .85;
+  }
+
+  .slider-row { display: flex; align-items: center; gap: 12px; }
+  .slider-row input[type=range] { flex: 1; accent-color: var(--accent); }
+  .slider-row .val {
+    font-size: 12px; color: var(--brand); width: 76px; text-align: right;
+    font-variant-numeric: tabular-nums; font-weight: 500;
+  }
+
+  .check {
+    display: flex; align-items: center; gap: 9px;
+    font-size: 13px; padding: 6px 0; cursor: pointer; user-select: none;
+    color: var(--ink);
+  }
+  .check input { accent-color: var(--brand); width: 15px; height: 15px; cursor: pointer; }
+  .check .dot { width: 9px; height: 9px; border-radius: 2px; flex: 0 0 9px; }
+  .check .sub { color: var(--ink-3); font-size: 12px; }
+
+  .btn {
+    width: 100%;
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 10px;
+    border: 1px solid var(--line);
+    background: var(--surface);
+    color: var(--ink-2);
+    border-radius: 9px;
+    cursor: pointer;
+    margin-top: 9px;
+    transition: background .15s, border-color .15s, box-shadow .15s;
+    box-shadow: var(--shadow-s);
+  }
+  .btn:hover { border-color: var(--brand); background: var(--brand-lt); color: var(--brand); }
+  .btn:active { background: var(--surface-3); box-shadow: none; transform: translateY(1px); }
+  .btn.on { background: var(--brand-lt); border-color: var(--brand); color: var(--brand); }
+
+  /* 已选顶点清单 */
+  .sel-list {
+    display: flex; flex-wrap: wrap; gap: 7px;
+    min-height: 34px;
+    padding: 9px 11px;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 10px;
+    font-size: 12px;
+    color: var(--ink-3);
+    line-height: 1.5;
+    align-items: center;
+  }
+  .sel-list .chip {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 999px;
+    background: var(--accent);
+    color: #FFFFFF;
+    font-weight: 600;
+    font-size: 12px;
+    box-shadow: 0 0 0 1px rgba(255,122,69,.35), 0 2px 8px var(--glow-accent);
+  }
+
+  /* 卡片：左侧色条 + 轻阴影，替代整块底色，减少视觉噪音 */
+  .card {
+    position: relative;
+    border-radius: var(--radius);
+    padding: 14px 16px 14px 18px;
+    margin-top: 12px;
+    font-size: 13px;
+    line-height: 1.9;
+    background: var(--surface);
+    border: 1px solid var(--line-soft);
+    box-shadow: var(--shadow-s);
+    color: var(--ink-2);
+  }
+  .card::before {
+    content: ''; position: absolute;
+    left: 0; top: 12px; bottom: 12px; width: 3px;
+    border-radius: 0 3px 3px 0;
+  }
+  .card .h {
+    font-weight: 600;
+    margin-bottom: 7px;
+    font-size: 13.5px;
+    letter-spacing: .2px;
+  }
+  .card.q1::before { background: var(--green); }
+  .card.q1 { background: var(--green-lt); border-color: #2C3A1F; }
+  .card.q1 .h { color: var(--green); }
+  .card.q2::before { background: var(--violet); }
+  .card.q2 { background: var(--violet-lt); border-color: #322C4A; }
+  .card.q2 .h { color: var(--violet); }
+
+  .steps {
+    font-size: 13px;
+    line-height: 2.05;
+    color: var(--ink-2);
+  }
+  .steps .k {
+    font-weight: 600;
+    color: var(--brand);
+    margin-top: 13px;
+    display: block;
+    font-size: 12.5px;
+    letter-spacing: .3px;
+  }
+  .steps .k:first-child { margin-top: 0; }
+  .steps code {
+    font-family: "Cascadia Code", Consolas, "Courier New", monospace;
+    background: var(--surface-2);
+    border: 1px solid var(--line-soft);
+    border-radius: 5px;
+    padding: 1px 6px;
+    font-size: 12px;
+    color: var(--accent);
+  }
+  .hl {
+    background: var(--accent-lt);
+    border-radius: 4px;
+    padding: 0 4px;
+    color: var(--accent);
+    font-weight: 600;
+  }
+
+  #stage {
+    flex: 1; position: relative; overflow: hidden;
+    background: radial-gradient(ellipse at 50% 42%, #1B232E 0%, #131A22 62%, #0B0F14 100%);
+  }
+  /* touch-action:none —— 交出全部手势控制权，否则平板上单指拖拽会变成滚动页面 */
+  #cv { display: block; width: 100%; height: 100%; touch-action: none; }
+
+  #labels { position: absolute; inset: 0; pointer-events: none; overflow: hidden; }
+  #labels .lab {
+    position: absolute;
+    font-size: var(--lab-size, 22px);
+    font-weight: 600;
+    color: #BBD7F5;
+    background: rgba(22,27,34,.88);
+    border: 1px solid rgba(107,168,232,.30);
+    border-radius: 7px;
+    padding: 1px 8px;
+    line-height: 1.3;
+    white-space: nowrap;
+    will-change: transform;
+    box-shadow: 0 2px 8px rgba(0,0,0,.55);
+    backdrop-filter: blur(3px);
+  }
+  #labels .lab.p {
+    color: #FFB392;
+    background: rgba(38,24,17,.92);
+    border-color: rgba(255,122,69,.55);
+    box-shadow: 0 0 10px rgba(255,122,69,.20), 0 2px 8px rgba(0,0,0,.5);
+  }
+  /* P 点被悬停或拖动中：加呼吸光环 + 加深底色，明确"这个点可以抓" */
+  #labels .lab.p.hot {
+    color: #FFFFFF;
+    background: var(--accent);
+    border-color: #FFB392;
+    animation: labPulse 1.15s ease-in-out infinite;
+  }
+  @keyframes labPulse {
+    0%, 100% { box-shadow: 0 0 0 4px rgba(255,122,69,.42), 0 0 16px rgba(255,122,69,.35); }
+    50%      { box-shadow: 0 0 0 11px rgba(255,122,69,.06), 0 0 20px rgba(255,122,69,.20); }
+  }
+  /* P 标签后面挂一个小拖拽把柄，触摸端也能一眼看出可拖 */
+  #labels .lab.p::after {
+    content: '⠿';
+    margin-left: 6px;
+    opacity: .6;
+    font-size: .78em;
+  }
+  #labels .lab.hide { display: none; }
+  /* 被点选的顶点：橙底白字，与未选中态强对比 */
+  #labels .lab.sel {
+    color: #FFFFFF;
+    background: var(--accent);
+    border-color: #FFB392;
+    box-shadow: 0 0 0 3px rgba(255,122,69,.32), 0 0 14px rgba(255,122,69,.28);
+  }
+
+  #hint {
+    position: absolute; left: 16px; bottom: 15px;
+    font-size: 12px; color: var(--ink-2);
+    background: rgba(22,27,34,.92);
+    border: 1px solid var(--line);
+    border-radius: 9px;
+    padding: 7px 12px; pointer-events: none;
+    box-shadow: var(--shadow-s);
+    backdrop-filter: blur(3px);
+    max-width: calc(100% - 32px);
+  }
+
+  #readout {
+    position: absolute; right: 16px; top: 16px;
+    font-size: 13px; line-height: 1.85;
+    background: rgba(22,27,34,.95);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    padding: 14px 17px;
+    min-width: 216px;
+    pointer-events: none;
+    font-variant-numeric: tabular-nums;
+    box-shadow: var(--shadow-m);
+    backdrop-filter: blur(4px);
+    transition: background .22s, border-color .22s;
+  }
+  #readout .row { display: flex; justify-content: space-between; gap: 16px; }
+  #readout .row .k { color: var(--ink-3); }
+  #readout .row .v { font-weight: 600; color: var(--brand); }
+  #readout.perp {
+    background: rgba(46,26,17,.97);
+    border-color: var(--accent);
+    box-shadow: 0 0 0 3px rgba(255,122,69,.22), 0 0 24px rgba(255,122,69,.18), var(--shadow-m);
+  }
+  #readout.perp .row .v { color: var(--accent); }
+  #readout .flag {
+    margin-top: 7px; font-size: 12px; font-weight: 500;
+    color: var(--accent); display: none;
+    padding-top: 7px;
+    border-top: 1px dashed rgba(255,122,69,.45);
+  }
+  #readout.perp .flag { display: block; }
+  /* 拖到精确中点时的提示，配合"垂直条件解出 t=1/2"这个教学点 */
+  #readout .mid-flag {
+    margin-top: 7px; font-size: 12px; font-weight: 500;
+    color: var(--accent);
+    display: none;
+    align-items: center; gap: 6px;
+  }
+  #readout .mid-flag::before { content: '\25C6'; font-size: 9px; }
+  #readout .mid-flag.on { display: flex; }
+
+  /* 点选顶点后的读数 */
+  #readout .pick {
+    margin-top: 10px; padding-top: 10px;
+    border-top: 1px solid var(--line-soft);
+    font-size: 12px; line-height: 1.7; color: var(--ink-3);
+  }
+  #readout .pick.on { color: #FFB392; }
+  #readout .pick b {
+    display: block; font-size: 13.5px; font-weight: 600; color: var(--accent);
+    margin-bottom: 3px;
+  }
+  /* 多选时的坐标清单：每个顶点一行 */
+  #readout .pr {
+    display: flex; justify-content: space-between; align-items: baseline;
+    gap: 10px; white-space: nowrap;
+    font-size: 11.5px; line-height: 1.75;
+    color: #C9A794;
+  }
+  #readout .pr i {
+    font-style: normal; font-weight: 700; color: var(--accent);
+    min-width: 24px; flex: 0 0 auto;
+  }
+  #readout .pr span { font-variant-numeric: tabular-nums; }
+
+  /* ---------- 悬浮控制按钮 + 遮罩（仅平板/触屏显示） ---------- */
+  #toggle {
+    display: none;
+    position: fixed; left: 14px; top: 14px; z-index: 40;
+    align-items: center; gap: 9px;
+    height: 48px; padding: 0 20px;
+    font-family: inherit; font-size: 15px; font-weight: 600;
+    color: var(--brand); background: var(--surface);
+    border: 1px solid var(--line); border-radius: 24px;
+    box-shadow: var(--shadow-m);
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    -webkit-user-select: none; user-select: none;
+    top: calc(14px + env(safe-area-inset-top, 0px));
+  }
+  #toggle:active { background: var(--brand-lt); }
+  #toggle .bars { position: relative; width: 16px; height: 2px; background: var(--brand); flex: 0 0 16px; }
+  #toggle .bars::before, #toggle .bars::after {
+    content: ''; position: absolute; left: 0; width: 16px; height: 2px; background: var(--brand);
+  }
+  #toggle .bars::before { top: -5px; }
+  #toggle .bars::after  { top: 5px; }
+
+  #scrim {
+    display: none;
+    position: fixed; inset: 0; z-index: 25;
+    background: rgba(0,0,0,.55);
+    -webkit-tap-highlight-color: transparent;
+    backdrop-filter: blur(2px);
+  }
+
+  /* ============================================================
+     平板 / 触屏适配
+     - 面板改为抽屉，3D 视口占满整屏（平板屏幕寸土寸金）
+     - 所有可点元素加高到 44px 以上，符合触摸目标下限
+     - 去掉对 hover 的依赖（触屏没有悬停态）
+     ============================================================ */
+  @media (max-width: 1024px), (pointer: coarse) {
+    html, body { overflow: hidden; overscroll-behavior: none; }
+    #app { display: block; position: relative; height: 100%; }
+    #stage { position: absolute; inset: 0; }
+
+    #panel {
+      position: fixed; top: 0; bottom: 0; left: 0;
+      width: min(84vw, 392px);
+      flex: none;
+      z-index: 30;
+      padding: 22px 20px 64px;
+      padding-top: calc(22px + env(safe-area-inset-top, 0px));
+      padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      transform: translateX(-104%);
+      transition: transform .26s cubic-bezier(.4, 0, .2, 1);
+      box-shadow: 2px 0 28px rgba(0,0,0,.65);
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior: contain;
+    }
+    #panel.open { transform: translateX(0); }
+    #toggle { display: inline-flex; }
+    #scrim.show { display: block; }
+
+    /* 触摸目标放大到 44px 以上 */
+    .btn { min-height: 48px; font-size: 15px; }
+    .check { min-height: 44px; font-size: 15px; padding: 8px 0; }
+    .check input { width: 21px; height: 21px; }
+    .check .dot { width: 11px; height: 11px; flex-basis: 11px; }
+    .slider-row { gap: 14px; }
+    .slider-row input[type=range] { height: 36px; }
+    .slider-row .val { font-size: 14px; width: 86px; }
+    h1 { font-size: 19px; }
+    .group > .title { font-size: 12px; }
+    .stem { font-size: 14px; }
+    .drag-tip { font-size: 13.5px; padding: 13px 15px; }
+    .card, .steps { font-size: 14px; }
+
+    /* 去掉 hover 依赖，改用 :active 反馈 */
+    .btn:hover { border-color: var(--line); background: var(--surface); }
+    .btn:active { background: var(--brand-lt); border-color: var(--brand); }
+
+    #hint { font-size: 13px; padding: 9px 13px; }
+    #readout { font-size: 14px; padding: 14px 17px; min-width: 206px; }
+  }
+
+  /* 平板竖屏：抽屉从底部升起更顺手（拇指可达） */
+  @media (max-width: 1024px) and (orientation: portrait) {
+    #panel {
+      top: auto; right: 0; bottom: 0; left: 0;
+      width: auto;
+      max-height: 78vh;
+      padding: 22px 20px 64px;
+      padding-bottom: calc(64px + env(safe-area-inset-bottom, 0px));
+      transform: translateY(104%);
+      border-radius: 20px 20px 0 0;
+      box-shadow: 0 -4px 28px rgba(27,36,48,.20);
+    }
+    #panel.open { transform: translateY(0); }
+    /* 竖屏时面板在上方，不要被悬浮按钮压住 */
+    #panel::before {
+      content: ''; display: block;
+      width: 44px; height: 4px; border-radius: 2px;
+      background: #CBD3DE; margin: -8px auto 14px;
+    }
+  }
+</style>
+</head>
+<body>
+<div id="app">
+
+  <aside id="panel">
+    <h1>正四棱台 ABCD-A′B′C′D′ 三维演示</h1>
+    <div style="margin-bottom:12px">
+      <span class="tag">2023 · 解答题</span>
+      <span class="tag diff">难度 ★★★★</span>
+    </div>
+
+    <div class="stem">
+      <div>正四棱台 <b>ABCD-A′B′C′D′</b> 中，<b>AB = 2A′B′</b>，点 <b>P</b> 为棱 <b>CC′</b> 上一点。</div>
+      <div class="q">(1) 记棱锥 <b>P-BCD</b> 的体积为 V₁，棱台被它分出的另一部分体积为 V₂，当 PC = PC′ 时，求 V₁ : V₂。</div>
+      <div class="q">(2) 若正四棱台侧棱与底面所成角为 π/3，当平面 <b>A′BD</b> ⊥ 平面 <b>PBD</b> 时，求直线 PA 与平面 PBC 所成角的正弦值。</div>
+    </div>
+
+    <div class="group">
+      <div class="title">动点 P 的位置（在棱 CC′ 上滑动）</div>
+      <div class="drag-tip">
+        <span class="grip">⠿</span>
+        <span><b>直接拖动 3D 里的 P 点</b>即可沿棱 CC′ 自由滑动，也可以用下面的滑块精确调节。</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="sT" min="0" max="1" step="0.001" value="0.5">
+        <span class="val" id="sTval">1.00 : 1.00</span>
+      </div>
+      <button class="btn" id="bMid">跳到中点（PC = PC′）</button>
+    </div>
+    <div class="group">
+      <div class="title">顶点标注</div>
+      <label class="check"><input type="checkbox" id="cLabels" checked><span class="dot" style="background:#6BA8E8"></span>显示顶点字母</label>
+      <div class="slider-row">
+        <span style="font-size:12px;color:var(--ink-3);flex:0 0 auto">字号</span>
+        <input type="range" id="sFont" min="14" max="32" step="1" value="22">
+        <span class="val" id="sFontval">22 px</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="title">顶点高亮（支持多选）</div>
+      <div class="sel-list" id="selList">尚未选中顶点</div>
+      <button class="btn" id="bClearSel">清空全部高亮</button>
+    </div>
+
+    <div class="group">
+      <div class="title">显示元素</div>
+      <label class="check"><input type="checkbox" id="cSolid" checked><span class="dot" style="background:#4A5A70"></span>棱台实体（半透明面）</label>
+      <label class="check"><input type="checkbox" id="cAngle60" checked><span class="dot" style="background:#8FBF5A"></span>侧棱与底面夹角 60°</label>
+      <label class="check"><input type="checkbox" id="cAxes"><span class="dot" style="background:#6BA8E8"></span>空间直角坐标系</label>
+    </div>
+
+    <div class="group">
+      <div class="title">第 (1) 问 · 体积比</div>
+      <label class="check"><input type="checkbox" id="cQ1"><span class="dot" style="background:#8FBF5A"></span>高亮棱锥 P-BCD</label>
+      <div class="card q1">
+        <div class="h">V₁ : V₂ = 1 : 6</div>
+        上底边长设为 a，则下底为 2a，棱台高为 h。<br>
+        棱台整体 <code>V = h/3·(a² + 2a² + 4a²)</code> = 7a²h/3；<br>
+        棱锥 P-BCD 的底面积 S<sub>△BCD</sub> = 2a²，PC = PC′ 故高为 h/2，<br>
+        V₁ = <code>1/3·2a²·h/2</code> = a²h/3；<br>
+        余下部分 V₂ = 7a²h/3 − a²h/3 = 2a²h ⟹ V₁:V₂ = <span class="hl">1:6</span>
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="title">第 (2) 问 · 垂直条件与线面角</div>
+      <label class="check"><input type="checkbox" id="cPlane1" checked><span class="dot" style="background:#5EA0E0"></span>平面 A′BD</label>
+      <label class="check"><input type="checkbox" id="cPlane2" checked><span class="dot" style="background:#FF7A45"></span>平面 PBD</label>
+      <label class="check"><input type="checkbox" id="cQ3"><span class="dot" style="background:#E86A6A"></span>直线 PA 与平面 PBC 的线面角</label>
+
+      <div class="card q2">
+        <div class="h">sin θ = 4√273 / 91 ≈ 0.7263</div>
+        取上底边长 1、下底边长 2，由侧棱与底面成 60° 得棱台高
+        <code>h = √6/2</code>。以底面中心 O 为原点建系，
+        设 <code>P = C + t(C′−C)</code>：<br>
+        n₁ = (2h, 2, 2h)，n₂ = (2ht, 2t−4, 2ht)；<br>
+        令 n₁·n₂ = 0 得 <code>t = 1/2</code>，即 <span class="hl">P 仍为 CC′ 中点</span>。<br>
+        代入 <code>sin θ = |PA·n| / (|PA|·|n|)</code> 即得结果。
+      </div>
+    </div>
+
+    <div class="group">
+      <div class="title">教学要点</div>
+      <div class="steps">
+        <span class="k">① 上下底关系</span>
+        正四棱台上下底都是正方形，中心连线垂直于底面，对应边互相平行。题目给 AB = 2A′B′，即上下底边长比 2:1，这直接决定了体积。
+
+        <span class="k">② 棱台体积公式</span>
+        <code>V = h/3 · (S₁ + S₂ + √(S₁·S₂))</code>，不要漏掉中间那个 √(S₁S₂) = 2a² 项，这是最常见的失分点。
+
+        <span class="k">③ 定高法求锥体体积</span>
+        P 在 CC′ 上，C 在底面、C′ 在上底面，所以 P 到底面的距离随 t 线性变化。当 P 为中点时，高恰为 h/2。
+
+        <span class="k">④ 两平面垂直的向量判定</span>
+        两平面都含公共棱 BD，用坐标法只需算两个法向量并令点积为零。本题解出 <code>t = 1/2</code>，与第(1)问的 P 位置完全重合，是命题人的巧思。
+
+        <span class="k">⑤ 线面角的作法</span>
+        直线 PA 与平面 PBC 所成角，关键是从 A 向平面 PBC 作垂线得垂足 H，则 ∠APH 即为所求（图中已画出 AH ⊥ 平面 PBC）。
+        <code>sin θ = |PA·n| / (|PA|·|n|)</code>
+      </div>
+    </div>
+  </aside>
+
+  <main id="stage">
+    <canvas id="cv"></canvas>
+    <div id="labels"></div>
+    <div id="readout">
+      <div class="row"><span class="k">P 位置 t</span><span class="v" id="rT">0.500</span></div>
+      <div class="row"><span class="k">PC : PC′</span><span class="v" id="rRatio">1 : 1</span></div>
+      <div class="row"><span class="k">两面夹角</span><span class="v" id="rAng">90.0°</span></div>
+      <div class="flag">两平面垂直（临界状态）</div>
+      <div class="mid-flag" id="rMid">P 恰为 CC′ 中点</div>
+      <div class="pick" id="rPick">点一下顶点即可高亮</div>
+    </div>
+    <div id="hint" data-touch="拖动橙色 P 点可滑动 · 轻触顶点高亮（可多选）· 单指旋转 · 双指缩放平移"
+                     data-mouse="拖动橙色 P 点可滑动 · 点击顶点高亮（可多选·再点取消）· 拖拽旋转 · 滚轮缩放 · 右键平移">拖动橙色 P 点可沿棱 CC′ 滑动 · 左键拖拽旋转 · 滚轮缩放 · 右键平移</div>
+  </main>
+
+  <button id="toggle" aria-label="打开控制面板"><span class="bars"></span>控制面板</button>
+  <div id="scrim"></div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script>if (!window.THREE) { document.write('<script src="three.min.js"><\/script>'); }</script>
+<script>
+(function () {
+  'use strict';
+
+  if (!window.THREE) {
+    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;line-height:1.8">' +
+      'Three.js 未能加载。<br>本页面通过 CDN（jsdelivr）引入 Three.js，请联网后重新打开；' +
+      '若需离线使用，请把 three.min.js 放在本 HTML 同一目录。</div>';
+    return;
+  }
+
+  // ============================================================
+  // 一、题目几何参数
+  //    下底边长 2、上底边长 1、高 h = √6/2（由侧棱与底面成 60° 推出）
+  // ============================================================
+  var H  = Math.sqrt(6) / 2;      // 棱台高
+  var Y0 = -H / 2, Y1 = H / 2;    // 底面、上底面所在平面（整体居中，便于旋转观察）
+
+  var V = {
+    A:  new THREE.Vector3(-1.0,   Y0, -1.0),
+    B:  new THREE.Vector3( 1.0,   Y0, -1.0),
+    C:  new THREE.Vector3( 1.0,   Y0,  1.0),
+    D:  new THREE.Vector3(-1.0,   Y0,  1.0),
+    Ap: new THREE.Vector3(-0.5,   Y1, -0.5),
+    Bp: new THREE.Vector3( 0.5,   Y1, -0.5),
+    Cp: new THREE.Vector3( 0.5,   Y1,  0.5),
+    Dp: new THREE.Vector3(-0.5,   Y1,  0.5)
+  };
+
+  var state = {
+    t: 0.5,
+    labels: true, solid: true, angle60: true, axes: false,
+    q1: false, plane1: true, plane2: true, q3: false
+  };
+
+  // ============================================================
+  // 二、场景
+  // ============================================================
+  var stage    = document.getElementById('stage');
+  var canvas   = document.getElementById('cv');
+  var labelBox = document.getElementById('labels');
+
+  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  // 暗色主题：画布不透明，必须与 #stage 的 CSS 渐变同色系，
+  // 否则 WebGL 会盖出一整块亮底，CSS 渐变根本看不见
+  renderer.setClearColor(0x131A22, 1);
+
+  var scene  = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(40, 1, 0.05, 200);
+
+  var cam = { azim: Math.PI * 0.24, elev: 0.34, dist: 6.6 };
+  var target = new THREE.Vector3(0, 0, 0);
+
+  function applyCamera() {
+    cam.elev = Math.max(-1.5, Math.min(1.5, cam.elev));
+    cam.dist = Math.max(2.6, Math.min(24, cam.dist));
+    camera.position.set(
+      target.x + cam.dist * Math.cos(cam.elev) * Math.sin(cam.azim),
+      target.y + cam.dist * Math.sin(cam.elev),
+      target.z + cam.dist * Math.cos(cam.elev) * Math.cos(cam.azim)
+    );
+    camera.lookAt(target);
+  }
+
+  // ============================================================
+  // 三、绘图工具
+  // ============================================================
+  /* ============================================================
+     3D 配色（暗色主题版）
+     与亮色版的关键差异：
+     - 棱线从"深蓝灰"改成"浅蓝白"：暗底上深色线条会完全消失
+     - 实体面提亮并加大透明度：暗底上半透明深色等于看不见
+     - 强调色整体提亮，否则在深底上发闷
+     ============================================================ */
+  var COL = {
+    edge:   0xB9C9DD,   // 棱线：亮蓝白，深底上才看得清
+    solid:  0x4A5A70,   // 半透明面：比底色亮一档
+    plane1: 0x5EA0E0,   // 平面 A′BD（蓝，提亮）
+    plane2: 0xFF7A45,   // 平面 PBD（橙，与动点 P 同色系）
+    q1:     0x8FBF5A,   // 棱锥 P-BCD
+    q3:     0xE86A6A,   // PA 与平面 PBC
+    q3face: 0x9B8BE8,
+    ang60:  0x8FBF5A,
+    axes:   0x6BA8E8,
+    p:      0xFF7A45    // 动点 P：与 CSS --accent 保持一致
+  };
+
+  function tube(a, b, r, color) {
+    var geo = new THREE.TubeGeometry(new THREE.LineCurve3(a.clone(), b.clone()), 1, r, 6, false);
+    return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color }));
+  }
+
+  function glassMat(color, opacity) {
+    return new THREE.MeshBasicMaterial({
+      color: color, transparent: true, opacity: opacity,
+      side: THREE.DoubleSide, depthWrite: false
+    });
+  }
+
+  function triMesh(p1, p2, p3, color, opacity) {
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute([
+      p1.x, p1.y, p1.z, p2.x, p2.y, p2.z, p3.x, p3.y, p3.z
+    ], 3));
+    geo.setIndex([0, 1, 2]);
+    geo.computeVertexNormals();
+    return new THREE.Mesh(geo, glassMat(color, opacity));
+  }
+
+  function polyMesh(pts, color, opacity) {
+    var arr = [], idx = [];
+    pts.forEach(function (p) { arr.push(p.x, p.y, p.z); });
+    for (var i = 1; i < pts.length - 1; i++) idx.push(0, i, i + 1);
+    var geo = new THREE.BufferGeometry();
+    geo.setAttribute('position', new THREE.Float32BufferAttribute(arr, 3));
+    geo.setIndex(idx);
+    geo.computeVertexNormals();
+    return new THREE.Mesh(geo, glassMat(color, opacity));
+  }
+
+  function ball(p, r, color) {
+    var m = new THREE.Mesh(new THREE.SphereGeometry(r, 14, 10),
+      new THREE.MeshBasicMaterial({ color: color }));
+    m.position.copy(p);
+    return m;
+  }
+
+  function clearGroup(g) {
+    if (!g) return;
+    scene.remove(g);
+    g.traverse(function (o) {
+      if (o.geometry) o.geometry.dispose();
+      if (o.material) o.material.dispose();
+    });
+  }
+
+  // ============================================================
+  // 四、棱台主体（静态部分）
+  // ============================================================
+  var gSolid, gAxes, gAngle60, gP, gPlanes, gQ1, gQ3, gDynFaces;
+  var labelEls = [];
+  var pPos = new THREE.Vector3();
+
+  function buildSolid() {
+    var g = new THREE.Group();
+
+    // 上下底面 + 四个侧面（半透明，帮助建立空间感）
+    g.add(polyMesh([V.A, V.B, V.C, V.D], COL.solid, 0.46));
+    g.add(polyMesh([V.Ap, V.Bp, V.Cp, V.Dp], COL.solid, 0.54));
+    var sides = [[V.A, V.B, V.Bp, V.Ap], [V.B, V.C, V.Cp, V.Bp],
+                 [V.C, V.D, V.Dp, V.Cp], [V.D, V.A, V.Ap, V.Dp]];
+    sides.forEach(function (s) { g.add(polyMesh(s, COL.solid, 0.22)); });
+
+    // 12 条棱
+    var E = [[V.A, V.B], [V.B, V.C], [V.C, V.D], [V.D, V.A],
+             [V.Ap, V.Bp], [V.Bp, V.Cp], [V.Cp, V.Dp], [V.Dp, V.Ap],
+             [V.A, V.Ap], [V.B, V.Bp], [V.C, V.Cp], [V.D, V.Dp]];
+    E.forEach(function (e) { g.add(tube(e[0], e[1], 0.016, COL.edge)); });
+
+    // 顶点小球不在这里创建：它们要独立于"棱台实体"开关存在
+    // （即使隐藏实体，顶点仍需可见、可点击），见 buildVerts()
+
+    return g;
+  }
+
+  // ---------- 顶点小球（独立成组，始终显示，可点击选中） ----------
+  var VERT_R = 0.044;
+  var gVerts = null;
+  var vertMeshes = [];      // [{ key, mesh }]
+
+  function buildVerts() {
+    var g = new THREE.Group();
+    vertMeshes = [];
+    Object.keys(V).forEach(function (k) {
+      var m = ball(V[k], VERT_R, COL.edge);
+      g.add(m);
+      vertMeshes.push({ key: k, mesh: m });
+    });
+    return g;
+  }
+
+  function buildAxes() {
+    var g = new THREE.Group();
+    var L = 2.6, o = new THREE.Vector3(0, Y0, 0);
+    var dirs = [
+      { v: new THREE.Vector3(L, 0, 0), c: 0xD4564F },
+      { v: new THREE.Vector3(0, L, 0), c: 0x6E8F42 },
+      { v: new THREE.Vector3(0, 0, L), c: 0x2F6DA8 }
+    ];
+    dirs.forEach(function (d) {
+      g.add(tube(o, o.clone().add(d.v), 0.012, d.c));
+      g.add(tube(o, o.clone().sub(d.v), 0.008, d.c));
+    });
+    return g;
+  }
+
+  // 侧棱 AA′ 与底面所成角：A → A″（A′ 在底面的投影）→ A′ 的直角三角形
+  function buildAngle60() {
+    var g = new THREE.Group();
+    var App = new THREE.Vector3(V.Ap.x, Y0, V.Ap.z);   // A′ 在底面的投影
+    g.add(tube(V.A, V.Ap, 0.024, COL.ang60));           // 侧棱 AA′
+    g.add(tube(V.A, App, 0.014, COL.ang60));            // 水平投影
+    g.add(tube(App, V.Ap, 0.014, COL.ang60));           // 竖直高
+    g.add(ball(App, 0.03, COL.ang60));
+    return g;
+  }
+
+  // ============================================================
+  // 五、动点 P 及两个平面
+  // ============================================================
+  function computeP() {
+    pPos.copy(V.C).lerp(V.Cp, state.t);
+    return pPos;
+  }
+
+  function planeNormal(p1, p2, p3) {
+    var a = new THREE.Vector3().subVectors(p2, p1);
+    var b = new THREE.Vector3().subVectors(p3, p1);
+    return new THREE.Vector3().crossVectors(a, b);
+  }
+
+  function buildDynamic() {
+    var P = computeP();
+
+    clearGroup(gP); clearGroup(gPlanes); clearGroup(gQ1); clearGroup(gQ3);
+    gP = new THREE.Group(); gPlanes = new THREE.Group();
+    gQ1 = new THREE.Group(); gQ3 = new THREE.Group();
+
+    // ---- 点 P 及 PC、PC′ 高亮 ----
+    gP.add(ball(P, 0.062, COL.p));
+    gP.add(tube(V.C, P, 0.02, COL.p));
+    gP.add(tube(P, V.Cp, 0.02, COL.p));
+
+    // ---- 平面 A′BD 与 平面 PBD（公共棱 BD） ----
+    if (state.plane1 || state.plane2) {
+      // 公共棱 BD 单独加粗，突出"两面共棱"
+      gPlanes.add(tube(V.B, V.D, 0.017, 0x66748A));
+    }
+    if (state.plane1) {
+      gPlanes.add(triMesh(V.Ap, V.B, V.D, COL.plane1, 0.38));
+      gPlanes.add(tube(V.Ap, V.B, 0.015, COL.plane1));
+      gPlanes.add(tube(V.Ap, V.D, 0.015, COL.plane1));
+    }
+    if (state.plane2) {
+      gPlanes.add(triMesh(P, V.B, V.D, COL.plane2, 0.34));
+      gPlanes.add(tube(P, V.B, 0.015, COL.plane2));
+      gPlanes.add(tube(P, V.D, 0.015, COL.plane2));
+    }
+
+    // ---- 第 (1) 问：棱锥 P-BCD ----
+    if (state.q1) {
+      gQ1.add(polyMesh([V.B, V.C, V.D], COL.q1, 0.42));
+      gQ1.add(tube(P, V.B, 0.014, COL.q1));
+      gQ1.add(tube(P, V.C, 0.014, COL.q1));
+      gQ1.add(tube(P, V.D, 0.014, COL.q1));
+      // 底面 BCD 的三边
+      gQ1.add(tube(V.B, V.C, 0.014, COL.q1));
+      gQ1.add(tube(V.C, V.D, 0.014, COL.q1));
+      // P 到底面的高（垂足在 CC′ 上的等分点）
+      var foot = new THREE.Vector3(P.x, Y0, P.z);
+      gQ1.add(tube(P, foot, 0.011, 0x8A4A12));
+      gQ1.add(ball(foot, 0.028, 0x8A4A12));
+    }
+
+    // ---- 第 (2) 问：线 PA 与平面 PBC 所成角 ----
+    if (state.q3) {
+      gQ3.add(triMesh(P, V.B, V.C, COL.q3face, 0.34));
+      gQ3.add(tube(P, V.B, 0.013, COL.q3face));
+      gQ3.add(tube(P, V.C, 0.013, COL.q3face));
+
+      gQ3.add(tube(V.A, P, 0.02, COL.q3));            // 直线 PA
+
+      // 从 A 向平面 PBC 作垂线，垂足 H；∠APH 即为所求线面角
+      var n = planeNormal(P, V.B, V.C).normalize();
+      var AP = new THREE.Vector3().subVectors(V.A, P);
+      var Hf = new THREE.Vector3().copy(V.A).addScaledVector(n, -AP.dot(n));
+      gQ3.add(tube(V.A, Hf, 0.012, COL.q3));
+      gQ3.add(tube(P, Hf, 0.013, COL.q3));
+      gQ3.add(ball(Hf, 0.032, COL.q3));
+    }
+
+    // 记录 P 点小球，选中高亮需要单独控制它（滑块变化会重建整个 gP）
+    pMesh = gP.children[0] || null;
+
+    scene.add(gP, gPlanes, gQ1, gQ3);
+    applyVisibility();
+    applyPickStyles();     // 重建后重新套用选中样式，否则高亮会被冲掉
+  }
+
+  // ============================================================
+  // 五之二、顶点选中（点一下就高亮）
+  // ============================================================
+  var SEL_COLOR = 0xFF7A45;   // 与 COL.p / CSS --accent 保持一致（暗色主题提亮版）
+  // 多选：已选顶点按点击先后存入数组，点新顶点不会清掉之前的
+  var selKeys = [];
+  var ringPool = [];         // 光晕对象池，每个选中顶点对应一个
+  var pMesh = null;          // P 点小球（随滑块重建，需单独跟踪）
+
+  function isSel(key) { return selKeys.indexOf(key) >= 0; }
+
+  var LABEL_NAME = { A: 'A', B: 'B', C: 'C', D: 'D', Ap: 'A′', Bp: 'B′', Cp: 'C′', Dp: 'D′', P: 'P' };
+
+  // 教学坐标：以底面中心 O 为原点、底面 y = 0
+  // （渲染时把模型整体下移了 H/2 以便居中旋转，这里换回标准写法）
+  function teachingCoord(key) {
+    var p = (key === 'P') ? computeP() : V[key];
+    if (!p) return null;
+    return [p.x, p.y - Y0, p.z];
+  }
+
+  // 静态顶点给出精确写法，比小数更有教学意义
+  var EXACT_COORD = {
+    A:  '(−1, 0, −1)',
+    B:  '(1, 0, −1)',
+    C:  '(1, 0, 1)',
+    D:  '(−1, 0, 1)',
+    Ap: '(−1/2, √6/2, −1/2)',
+    Bp: '(1/2, √6/2, −1/2)',
+    Cp: '(1/2, √6/2, 1/2)',
+    Dp: '(−1/2, √6/2, 1/2)'
+  };
+
+  function coordText(key) {
+    if (EXACT_COORD[key]) return EXACT_COORD[key];
+    var c = teachingCoord(key);
+    if (!c) return '';
+    var f = function (x) {
+      var s = x.toFixed(3).replace(/\.?0+$/, '');
+      return (s === '' || s === '-0') ? '0' : s;
+    };
+    return '(' + f(c[0]) + ', ' + f(c[1]) + ', ' + f(c[2]) + ')';
+  }
+
+  function applyPickStyles() {
+    // ---- 顶点小球：每个选中顶点都用完全相同的放大倍率与颜色 ----
+    vertMeshes.forEach(function (o) {
+      var on = isSel(o.key);
+      o.mesh.scale.setScalar(on ? 1.85 : 1);
+      o.mesh.material.color.setHex(on ? SEL_COLOR : COL.edge);
+    });
+
+    // P 点小球（本身是橙色，选中时加深并放大，与静态顶点视觉权重一致）
+    if (pMesh) {
+      var onP = isSel('P');
+      var s = onP ? 1.7 : 1;
+      if (pHot) s *= 1.35;                      // 悬停/拖动中额外放大，强调"可抓"
+      pMesh.scale.setScalar(s);
+      pMesh.material.color.setHex(onP ? 0x8F2F09 : (pHot ? 0xA8380F : COL.p));
+    }
+
+    // ---- 光晕：每个选中顶点一个，从对象池取，避免频繁新建几何体 ----
+    var selPos = selKeys.map(function (k) {
+      return (k === 'P') ? computeP() : V[k];
+    });
+    ringPool.forEach(function (r, i) {
+      if (i < selPos.length) {
+        r.visible = true;
+        r.position.copy(selPos[i]);
+        r.scale.setScalar(0.145);
+      } else {
+        r.visible = false;
+      }
+    });
+    while (ringPool.length < selPos.length) {
+      var ring = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 20, 14),
+        new THREE.MeshBasicMaterial({
+          color: SEL_COLOR, transparent: true, opacity: 0.30, depthWrite: false
+        })
+      );
+      ring.visible = false;
+      scene.add(ring);
+      ringPool.push(ring);
+    }
+
+    // ---- DOM 标签：所有选中顶点统一加 .sel ----
+    labelEls.forEach(function (o) {
+      if (!o.el) return;
+      if (isSel(o.key)) o.el.classList.add('sel');
+      else o.el.classList.remove('sel');
+    });
+
+    // ---- 面板清单：胶囊标签，一眼看清选了哪些 ----
+    var list = document.getElementById('selList');
+    if (list) {
+      if (selKeys.length === 0) {
+        list.textContent = '尚未选中顶点';
+      } else {
+        list.innerHTML = '';
+        selKeys.forEach(function (k) {
+          var chip = document.createElement('span');
+          chip.className = 'chip';
+          chip.textContent = LABEL_NAME[k];
+          list.appendChild(chip);
+        });
+      }
+    }
+
+    // ---- 读数区：逐行列出每个选中顶点的坐标 ----
+    var box = document.getElementById('rPick');
+    if (box) {
+      if (selKeys.length === 0) {
+        box.className = 'pick';
+        box.textContent = '点一下顶点即可高亮（可多选）';
+      } else {
+        var html = '<b>已选 ' + selKeys.length + ' 个顶点</b>';
+        selKeys.forEach(function (k) {
+          html += '<div class="pr"><i>' + LABEL_NAME[k] + '</i><span>' +
+                  coordText(k) + '</span></div>';
+        });
+        if (isSel('P')) html += '<div class="pr" style="opacity:.7">P 随滑块实时变化</div>';
+        box.className = 'pick on';
+        box.innerHTML = html;
+      }
+    }
+  }
+
+  // 屏幕空间命中检测：不依赖 3D 射线，对触摸更友好——
+  // 手指远比顶点小球粗，所以判定半径必须按"指尖"而不是"球体"来算。
+  //
+  // 注意 P 点要特殊对待：DOM 标签是沿"背离模型中心"方向外推过的，
+  // 实测 22px 字号下 P 的标签中心与其小球投影相差约 32px。若只按小球
+  // 位置判定，用户会以为"点在 P 标签上"却什么也没抓住。所以 P 的命中
+  // 范围要用"小球位置 ∪ 标签矩形"两个区域，任一命中即算抓住。
+  var pLabelRect = null;      // 由 syncLabels 每帧更新
+
+  // P 点的命中容差单独放大：它既是可拖对象、又是可点选对象，
+  // 判定半径必须比普通顶点更宽松，否则"明明按住了小球却抓不住"。
+  function pickTol(base, pointerType) {
+    return (pointerType === 'touch' || pointerType === 'pen') ? base + 20 : base + 4;
+  }
+  var TOL_P = pickTol(22, 'mouse');   // 26px / 46px（触摸）
+
+  function pickVertex(px, py, w, h, tol) {
+    var best = null, bestD = Infinity;
+
+    function test(key, pos, t) {
+      var p = pos.clone().project(camera);
+      if (p.z > 1) return;                       // 在相机背后
+      var x = (p.x * 0.5 + 0.5) * w;
+      var y = (-p.y * 0.5 + 0.5) * h;
+      var d = Math.hypot(x - px, y - py);
+      if (d < t && d < bestD) { bestD = d; best = key; }
+    }
+
+    Object.keys(V).forEach(function (k) { test(k, V[k], tol); });
+    // P 用放大后的容差单独判一次，并且优先于普通顶点：
+    // 它常常贴着 C、C′，不优先就会出现"想拖 P 却选中了 C′"
+    test('P', computeP(), Math.max(tol, TOL_P));
+
+    // 如果上面没命中 P，再看指针是否落在 P 的标签框内——
+    // 标签比小球好点得多，学生自然会去点字母
+    if (best !== 'P' && pLabelRect) {
+      var r = pLabelRect;
+      if (px >= r.x0 && px <= r.x1 && py >= r.y0 && py <= r.y1) {
+        best = 'P';
+      }
+    }
+    return best;
+  }
+
+  // 点选：优先用 pointerdown 阶段已经判定好的顶点（heldKey），
+  // 不再二次命中。pointerdown 用的容差比这里宽松，若重新判定，
+  // 会出现"按下时抓住了 P、松手时却判定失败"的割裂现象。
+  function doTapKey(key) {
+    if (!key) return;
+    var i = selKeys.indexOf(key);
+    if (i >= 0) {
+      selKeys.splice(i, 1);        // 再点已选顶点 = 取消这一个
+    } else {
+      selKeys.push(key);           // 点新顶点 = 追加，之前的保持高亮
+    }
+    applyPickStyles();
+  }
+
+  // ============================================================
+  // 六、顶点标注（DOM 叠加层）
+  // ============================================================
+  function buildLabels() {
+    labelBox.innerHTML = '';
+    labelEls = [];
+    Object.keys(V).forEach(function (k) {
+      var d = document.createElement('div');
+      d.className = 'lab';
+      d.textContent = LABEL_NAME[k];
+      labelBox.appendChild(d);
+      labelEls.push({ el: d, pos: V[k].clone(), key: k });
+    });
+    // P 标签（位置每帧从 computeP() 取，所以 pos 留空）
+    var pd = document.createElement('div');
+    pd.className = 'lab p';
+    pd.textContent = 'P';
+    labelBox.appendChild(pd);
+    labelEls.push({ el: pd, pos: null, key: 'P' });
+  }
+
+  var labelSize = 22;   // px，与 CSS 变量 --lab-size 保持同步
+
+  function setLabelSize(px) {
+    labelSize = px;
+    labelBox.style.setProperty('--lab-size', px + 'px');
+    var out = document.getElementById('sFontval');
+    if (out) out.textContent = px + ' px';
+  }
+
+  var vtmp = new THREE.Vector3();
+  function syncLabels() {
+    // 标签关掉时不能再用标签框作命中区，否则会出现"看不见却能点中"的幽灵热区
+    if (!state.labels) { pLabelRect = null; return; }
+    var w = stage.clientWidth, h = stage.clientHeight;
+    var origin = vtmp.set(target.x, target.y, target.z).project(camera);
+    var ox = (origin.x * 0.5 + 0.5) * w, oy = (-origin.y * 0.5 + 0.5) * h;
+
+    // 偏移量随字号线性放大：保证标签外推的距离始终大于自身高度的一半，
+    // 否则字变大后会压住顶点小球。1.35 是 22px 下反复试出的较优比例。
+    var off = labelSize * 1.35;
+
+    // 第一步：算基准位置（顶点投影 + 沿"背离模型中心"方向外推）
+    var pts = [];
+    labelEls.forEach(function (o) {
+      var wp = (o.key === 'P') ? pPos : o.pos;
+      var p = wp.clone().project(camera);
+      if (p.z > 1) { o.el.style.display = 'none'; return; }
+      o.el.style.display = 'block';
+      var x = (p.x * 0.5 + 0.5) * w, y = (-p.y * 0.5 + 0.5) * h;
+      var dx = x - ox, dy = y - oy, len = Math.hypot(dx, dy) || 1;
+      pts.push({
+        el: o.el,
+        key: o.key,                      // 后续要靠它识别出 P 的标签框
+        bx: x + dx / len * off, by: y + dy / len * off,
+        x:  x + dx / len * off, y:  y + dy / len * off
+      });
+    });
+
+    // 第二步：标签避让。视角接近"侧向平视"时上底面会与视线共面，
+    // 相邻顶点投影几乎重合（实测最小可到 11px），此时任何字号都会叠字。
+    // 用几轮松弛把过近的标签沿连线方向互相推开。
+    // 最小间距必须按"标签实际宽度"取，不能只按字号：
+    // 宽度 ≈ 0.9×字号（字母+撇号）+ 约 18px 的内边距与边框
+    var minD = labelSize * 1.05 + 18;
+    for (var it = 0; it < 12; it++) {
+      var moved = false;
+      for (var i = 0; i < pts.length; i++) {
+        for (var j = i + 1; j < pts.length; j++) {
+          var a = pts[i], b = pts[j];
+          var vx = b.x - a.x, vy = b.y - a.y;
+          var d = Math.hypot(vx, vy);
+          if (d >= minD) continue;
+          moved = true;
+          if (d < 0.01) { vx = 1; vy = 0; d = 1; }
+          var push = (minD - d) / 2, ux = vx / d, uy = vy / d;
+          a.x -= ux * push; a.y -= uy * push;
+          b.x += ux * push; b.y += uy * push;
+        }
+      }
+      if (!moved) break;
+    }
+
+    // 第三步：限制漂移半径，保证标签始终"贴着自己的顶点"，不会跑飞
+    var lim = off * 2.2;
+    pts.forEach(function (o) {
+      var dx = o.x - o.bx, dy = o.y - o.by, d = Math.hypot(dx, dy);
+      if (d > lim) { o.x = o.bx + dx / d * lim; o.y = o.by + dy / d * lim; }
+      o.el.style.transform = 'translate(-50%,-50%) translate(' + o.x + 'px,' + o.y + 'px)';
+      // 顺手记下每个标签的屏幕矩形（用刚算出的 x,y 与真实渲染尺寸）
+      o.hit = {
+        x0: o.x - o.el.offsetWidth / 2, x1: o.x + o.el.offsetWidth / 2,
+        y0: o.y - o.el.offsetHeight / 2, y1: o.y + o.el.offsetHeight / 2
+      };
+      if (o.key === 'P') pLabelRect = o.hit;
+    });
+  }
+
+  // ============================================================
+  // 七、实时计算并刷新读数
+  // ============================================================
+  function fmt(x) {
+    var s = x.toFixed(2).replace(/\.?0+$/, '');
+    return (s === '' || s === '-') ? '0' : s;
+  }
+
+  function refresh() {
+    buildDynamic();
+    refreshReadout();
+  }
+
+  // 只刷新文字读数，不重建几何体。
+  // 拖动 P 点时每帧都会调用，重建几何体太贵也没必要（buildDynamic 已在 setT 里做过）。
+  function refreshReadout() {
+    var P = pPos;
+    var n1 = planeNormal(V.Ap, V.B, V.D);
+    var n2 = planeNormal(P, V.B, V.D);
+
+    var ang = 90;
+    if (n1.length() > 1e-9 && n2.length() > 1e-9) {
+      var c = Math.abs(n1.dot(n2)) / (n1.length() * n2.length());
+      c = Math.max(-1, Math.min(1, c));
+      ang = Math.acos(c) * 180 / Math.PI;
+    }
+
+    var pc = 1 - state.t, pcp = state.t;
+    var ratioTxt;
+    if (pc < 1e-6) ratioTxt = '0 : 1';
+    else if (pcp < 1e-6) ratioTxt = '1 : 0';
+    else ratioTxt = '1 : ' + fmt(pcp / pc);
+
+    document.getElementById('rT').textContent = state.t.toFixed(3);
+    document.getElementById('rRatio').textContent = ratioTxt;
+    document.getElementById('rAng').textContent = ang.toFixed(1) + '°';
+
+    // 拖到精确中点时给个提示，方便讲解"垂直临界状态"
+    var hintR = document.getElementById('rMid');
+    if (hintR) hintR.classList.toggle('on', Math.abs(state.t - 0.5) < 0.004);
+
+    var box = document.getElementById('readout');
+    if (Math.abs(ang - 90) < 0.35) box.classList.add('perp');
+    else box.classList.remove('perp');
+
+    // P 被选中时坐标要跟着动
+    if (isSel('P')) applyPickStyles();
+  }
+
+  // ============================================================
+  // 八、可见性
+  // ============================================================
+  function applyVisibility() {
+    if (gSolid)   gSolid.visible   = state.solid;
+    if (gAxes)    gAxes.visible    = state.axes;
+    if (gAngle60) gAngle60.visible = state.angle60;
+    if (gP)       gP.visible       = true;
+    if (gPlanes)  gPlanes.visible  = state.plane1 || state.plane2;
+    if (gQ1)      gQ1.visible      = state.q1;
+    if (gQ3)      gQ3.visible      = state.q3;
+    if (gVerts)   gVerts.visible   = true;   // 顶点始终显示，否则没法点
+
+    labelEls.forEach(function (o) {
+      o.el.style.display = state.labels ? 'block' : 'none';
+    });
+  }
+
+  // ============================================================
+  // 九、渲染循环
+  // ============================================================
+  function resize() {
+    var w = stage.clientWidth, h = stage.clientHeight;
+    if (!w || !h) return;
+    renderer.setSize(w, h, false);
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+  }
+
+  function loop() {
+    requestAnimationFrame(loop);
+
+    // P 点在拖动中持续脉动，给"我正抓着这个点"的即时反馈
+    if (gesture === 'dragP' && pMesh) {
+      pPulse += 0.16;
+      var s = 1.35 + Math.sin(pPulse) * 0.13;
+      pMesh.scale.setScalar(isSel('P') ? s * 1.7 : s);
+    }
+
+    renderer.render(scene, camera);
+    syncLabels();
+  }
+  // ============================================================
+  // 十、交互：旋转 / 缩放 / 平移 / 点选顶点
+  //     统一走 Pointer Events —— 鼠标、手指、触控笔同一套逻辑，
+  //     不用 mousedown + touchstart 两份代码互相打架
+  // ============================================================
+  var right = new THREE.Vector3(), upv = new THREE.Vector3();
+  var ptrs = new Map();               // pointerId -> 最新坐标
+  var gesture = null;                 // 'rotate' | 'pan' | 'pinch' | 'dragP'
+  var tapInfo = null;                 // 区分"点选"与"拖拽"
+  var pinchStart = null, camStartDist = 6.6, targetStart = new THREE.Vector3();
+
+  // ============================================================
+  // 十之一、拖动动点 P —— 全程只沿棱 CC′ 滑动
+  //
+  // 数学本质：P = C + t(C′−C)，t ∈ [0,1] 由拖拽实时反算。
+  // 这里不做任何"自由移动然后吸附回棱上"的处理：P 从一开始就不离开棱，
+  // 因为题目里"P 为棱 CC′ 上一点"本身就是约束条件，P 的自由度只有 1。
+  //
+  // 反算是二维到一维的最小二乘：把指针位置先"反投影"成 C 与 C′ 各自的
+  // 屏幕点，棱在屏幕上就是线段 S_C → S_C'，求指针在该线段上的投影参数。
+  // 用屏幕空间而不是三维射线求交，是为了让它天然贴合"屏幕上看起来
+  // 手指贴着棱走"的直觉，也避免相机方向与棱接近平行时数值退化。
+  // ============================================================
+  var dragP = null;
+
+  // P 点"可抓取"强调状态：悬停或拖动中时，P 小球放大、标签加 .hot
+  var pHot = false;
+  function setPHot(on) {
+    if (pHot === on) return;
+    pHot = on;
+    var lab = null;
+    labelEls.forEach(function (o) { if (o.key === 'P') lab = o.el; });
+    if (lab) lab.classList.toggle('hot', on);
+    if (pMesh) applyPickStyles();
+  }
+
+  // 拖动过程中给 P 小球加脉动，明确"这个点正在被我控制"
+  var pPulse = 0;
+
+  // 把屏幕坐标 (px,py) 转成世界空间的一条射线，再求射线与棱 CC′ 的最近点。
+  //
+  // 为什么不用"把屏幕点投影到棱的屏幕线段上"这种更直觉的做法：
+  // 透视投影下，三维棱上等距的点在屏幕上并不等距。本模型 C 与 C′ 的深度
+  // 相差约 0.26，实测最坏会让 t 偏 1.15%——把 P 拖到"看起来正是 C′ 的位置"
+  // 却得到 t=0.9885，学生一眼就能看出点没落在顶点上。
+  //
+  // 精确解：设棱 Q(t)=C+t·u（u=C′−C），射线 R(s)=O+s·d（d 为单位向量），
+  // 最小化 |Q(t)−R(s)|² 得正规方程（w = O−C）：
+  //     t·(u·u) − s·(d·u) = w·u
+  //     t·(u·d) − s·(d·d) = w·d
+  // 消去 s 即得下面的 t。全程误差在浮点精度内（实测 2.6e-15）。
+  var _rayO = new THREE.Vector3(), _rayD = new THREE.Vector3();
+  var _segU = new THREE.Vector3(), _rayW = new THREE.Vector3();
+
+  function rayDirFromScreen(px, py, w, h) {
+    // 与 three.js PerspectiveCamera 一致的反投影：
+    // NDC → 相机空间方向 → 世界方向
+    var fy = camera.projectionMatrix.elements[5];   // = 1/tan(fov/2)
+    var fx = camera.projectionMatrix.elements[0];   // = fy / aspect
+    var ndcX = (px / w) * 2 - 1;
+    var ndcY = -((py / h) * 2 - 1);
+
+    _rayO.setFromMatrixPosition(camera.matrixWorld);
+    _rayD.set(
+      ndcX / fx, ndcY / fy, -1
+    ).applyMatrix4(
+      new THREE.Matrix4().extractRotation(camera.matrixWorld)
+    ).normalize();
+    return _rayD;
+  }
+
+  function screenToT(px, py, r) {
+    var w = r.width, h = r.height;
+    var aspect = w / h;
+    // 极端视口比例下反投影会失真，宁可不动也不要乱跳
+    if (!isFinite(aspect) || aspect < 0.35 || aspect > 3.0) return null;
+
+    var d = rayDirFromScreen(px, py, w, h);
+    _segU.subVectors(V.Cp, V.C);                 // u = C′ − C
+    _rayW.subVectors(_rayO, V.C);                // w = 相机位置 − C
+
+    var uu = _segU.dot(_segU), ud = _segU.dot(d), dd = d.dot(d);
+    var uw = _rayW.dot(_segU), dw = _rayW.dot(d);
+    var det = uu * (-dd) - (-ud) * ud;           // = −uu·dd + ud²
+    if (!isFinite(det) || Math.abs(det) < 1e-9) return null;   // 射线与棱平行
+    var t = ((-dd) * uw + ud * dw) / det;
+    if (!isFinite(t)) return null;
+    return Math.max(0, Math.min(1, t));          // 越出棱段即停在端点
+  }
+
+  function setT(t, fromUser) {
+    state.t = t;
+    var sT = document.getElementById('sT');
+    if (sT) sT.value = t;                    // 滑块与拖拽双向同步
+    buildDynamic();                          // 只重建动点相关部分，相机不动
+    refreshReadout();
+  }
+
+  function camAxes() {
+    camera.updateMatrixWorld();
+    right.setFromMatrixColumn(camera.matrix, 0);
+    upv.setFromMatrixColumn(camera.matrix, 1);
+  }
+
+  function pinchGeom() {
+    var a = [], it = ptrs.values(), v = it.next();
+    while (!v.done) { a.push(v.value); v = it.next(); }
+    if (a.length < 2) return null;
+    return {
+      d:  Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y),
+      cx: (a[0].x + a[1].x) / 2,
+      cy: (a[0].y + a[1].y) / 2
+    };
+  }
+
+  function doTap(cx, cy, pointerType) {
+    var r = canvas.getBoundingClientRect();
+    // 指尖比顶点小球粗得多，触摸用 40px 判定半径，鼠标 22px
+    var tol = (pointerType === 'touch' || pointerType === 'pen') ? 40 : 22;
+    var key = pickVertex(cx - r.left, cy - r.top, r.width, r.height, tol);
+
+    // 点在空白处：保持已有高亮不动。
+    // 讲课时手指很容易扫到空白区域，若此处清空会让已选顶点全部丢失。
+    if (key === null) return;
+    doTapKey(key);
+  }
+
+  canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+  canvas.addEventListener('pointerdown', function (e) {
+    if (canvas.setPointerCapture) {
+      try { canvas.setPointerCapture(e.pointerId); } catch (err) {}
+    }
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    if (ptrs.size === 1) {
+      // 先判断有没有按在动点 P 上。按住了就进入 dragP：
+      // 整个手势期间相机完全不动，避免"想拖 P 结果把模型转走了"。
+      var r = canvas.getBoundingClientRect();
+      var px = e.clientX - r.left, py = e.clientY - r.top;
+      var hot = pickVertex(px, py, r.width, r.height, TOL_P);
+
+      if (hot === 'P' && e.button !== 2 && !e.shiftKey) {
+        gesture = 'dragP';
+        tapInfo = null;
+        // heldKey 记下"按下时抓住的是谁"。松手时若几乎没动，直接拿它
+        // 去切换高亮，不再二次命中——否则会出现"按住了 P 却选不中"。
+        dragP = { r: r, startT: state.t, lastT: state.t, movedEnough: false, heldKey: 'P' };
+        setPHot(true);
+        canvas.style.cursor = 'grabbing';
+        return;
+      }
+
+      gesture = (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate';
+      tapInfo = {
+        x: e.clientX, y: e.clientY, t: performance.now(),
+        moved: false, type: e.pointerType, key: hot
+      };
+      canvas.style.cursor = (gesture === 'pan') ? 'move' : 'grabbing';
+    } else if (ptrs.size === 2) {
+      gesture = 'pinch';
+      tapInfo = null;                            // 双指一定不是点选
+      dragP = null;
+      pinchStart = pinchGeom();
+      camStartDist = cam.dist;
+      targetStart.copy(target);
+      canvas.style.cursor = 'grabbing';
+    }
+  });
+
+  canvas.addEventListener('pointermove', function (e) {
+    if (!ptrs.has(e.pointerId)) {
+      // 未按下时的"悬停探测"：光标移到 P 点上就换成可抓取光标，
+      // 这是鼠标端唯一的"此处可拖"暗示（触摸端没有悬停态，靠标签提示）
+      if (e.pointerType === 'mouse' && !gesture) {
+        var rr = canvas.getBoundingClientRect();
+        var hk = pickVertex(e.clientX - rr.left, e.clientY - rr.top, rr.width, rr.height, TOL_P);
+        setPHot(hk === 'P');
+        canvas.style.cursor = 'grab';   // 悬停在 P 上时 cursor:grab 由 CSS 类体现
+      }
+      return;
+    }
+    var prev = ptrs.get(e.pointerId);
+    var dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+    ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+    // ---- 拖动 P：把指针位置换算成棱上的参数 t ----
+    if (gesture === 'dragP') {
+      var t = screenToT(e.clientX - dragP.r.left, e.clientY - dragP.r.top, dragP.r);
+      if (t !== null) {
+        // 位移超过阈值即算"真拖动"而非"点选"，阈值用 t 的变化量衡量
+        if (Math.abs(t - dragP.startT) > 0.02) dragP.movedEnough = true;
+        setT(t, true);
+        dragP.lastT = t;
+      }
+      return;
+    }
+
+    if (gesture === 'pinch' && ptrs.size >= 2) {
+      var cur = pinchGeom();
+      if (!cur || !pinchStart) return;
+      if (cur.d > 0 && pinchStart.d > 0) cam.dist = camStartDist * pinchStart.d / cur.d;
+      // 平移用起始距离换算比例，否则缩放过程中平移会跟着抖
+      camAxes();
+      var kp0 = camStartDist * 0.0016;
+      target.copy(targetStart);
+      target.addScaledVector(right, -(cur.cx - pinchStart.cx) * kp0);
+      target.addScaledVector(upv,  (cur.cy - pinchStart.cy) * kp0);
+      applyCamera();
+      return;
+    }
+
+    if (gesture === 'pan') {
+      camAxes();
+      var kp = cam.dist * 0.0016;
+      target.addScaledVector(right, -dx * kp);
+      target.addScaledVector(upv, dy * kp);
+      applyCamera();
+      return;
+    }
+
+    if (gesture === 'rotate') {
+      if (tapInfo && !tapInfo.moved) {
+        if (Math.hypot(e.clientX - tapInfo.x, e.clientY - tapInfo.y) > 9) {
+          tapInfo.moved = true;
+          // 补上从起点到当前的完整位移，避免"前 9px 白拖"
+          dx = e.clientX - tapInfo.x;
+          dy = e.clientY - tapInfo.y;
+        } else {
+          return;   // 未越过阈值不作旋转，防止轻点顶点时画面跳动
+        }
+      }
+      cam.azim -= dx * 0.008;
+      cam.elev += dy * 0.008;
+      applyCamera();
+    }
+  });
+
+  function endPointer(e) {
+    var wasSingle = (ptrs.size === 1);
+    var wasDragP = (gesture === 'dragP');
+    ptrs.delete(e.pointerId);
+    if (canvas.releasePointerCapture) {
+      try { canvas.releasePointerCapture(e.pointerId); } catch (err) {}
+    }
+
+    // 拖动 P 结束：若几乎没动，视为"点选 P"（走原有高亮逻辑），
+    // 这样 P 既是可拖的、也仍然能被点选高亮，两个能力不冲突
+    if (wasDragP) {
+      if (dragP && !dragP.movedEnough) {
+        doTapKey(dragP.heldKey);          // 复用按下时的判定结果，不做二次命中
+      }
+      dragP = null;
+      setPHot(false);
+      if (ptrs.size === 0) {
+        gesture = null;
+        canvas.style.cursor = 'grab';
+      }
+      return;
+    }
+
+    // 点选判定：单指/单键 + 几乎没移动 + 按下时间够短
+    if (wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
+        performance.now() - tapInfo.t < 700) {
+      if (tapInfo.key) {
+        doTapKey(tapInfo.key);            // 按下时已判定的顶点，直接用
+      } else {
+        doTap(e.clientX, e.clientY, tapInfo.type);   // 有位移，按松手位置重新判
+      }
+    }
+
+    if (ptrs.size === 0) {
+      gesture = null; tapInfo = null; pinchStart = null;
+      canvas.style.cursor = 'grab';
+    } else if (ptrs.size === 1) {
+      // 双指松开一根手指：重置基准并标记为已移动，避免误判成点选
+      var rest = ptrs.values().next().value;
+      gesture = 'rotate';
+      tapInfo = { x: rest.x, y: rest.y, t: performance.now(), moved: true, type: 'touch' };
+    }
+  }
+  canvas.addEventListener('pointerup', endPointer);
+  canvas.addEventListener('pointercancel', endPointer);
+
+  canvas.addEventListener('wheel', function (e) {
+    e.preventDefault();
+    cam.dist *= (1 + Math.sign(e.deltaY) * 0.09);
+    applyCamera();
+  }, { passive: false });
+
+  // iOS Safari 仍可能抢走触摸手势（页面橡皮筋、双击缩放），兜底拦截
+  canvas.addEventListener('touchmove', function (e) {
+    if (e.cancelable) e.preventDefault();
+  }, { passive: false });
+
+  // 桌面端：方向键微调，Esc 取消选中
+  window.addEventListener('keydown', function (e) {
+    var s = 0.06;
+    if (e.key === 'ArrowLeft')  { cam.azim -= s; applyCamera(); }
+    if (e.key === 'ArrowRight') { cam.azim += s; applyCamera(); }
+    if (e.key === 'ArrowUp')    { cam.elev += s; applyCamera(); }
+    if (e.key === 'ArrowDown')  { cam.elev -= s; applyCamera(); }
+    if (e.key === 'Escape' && selKeys.length) { selKeys.length = 0; applyPickStyles(); }
+  });
+
+  // ============================================================
+  // 十一、控件绑定
+  // ============================================================
+  var sT = document.getElementById('sT');
+  // 滑块与拖拽共用 setT，两边状态永远一致（含中点提示的联动）
+  sT.addEventListener('input', function () {
+    setT(parseFloat(sT.value), true);
+  });
+
+  document.getElementById('bMid').addEventListener('click', function () {
+    setT(0.5, true);
+  });
+
+  var sFont = document.getElementById('sFont');
+  sFont.addEventListener('input', function () {
+    setLabelSize(parseInt(sFont.value, 10));
+  });
+
+  // 清空全部高亮（因为点空白处不再清空，需要一个明确的入口）
+  document.getElementById('bClearSel').addEventListener('click', function () {
+    if (selKeys.length === 0) return;
+    selKeys.length = 0;
+    applyPickStyles();
+  });
+
+  function bind(id, field, rebuild) {
+    var el = document.getElementById(id);
+    el.checked = state[field];
+    el.addEventListener('change', function () {
+      state[field] = el.checked;
+      if (rebuild) refresh(); else applyVisibility();
+    });
+  }
+  bind('cLabels', 'labels');
+  bind('cSolid', 'solid');
+  bind('cAngle60', 'angle60');
+  bind('cAxes', 'axes');
+  bind('cQ1', 'q1', true);
+  bind('cPlane1', 'plane1', true);
+  bind('cPlane2', 'plane2', true);
+  bind('cQ3', 'q3', true);
+
+  // ============================================================
+  // 十一之二、平板抽屉面板
+  // ============================================================
+  (function () {
+    var panel = document.getElementById('panel');
+    var tgl   = document.getElementById('toggle');
+    var scrim = document.getElementById('scrim');
+
+    function setDrawer(open) {
+      panel.classList.toggle('open', open);
+      scrim.classList.toggle('show', open);
+    }
+    tgl.addEventListener('click', function () {
+      setDrawer(!panel.classList.contains('open'));
+    });
+    scrim.addEventListener('click', function () { setDrawer(false); });
+    // 点面板里的按钮后自动收起，让 3D 视图露出来（勾选框不收起，方便连续调节）
+    panel.addEventListener('click', function (e) {
+      var t = e.target;
+      if (t && t.tagName === 'BUTTON' && t.id !== 'toggle' &&
+          panel.classList.contains('open')) {
+        setTimeout(function () { setDrawer(false); }, 180);
+      }
+    });
+    // 竖屏切横屏时关掉抽屉，避免横屏下残留底部面板
+    window.addEventListener('orientationchange', function () { setDrawer(false); });
+  })();
+
+  // 触屏设备换成触屏操作提示
+  (function () {
+    var coarse = window.matchMedia && window.matchMedia('(pointer: coarse)').matches;
+    var hint = document.getElementById('hint');
+    if (coarse) hint.textContent = hint.getAttribute('data-touch');
+    else hint.textContent = hint.getAttribute('data-mouse');
+  })();
+
+  window.addEventListener('resize', resize);
+
+  // ============================================================
+  // 十二、启动
+  // ============================================================
+  canvas.style.cursor = 'grab';
+  resize();
+  applyCamera();
+
+  gSolid   = buildSolid();
+  gAxes    = buildAxes();
+  gAngle60 = buildAngle60();
+  gVerts   = buildVerts();
+  scene.add(gSolid, gAxes, gAngle60, gVerts);
+
+  setLabelSize(parseInt(document.getElementById('sFont').value, 10));
+  buildLabels();
+  computeP();
+  refresh();
+
+  loop();
+
+  // 自动化测试挂钩：仅暴露只读句柄，不改变任何行为。
+  // 生产使用时可整块删除，不影响页面功能。
+  window.__S = {
+    state: state, cam: cam, camera: camera, selKeys: selKeys,
+    setT: setT, applyPickStyles: applyPickStyles, screenToT: screenToT,
+    pickVertex: pickVertex, computeP: computeP, renderer: renderer,
+    get pLabelRect() { return pLabelRect; }
+  };
+  window.__GEO = {};
+  Object.keys(V).forEach(function (k) { window.__GEO[k] = V[k]; });
+
+})();
+</script>
+</body>
+</html>

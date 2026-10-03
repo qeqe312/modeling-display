@@ -1,0 +1,27 @@
+# 开发期临时文件（每次改源码后重新生成，不入库）
+_selftest.html
+_diag*.html
+_probe.js
+_*.bak
+*.darkbak
+
+# 临时目录
+_shots/
+_t/
+_final/
+tmp/
+
+# Three.js 离线副本：606KB 第三方库，按需自取，不入库
+# 需要离线使用时，下载 three.js r146 的 build/three.min.js 放到产出目录
+three.min.js
+
+# 回归脚本（含项目特定的几何参数，按需保留）
+verify_drag.js
+
+# 系统 / 编辑器
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp

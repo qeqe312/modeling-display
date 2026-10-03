@@ -1,0 +1,1181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<title>__TITLE__</title>
+<!--
+  ============================================================
+  几何题三维教学演示 · 骨架模板
+  ============================================================
+  换题只需改三段（都在文件下半部分的 <script> 里，有醒目分隔）：
+    【A】题目文案   —— 标题、标签、题干、分问卡片、解题步骤
+    【B】几何数据   —— 顶点坐标、面、棱、动点定义
+    【C】动态对象   —— 依赖动点的平面/棱锥/线面角（可选，没有就留空函数）
+  引擎部分（D 之后）已验证，不要改。
+  ============================================================
+-->
+<style>
+/* ============================================================
+   主题色：本项目只用暗色（详见 references/visual-theme.md）
+   ============================================================ */
+:root {
+  --bg:#0D1117; --surface:#161B22; --surface-2:#1C232C; --surface-3:#232B36;
+  --line:#2A3441; --line-soft:#212A34;
+  --ink:#E6EDF3; --ink-2:#A9B6C4; --ink-3:#8B99A8;
+  --brand:#6BA8E8; --brand-lt:#17293E;
+  --accent:#FF7A45; --accent-lt:#2E1A11;
+  --green:#8FBF5A; --green-lt:#1A2413;
+  --violet:#A692E8; --violet-lt:#1E1B2E;
+  --shadow-s:0 1px 2px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.03);
+  --shadow-m:0 4px 16px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.04);
+  --radius:12px;
+  --glow-accent:rgba(255,122,69,.30);
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; }
+body {
+  font-family: "Microsoft YaHei", "Segoe UI", system-ui, sans-serif;
+  background: var(--bg); color: var(--ink);
+  overflow: hidden; -webkit-font-smoothing: antialiased;
+}
+#app { display: flex; height: 100%; }
+
+/* ---------- 左侧面板 ---------- */
+#panel {
+  width: 372px; flex: 0 0 372px;
+  background: var(--surface); border-right: 1px solid var(--line);
+  overflow-y: auto; padding: 22px 20px 48px;
+}
+#panel::-webkit-scrollbar { width: 10px; }
+#panel::-webkit-scrollbar-track { background: transparent; }
+#panel::-webkit-scrollbar-thumb { background:#39434F; border-radius:5px; border:3px solid var(--surface); }
+#panel::-webkit-scrollbar-thumb:hover { background:#4A5765; }
+
+h1 { font-size: 17px; font-weight: 600; margin: 0 0 9px; letter-spacing:.2px; line-height:1.45; }
+.tag {
+  display:inline-block; font-size:11px; font-weight:500; padding:3px 10px;
+  border-radius:999px; background:var(--brand-lt); color:var(--brand);
+  margin-right:6px; letter-spacing:.3px;
+}
+.tag.diff { background:#3A1D1D; color:#E88B8B; }
+
+.group { margin-top: 26px; }
+.group > .title {
+  font-size:11px; font-weight:600; color:var(--ink-3); letter-spacing:1.1px;
+  text-transform:uppercase; margin-bottom:11px; display:flex; align-items:center; gap:8px;
+}
+.group > .title::after { content:''; flex:1; height:1px; background:var(--line-soft); }
+
+.stem {
+  font-size:13.5px; line-height:1.8; background:var(--surface-2);
+  border:1px solid var(--line-soft); border-radius:var(--radius);
+  padding:14px 16px; color:var(--ink);
+}
+.stem .q { margin: 10px 0 0; }
+.stem .q:first-child { margin-top: 0; }
+.stem b { font-weight:600; color:var(--brand); }
+
+/* 拖拽提示条 */
+.drag-tip {
+  display:flex; align-items:flex-start; gap:10px; font-size:12.5px; line-height:1.65;
+  background:var(--accent-lt); border:1px solid rgba(255,122,69,.32);
+  border-radius:10px; padding:11px 13px; margin-bottom:13px; color:#FFB392;
+}
+.drag-tip b { font-weight:600; color:var(--accent); }
+.drag-tip .grip { flex:0 0 auto; font-size:15px; line-height:1.35; color:var(--accent); opacity:.85; }
+
+.slider-row { display:flex; align-items:center; gap:12px; }
+.slider-row input[type=range] { flex:1; accent-color:var(--accent); }
+.slider-row .val {
+  font-size:12px; color:var(--brand); width:76px; text-align:right;
+  font-variant-numeric:tabular-nums; font-weight:500;
+}
+
+.check {
+  display:flex; align-items:center; gap:9px; font-size:13px; padding:6px 0;
+  cursor:pointer; user-select:none; color:var(--ink);
+}
+.check input { accent-color:var(--brand); width:15px; height:15px; cursor:pointer; }
+.check .dot { width:9px; height:9px; border-radius:2px; flex:0 0 9px; }
+
+.btn {
+  width:100%; font-family:inherit; font-size:13px; font-weight:500; padding:10px;
+  border:1px solid var(--line); background:var(--surface); color:var(--ink-2);
+  border-radius:9px; cursor:pointer; margin-top:9px;
+  transition:background .15s, border-color .15s, box-shadow .15s;
+  box-shadow:var(--shadow-s);
+}
+.btn:hover { border-color:var(--brand); background:var(--brand-lt); color:var(--brand); }
+.btn:active { background:var(--surface-3); box-shadow:none; transform:translateY(1px); }
+
+/* 已选顶点清单 */
+.sel-list {
+  display:flex; flex-wrap:wrap; gap:7px; min-height:34px; padding:9px 11px;
+  background:var(--surface-2); border:1px solid var(--line-soft);
+  border-radius:10px; font-size:12px; color:var(--ink-3);
+  line-height:1.5; align-items:center;
+}
+.sel-list .chip {
+  display:inline-block; padding:2px 10px; border-radius:999px;
+  background:var(--accent); color:#FFFFFF; font-weight:600; font-size:12px;
+  box-shadow:0 0 0 1px rgba(255,122,69,.35), 0 2px 8px var(--glow-accent);
+}
+
+/* 分问卡片 */
+.card {
+  position:relative; border-radius:var(--radius); padding:14px 16px 14px 18px;
+  margin-top:12px; font-size:13px; line-height:1.9;
+  background:var(--surface); border:1px solid var(--line-soft);
+  box-shadow:var(--shadow-s); color:var(--ink-2);
+}
+.card::before {
+  content:''; position:absolute; left:0; top:12px; bottom:12px; width:3px;
+  border-radius:0 3px 3px 0;
+}
+.card .h { font-weight:600; margin-bottom:7px; font-size:13.5px; letter-spacing:.2px; }
+.card.q1::before { background:var(--green); }
+.card.q1 { background:var(--green-lt); border-color:#2C3A1F; }
+.card.q1 .h { color:var(--green); }
+.card.q2::before { background:var(--violet); }
+.card.q2 { background:var(--violet-lt); border-color:#322C4A; }
+.card.q2 .h { color:var(--violet); }
+
+.steps { font-size:13px; line-height:2.05; color:var(--ink-2); }
+.steps .k { font-weight:600; color:var(--brand); margin-top:13px; display:block; font-size:12.5px; letter-spacing:.3px; }
+.steps .k:first-child { margin-top:0; }
+.steps code {
+  font-family:"Cascadia Code", Consolas, "Courier New", monospace;
+  background:var(--surface-2); border:1px solid var(--line-soft);
+  border-radius:5px; padding:1px 6px; font-size:12px; color:var(--accent);
+}
+.hl { background:var(--accent-lt); border-radius:4px; padding:0 4px; color:var(--accent); font-weight:600; }
+
+/* ---------- 3D 视口 ---------- */
+#stage {
+  flex:1; position:relative; overflow:hidden;
+  background: radial-gradient(ellipse at 50% 42%, #1B232E 0%, #131A22 62%, #0B0F14 100%);
+}
+/* touch-action:none —— 交出全部手势控制权，否则平板上单指拖拽会变成滚动页面 */
+#cv { display:block; width:100%; height:100%; touch-action:none; }
+
+#labels { position:absolute; inset:0; pointer-events:none; overflow:hidden; }
+#labels .lab {
+  position:absolute; font-size:var(--lab-size, 22px); font-weight:600;
+  color:#BBD7F5; background:rgba(22,27,34,.88);
+  border:1px solid rgba(107,168,232,.30); border-radius:7px;
+  padding:1px 8px; line-height:1.3; white-space:nowrap;
+  will-change:transform; box-shadow:0 2px 8px rgba(0,0,0,.55);
+  backdrop-filter:blur(3px);
+}
+#labels .lab.p {
+  color:#FFB392; background:rgba(38,24,17,.92); border-color:rgba(255,122,69,.55);
+  box-shadow:0 0 10px rgba(255,122,69,.20), 0 2px 8px rgba(0,0,0,.5);
+}
+#labels .lab.p.hot {
+  color:#FFFFFF; background:var(--accent); border-color:#FFB392;
+  animation:labPulse 1.15s ease-in-out infinite;
+}
+/* ★ 呼吸动画只能动 box-shadow，绝不能碰 transform（syncLabels 每帧在写 transform） */
+@keyframes labPulse {
+  0%,100% { box-shadow:0 0 0 4px rgba(255,122,69,.42), 0 0 16px rgba(255,122,69,.35); }
+  50%     { box-shadow:0 0 0 11px rgba(255,122,69,.06), 0 0 20px rgba(255,122,69,.20); }
+}
+/* 拖拽把柄：触摸端没有悬停态，靠这个暗示"可拖" */
+#labels .lab.p::after { content:'⠿'; margin-left:6px; opacity:.6; font-size:.78em; }
+#labels .lab.hide { display:none; }
+#labels .lab.sel {
+  color:#FFFFFF; background:var(--accent); border-color:#FFB392;
+  box-shadow:0 0 0 3px rgba(255,122,69,.32), 0 0 14px rgba(255,122,69,.28);
+}
+
+#hint {
+  position:absolute; left:16px; bottom:15px; font-size:12px; color:var(--ink-2);
+  background:rgba(22,27,34,.92); border:1px solid var(--line); border-radius:9px;
+  padding:7px 12px; pointer-events:none; box-shadow:var(--shadow-s);
+  backdrop-filter:blur(3px); max-width:calc(100% - 32px);
+}
+#readout {
+  position:absolute; right:16px; top:16px; font-size:13px; line-height:1.85;
+  background:rgba(22,27,34,.95); border:1px solid var(--line);
+  border-radius:var(--radius); padding:14px 17px; min-width:216px;
+  pointer-events:none; font-variant-numeric:tabular-nums;
+  box-shadow:var(--shadow-m); backdrop-filter:blur(4px);
+  transition:background .22s, border-color .22s;
+}
+#readout .row { display:flex; justify-content:space-between; gap:16px; }
+#readout .row .k { color:var(--ink-3); }
+#readout .row .v { font-weight:600; color:var(--brand); }
+#readout.crit {
+  background:rgba(46,26,17,.97); border-color:var(--accent);
+  box-shadow:0 0 0 3px rgba(255,122,69,.22), 0 0 24px rgba(255,122,69,.18), var(--shadow-m);
+}
+#readout.crit .row .v { color:var(--accent); }
+#readout .flag {
+  margin-top:7px; font-size:12px; font-weight:500; color:var(--accent); display:none;
+  padding-top:7px; border-top:1px dashed rgba(255,122,69,.45);
+}
+#readout.crit .flag { display:block; }
+#readout .mid-flag {
+  margin-top:7px; font-size:12px; font-weight:500; color:var(--accent);
+  display:none; align-items:center; gap:6px;
+}
+#readout .mid-flag::before { content:'\25C6'; font-size:9px; }
+#readout .mid-flag.on { display:flex; }
+#readout .pick {
+  margin-top:10px; padding-top:10px; border-top:1px solid var(--line-soft);
+  font-size:12px; line-height:1.7; color:var(--ink-3);
+}
+#readout .pick.on { color:#FFB392; }
+#readout .pick b { display:block; font-size:13.5px; font-weight:600; color:var(--accent); margin-bottom:3px; }
+#readout .pr {
+  display:flex; justify-content:space-between; align-items:baseline;
+  gap:10px; white-space:nowrap; font-size:11.5px; line-height:1.75; color:#C9A794;
+}
+#readout .pr i { font-style:normal; font-weight:700; color:var(--accent); min-width:24px; flex:0 0 auto; }
+#readout .pr span { font-variant-numeric:tabular-nums; }
+
+/* ---------- 触屏抽屉 ---------- */
+#toggle {
+  display:none; position:fixed; left:14px; z-index:40; align-items:center; gap:9px;
+  height:48px; padding:0 20px; font-family:inherit; font-size:15px; font-weight:600;
+  color:var(--brand); background:var(--surface); border:1px solid var(--line);
+  border-radius:24px; box-shadow:var(--shadow-m); cursor:pointer;
+  -webkit-tap-highlight-color:transparent; -webkit-user-select:none; user-select:none;
+  top:calc(14px + env(safe-area-inset-top, 0px));
+}
+#toggle:active { background:var(--brand-lt); }
+#toggle .bars { position:relative; width:16px; height:2px; background:var(--brand); flex:0 0 16px; }
+#toggle .bars::before, #toggle .bars::after {
+  content:''; position:absolute; left:0; width:16px; height:2px; background:var(--brand);
+}
+#toggle .bars::before { top:-5px; }
+#toggle .bars::after  { top:5px; }
+#scrim {
+  display:none; position:fixed; inset:0; z-index:25; background:rgba(0,0,0,.55);
+  -webkit-tap-highlight-color:transparent; backdrop-filter:blur(2px);
+}
+
+/* ---------- 平板 / 触屏适配 ---------- */
+@media (max-width:1024px), (pointer:coarse) {
+  html, body { overflow:hidden; overscroll-behavior:none; }
+  #app { display:block; position:relative; height:100%; }
+  #stage { position:absolute; inset:0; }
+  #panel {
+    position:fixed; top:0; bottom:0; left:0; width:min(84vw, 392px); flex:none;
+    z-index:30; padding:22px 20px 64px;
+    padding-top:calc(22px + env(safe-area-inset-top, 0px));
+    padding-bottom:calc(64px + env(safe-area-inset-bottom, 0px));
+    transform:translateX(-104%); transition:transform .26s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 28px rgba(0,0,0,.65);
+    -webkit-overflow-scrolling:touch; overscroll-behavior:contain;
+  }
+  #panel.open { transform:translateX(0); }
+  #toggle { display:inline-flex; }
+  #scrim.show { display:block; }
+
+  /* 触摸目标放大到 44px 以上 */
+  .btn { min-height:48px; font-size:15px; }
+  .check { min-height:44px; font-size:15px; padding:8px 0; }
+  .check input { width:21px; height:21px; }
+  .check .dot { width:11px; height:11px; flex-basis:11px; }
+  .slider-row { gap:14px; }
+  .slider-row input[type=range] { height:36px; }
+  .slider-row .val { font-size:14px; width:86px; }
+  h1 { font-size:19px; }
+  .group > .title { font-size:12px; }
+  .stem { font-size:14px; }
+  .drag-tip { font-size:13.5px; padding:13px 15px; }
+  .card, .steps { font-size:14px; }
+  #hint { font-size:13px; left:12px; bottom:calc(12px + env(safe-area-inset-bottom, 0px)); }
+  #readout { font-size:14px; top:calc(16px + env(safe-area-inset-top, 0px)); }
+}
+/* 竖屏时抽屉从底部升起（拇指够不到顶部滑出面板） */
+@media (max-width:1024px) and (orientation:portrait) {
+  #panel {
+    top:auto; bottom:0; left:0; right:0; width:auto; max-height:72vh;
+    border-radius:18px 18px 0 0; transform:translateY(104%);
+    box-shadow:0 -8px 32px rgba(0,0,0,.7);
+  }
+  #panel.open { transform:translateY(0); }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <aside id="panel">
+    <!-- 1. 标题 -->
+    <h1>__TITLE__</h1>
+    <div style="margin-bottom:14px">
+      <span class="tag">__TAG1__</span>
+      <span class="tag diff">__TAG2__</span>
+    </div>
+
+    <!-- 2. 题干 -->
+    <div class="stem">__STEM__</div>
+
+    <!-- 3. 交互提示 -->
+    <div class="group">
+      <div class="title">动点位置（__MOVER_DESC__）</div>
+      <div class="drag-tip">
+        <span class="grip">⠿</span>
+        <span><b>直接拖动 3D 里的 __MOVER_LABEL__ 点</b>即可沿棱自由滑动，也可以用下面的滑块精确调节。</span>
+      </div>
+      <div class="slider-row">
+        <input type="range" id="sT" min="0" max="1" step="0.001" value="0.5">
+        <span class="val" id="sTval">1.00 : 1.00</span>
+      </div>
+      <button class="btn" id="bMid">跳到中点</button>
+    </div>
+
+    <!-- 4. 顶点标注 -->
+    <div class="group">
+      <div class="title">顶点标注</div>
+      <label class="check"><input type="checkbox" id="cLabels" checked><span class="dot" style="background:#6BA8E8"></span>显示顶点字母</label>
+      <div class="slider-row" style="margin-top:6px">
+        <span style="font-size:12px;color:var(--ink-3);flex:0 0 auto">字号</span>
+        <input type="range" id="sFont" min="14" max="32" step="1" value="22">
+        <span class="val" id="sFontval">22 px</span>
+      </div>
+    </div>
+
+    <!-- 5. 顶点高亮（多选） -->
+    <div class="group">
+      <div class="title">顶点高亮（支持多选）</div>
+      <div class="sel-list" id="selList">尚未选中顶点</div>
+      <button class="btn" id="bClearSel">清空全部高亮</button>
+    </div>
+
+    <!-- 6. 显示元素 -->
+    <div class="group">
+      <div class="title">显示元素</div>
+      __ELEMENT_SWITCHES__
+    </div>
+
+    <!-- 7. 分问卡片 -->
+    __QUESTION_CARDS__
+
+    <!-- 8. 解题步骤 -->
+    <div class="group">
+      <div class="title">解题步骤</div>
+      <div class="steps">__STEPS__</div>
+    </div>
+  </aside>
+
+  <main id="stage">
+    <canvas id="cv"></canvas>
+    <div id="labels"></div>
+    <div id="readout">
+      <div class="row"><span class="k">__READOUT_K1__</span><span class="v" id="rT">0.500</span></div>
+      <div class="row"><span class="k">__READOUT_K2__</span><span class="v" id="rRatio">1 : 1</span></div>
+      <div class="row"><span class="k">__READOUT_K3__</span><span class="v" id="rAng">90.0°</span></div>
+      <div class="flag" id="rFlag">__CRIT_TEXT__</div>
+      <div class="mid-flag" id="rMid">__MID_TEXT__</div>
+      <div class="pick" id="pickBox">点一下顶点即可高亮（可多选）</div>
+    </div>
+    <div id="hint">拖动 __MOVER_LABEL__ 点可滑动 · 点击顶点高亮（可多选）· 拖拽旋转 · 滚轮缩放 · 右键平移</div>
+  </main>
+</div>
+<button id="toggle"><span class="bars"></span>控制面板</button>
+<div id="scrim"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
+<script>if (!window.THREE) { document.write('<script src="three.min.js"><\/script>'); }</script>
+<script>
+(function () {
+'use strict';
+
+/* ════════════════════════════════════════════════════════════
+   【A】题目配置  ← 换题改这里
+   ════════════════════════════════════════════════════════════ */
+
+// 动点定义：沿哪条棱滑动
+var MOVER = {
+  enabled : true,
+  from    : 'C',      // 起点顶点 key
+  to      : 'Cp',     // 终点顶点 key
+  label   : 'P',
+  fromName: 'C',      // 显示用名称
+  toName  : 'C′',
+  t0      : 0.5,      // 初始位置
+  midText : 'P 恰为 CC′ 中点',        // 拖到中点时的提示
+  critText: '两平面垂直（临界状态）'   // 满足临界条件时的提示（不需要就把 critTest 设为 null）
+};
+
+/* ════════════════════════════════════════════════════════════
+   【B】几何数据  ← 换题改这里
+   约定：y 轴向上；顶点 key 用 A / Ap 表示 A 与 A′
+   ════════════════════════════════════════════════════════════ */
+
+var H  = 1.2247448713915890;   // 高度（按题目条件算出）
+var Y0 = -H / 2, Y1 = H / 2;
+
+var V = {
+  A:  [-1, Y0, -1],   B:  [ 1, Y0, -1],   C:  [ 1, Y0,  1],   D:  [-1, Y0,  1],
+  Ap: [-0.5, Y1, -0.5], Bp: [ 0.5, Y1, -0.5], Cp: [ 0.5, Y1,  0.5], Dp: [-0.5, Y1,  0.5]
+};
+Object.keys(V).forEach(function (k) {
+  V[k] = new THREE.Vector3(V[k][0], V[k][1], V[k][2]);
+});
+
+// 标签显示名（Ap → A′）
+var LABEL_NAME = { A:'A', B:'B', C:'C', D:'D', Ap:'A′', Bp:'B′', Cp:'C′', Dp:'D′', P:'P' };
+
+// 实体轮廓棱（画成粗管）
+var EDGES = [
+  ['A','B'],['B','C'],['C','D'],['D','A'],
+  ['Ap','Bp'],['Bp','Cp'],['Cp','Dp'],['Dp','Ap'],
+  ['A','Ap'],['B','Bp'],['C','Cp'],['D','Dp']
+];
+
+// 半透明实体面
+// 棱台/棱柱的侧面是梯形/矩形，按顶点顺序排即可（顺序错了面会自交）
+// 侧棱对应关系：底面 A,B,C,D ↔ 顶面 Ap,Bp,Cp,Dp
+var SOLID_FACES = [
+  { pts: ['A','B','C','D'],     opacity: 0.46 },   // 底面
+  { pts: ['Ap','Bp','Cp','Dp'], opacity: 0.54 },   // 顶面
+  // 四个侧面（棱台/棱柱）。不想要就删掉这四行；四面体/棱锥按自己的顶点顺序改
+  { pts: ['A','B','Bp','Ap'],   opacity: 0.22 },
+  { pts: ['B','C','Cp','Bp'],   opacity: 0.22 },
+  { pts: ['C','D','Dp','Cp'],   opacity: 0.22 },
+  { pts: ['D','A','Ap','Dp'],   opacity: 0.22 }
+];
+
+/* ════════════════════════════════════════════════════════════
+   【C】动态对象  ← 换题改这里（依赖动点 t 的平面 / 棱锥 / 线面角）
+   没有就保持函数体为空
+   ════════════════════════════════════════════════════════════ */
+
+// ★ 函数名必须是 buildDynamicLegacy —— 引擎每帧重建时会调用它
+function buildDynamicLegacy(groups) {
+  var P = computeP();
+
+  // —— 平面1（例：平面 A′BD）——
+  if (state.plane1) groups.planes.add(triMesh(V.Ap, V.B, V.D, COL.plane1, 0.38));
+
+  // —— 平面2（例：平面 PBD）——
+  if (state.plane2 && MOVER.enabled) groups.planes.add(triMesh(P, V.B, V.D, COL.plane2, 0.34));
+
+  // —— 第1问：棱锥 P-BCD ——
+  if (state.q1 && MOVER.enabled) groups.q1.add(polyMesh([V.B, V.C, V.D], COL.q1, 0.42));
+
+  // —— 动态棱：把动点到端点的两段画出来 ——
+  if (MOVER.enabled) {
+    groups.mover.add(tube(P, V[MOVER.from], 0.012, COL.p));
+    groups.mover.add(tube(P, V[MOVER.to],   0.012, COL.p));
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   【D】引擎 —— 以下已验证，换题不要改
+   ════════════════════════════════════════════════════════════ */
+
+var COL = {
+  edge:   0xB9C9DD,
+  solid:  0x4A5A70,
+  plane1: 0x5EA0E0,
+  plane2: 0xFF7A45,
+  q1:     0x8FBF5A,
+  q3:     0xE86A6A,
+  q3face: 0x9B8BE8,
+  axes:   0x6BA8E8,
+  p:      0xFF7A45
+};
+var SEL_COLOR = 0xFF7A45;
+
+var canvas = document.getElementById('cv');
+var stage  = document.getElementById('stage');
+var labelBox = document.getElementById('labels');
+
+var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+// ★ 画布不透明，必须与 #stage 的 CSS 渐变同色系（改主题时同步改这里）
+renderer.setClearColor(0x131A22, 1);
+
+var scene  = new THREE.Scene();
+var camera = new THREE.PerspectiveCamera(40, 1, 0.05, 200);
+var cam    = { azim: Math.PI * 0.24, elev: 0.34, dist: 6.6 };
+var target = new THREE.Vector3(0, 0, 0);
+
+var state = {
+  t: MOVER.t0, labels: true, font: 22,
+  solid: true, axes: false,
+  plane1: true, plane2: true, q1: false, q3: false
+};
+
+var gSolid, gAxes, gPlanes, gQ1, gQ3, gVerts, gMover;
+var pMesh = null, pPos = new THREE.Vector3();
+var labelEls = [], labelSize = 22;
+var selKeys = [];
+var ringPool = [];
+var VERT_R = 0.044, P_R = 0.062;
+var pLabelRect = null, dragP = null, pHot = false, pPulse = 0;
+var gesture = null, ptrs = new Map(), tapInfo = null, pinchStart = null;
+var camStartDist = 0, targetStart = new THREE.Vector3();
+
+/* ---------- 小工具 ---------- */
+function fmt(v) {
+  var s = v.toFixed(2).replace(/\.?0+$/, '');
+  return s === '' ? '0' : s;
+}
+function tube(a, b, r, color) {
+  var geo = new THREE.TubeGeometry(new THREE.LineCurve3(a.clone(), b.clone()), 1, r, 6, false);
+  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color }));
+}
+function glassMat(color, opacity) {
+  return new THREE.MeshBasicMaterial({
+    color: color, transparent: true, opacity: opacity,
+    side: THREE.DoubleSide, depthWrite: false
+  });
+}
+function triMesh(p1, p2, p3, color, opacity) {
+  var geo = new THREE.BufferGeometry().setFromPoints([p1, p2, p3]);
+  geo.setIndex([0, 1, 2]); geo.computeVertexNormals();
+  return new THREE.Mesh(geo, glassMat(color, opacity));
+}
+function polyMesh(pts, color, opacity) {
+  var geo = new THREE.BufferGeometry().setFromPoints(pts);
+  var idx = [];
+  for (var i = 1; i < pts.length - 1; i++) idx.push(0, i, i + 1);
+  geo.setIndex(idx); geo.computeVertexNormals();
+  return new THREE.Mesh(geo, glassMat(color, opacity));
+}
+function planeNormal(a, b, c) {
+  var u = new THREE.Vector3().subVectors(b, a);
+  var v = new THREE.Vector3().subVectors(c, a);
+  return new THREE.Vector3().crossVectors(u, v).normalize();
+}
+function twoPlaneAngle(n1, n2) {
+  if (n1.length() < 1e-9 || n2.length() < 1e-9) return 90;
+  var c = Math.abs(n1.dot(n2)) / (n1.length() * n2.length());
+  return Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
+}
+function clearGroup(g) {
+  while (g.children.length) {
+    var c = g.children.pop();
+    if (c.geometry) c.geometry.dispose();
+    if (c.material) c.material.dispose();
+  }
+}
+
+/* ---------- 动点 ---------- */
+function computeP() {
+  if (!MOVER.enabled) return new THREE.Vector3();
+  return new THREE.Vector3().lerpVectors(V[MOVER.from], V[MOVER.to], state.t);
+}
+
+/* ---------- 静态几何 ---------- */
+function buildSolid() {
+  var g = new THREE.Group();
+  SOLID_FACES.forEach(function (f) {
+    g.add(polyMesh(f.pts.map(function (k) { return V[k]; }), COL.solid, f.opacity));
+  });
+  return g;
+}
+function buildVertices() {
+  var g = new THREE.Group();
+  Object.keys(V).forEach(function (k) {
+    var m = new THREE.Mesh(new THREE.SphereGeometry(VERT_R, 16, 12),
+                           new THREE.MeshBasicMaterial({ color: COL.edge }));
+    m.position.copy(V[k]); m.userData.key = k;
+    g.add(m);
+  });
+  if (MOVER.enabled) {
+    pMesh = new THREE.Mesh(new THREE.SphereGeometry(P_R, 20, 14),
+                           new THREE.MeshBasicMaterial({ color: COL.p }));
+    pMesh.userData.key = 'P';
+    g.add(pMesh);
+  }
+  return g;
+}
+function buildAxes() {
+  var g = new THREE.Group();
+  var L = 2.2;
+  g.add(tube(new THREE.Vector3(-L, 0, 0), new THREE.Vector3(L, 0, 0), 0.006, COL.axes));
+  g.add(tube(new THREE.Vector3(0, -L, 0), new THREE.Vector3(0, L, 0), 0.006, COL.axes));
+  g.add(tube(new THREE.Vector3(0, 0, -L), new THREE.Vector3(0, 0, L), 0.006, COL.axes));
+  return g;
+}
+
+/* ---------- 相机 ---------- */
+function applyCamera() {
+  cam.elev = Math.max(-1.5, Math.min(1.5, cam.elev));
+  var ce = Math.cos(cam.elev);
+  camera.position.set(
+    target.x + cam.dist * ce * Math.sin(cam.azim),
+    target.y + cam.dist * Math.sin(cam.elev),
+    target.z + cam.dist * ce * Math.cos(cam.azim)
+  );
+  camera.lookAt(target);
+}
+function resize() {
+  var w = stage.clientWidth, h = stage.clientHeight;
+  if (w < 2 || h < 2) return;
+  renderer.setSize(w, h, false);
+  camera.aspect = w / h;
+  camera.updateProjectionMatrix();
+}
+
+/* ---------- 命中检测（屏幕空间，不用 Raycaster） ---------- */
+function pickTol(base, pointerType) {
+  return (pointerType === 'touch' || pointerType === 'pen') ? base + 20 : base + 4;
+}
+var TOL_P = pickTol(22, 'mouse');   // 鼠标 26px / 触摸 46px
+
+function pickVertex(px, py, w, h, tol) {
+  var best = null, bestD = Infinity;
+  function test(key, pos, t) {
+    var p = pos.clone().project(camera);
+    if (p.z > 1) return;
+    var x = (p.x * 0.5 + 0.5) * w;
+    var y = (-p.y * 0.5 + 0.5) * h;
+    var d = Math.hypot(x - px, y - py);
+    if (d < t && d < bestD) { bestD = d; best = key; }
+  }
+  Object.keys(V).forEach(function (k) { test(k, V[k], tol); });
+  if (MOVER.enabled) {
+    // 动点优先判定（它常贴着端点）
+    test('P', computeP(), Math.max(tol, TOL_P));
+    // 标签矩形命中区
+    if (best !== 'P' && pLabelRect) {
+      var r = pLabelRect;
+      if (px >= r.x0 && px <= r.x1 && py >= r.y0 && py <= r.y1) best = 'P';
+    }
+  }
+  return best;
+}
+
+/* ---------- 拖动反算：射线–棱最近点解析解 ---------- */
+var _rayO = new THREE.Vector3(), _rayD = new THREE.Vector3();
+var _segU = new THREE.Vector3(), _rayW = new THREE.Vector3();
+var _rotM = new THREE.Matrix4();
+
+function rayDirFromScreen(px, py, w, h) {
+  var fy = camera.projectionMatrix.elements[5];
+  var fx = camera.projectionMatrix.elements[0];
+  var ndcX = (px / w) * 2 - 1;
+  var ndcY = -((py / h) * 2 - 1);
+  _rayO.setFromMatrixPosition(camera.matrixWorld);
+  _rayD.set(ndcX / fx, ndcY / fy, -1)
+    .applyMatrix4(_rotM.extractRotation(camera.matrixWorld))
+    .normalize();
+  return _rayD;
+}
+function screenToT(px, py, r) {
+  if (!MOVER.enabled) return null;
+  var w = r.width, h = r.height, aspect = w / h;
+  if (!isFinite(aspect) || aspect < 0.35 || aspect > 3.0) return null;
+
+  var d = rayDirFromScreen(px, py, w, h);
+  var A = V[MOVER.from], B = V[MOVER.to];
+  _segU.subVectors(B, A);
+  _rayW.subVectors(_rayO, A);
+  var uu = _segU.dot(_segU), ud = _segU.dot(d), dd = d.dot(d);
+  var uw = _rayW.dot(_segU), dw = _rayW.dot(d);
+  var det = uu * (-dd) - (-ud) * ud;
+  if (!isFinite(det) || Math.abs(det) < 1e-9) return null;
+  var t = ((-dd) * uw + ud * dw) / det;
+  if (!isFinite(t)) return null;
+  return Math.max(0, Math.min(1, t));
+}
+
+/* ---------- 选中样式 ---------- */
+function isSel(k) { return selKeys.indexOf(k) >= 0; }
+
+function applyPickStyles() {
+  // 小球
+  if (gVerts) {
+    gVerts.children.forEach(function (m) {
+      var k = m.userData.key;
+      if (!k) return;
+      var base = (k === 'P') ? P_R : VERT_R;
+      m.scale.setScalar(1);
+      if (m.material) m.material.color.setHex(
+        k === 'P' ? COL.p : COL.edge
+      );
+      if (isSel(k)) {
+        m.scale.setScalar(1.85);
+        m.material.color.setHex(SEL_COLOR);
+      }
+    });
+  }
+  // 光晕对象池
+  var need = selKeys.length, i = 0;
+  for (; i < need; i++) {
+    if (!ringPool[i]) {
+      ringPool[i] = new THREE.Mesh(
+        new THREE.SphereGeometry(1, 20, 14),
+        new THREE.MeshBasicMaterial({
+          color: SEL_COLOR, transparent: true, opacity: 0.30, depthWrite: false
+        })
+      );
+    }
+    var key = selKeys[i];
+    var pos = (key === 'P') ? computeP() : V[key];
+    if (!pos) continue;
+    ringPool[i].position.copy(pos);
+    ringPool[i].scale.setScalar((key === 'P' ? P_R : VERT_R) * 2.6);
+    ringPool[i].visible = true;
+    if (ringPool[i].parent !== scene) scene.add(ringPool[i]);
+  }
+  for (; i < ringPool.length; i++) ringPool[i].visible = false;
+  // DOM 标签
+  labelEls.forEach(function (o) {
+    o.el.classList.toggle('sel', isSel(o.key));
+  });
+  // 面板清单
+  var box = document.getElementById('selList');
+  if (box) {
+    if (!selKeys.length) box.textContent = '尚未选中顶点';
+    else {
+      box.innerHTML = selKeys.map(function (k) {
+        return '<span class="chip">' + (LABEL_NAME[k] || k) + '</span>';
+      }).join('');
+    }
+  }
+  refreshPick();
+}
+
+function doTapKey(key) {
+  if (!key) return;
+  var i = selKeys.indexOf(key);
+  if (i >= 0) selKeys.splice(i, 1);
+  else selKeys.push(key);
+  applyPickStyles();
+}
+function doTap(cx, cy, pointerType) {
+  var r = canvas.getBoundingClientRect();
+  var tol = (pointerType === 'touch' || pointerType === 'pen') ? 40 : 22;
+  var key = pickVertex(cx - r.left, cy - r.top, r.width, r.height, tol);
+  if (key === null) return;   // 点空白：不清空已有高亮
+  doTapKey(key);
+}
+
+/* ---------- 标签 ---------- */
+function setLabelSize(px) {
+  labelSize = px;
+  document.documentElement.style.setProperty('--lab-size', px + 'px');
+}
+function buildLabels() {
+  labelBox.innerHTML = '';
+  labelEls = [];
+  function mk(key, getPos) {
+    var el = document.createElement('div');
+    el.className = 'lab' + (key === 'P' ? ' p' : '');
+    el.textContent = LABEL_NAME[key] || key;
+    labelBox.appendChild(el);
+    labelEls.push({ el: el, key: key, getPos: getPos });
+  }
+  Object.keys(V).forEach(function (k) {
+    mk(k, (function (kk) { return function () { return V[kk]; }; })(k));
+  });
+  if (MOVER.enabled) mk('P', computeP);
+}
+
+function syncLabels() {
+  if (!state.labels) {
+    labelEls.forEach(function (o) { o.el.classList.add('hide'); });
+    pLabelRect = null;
+    return;
+  }
+  var rect = canvas.getBoundingClientRect();
+  var pts = [];
+
+  labelEls.forEach(function (o) {
+    var pos = o.getPos();
+    var p = pos.clone().project(camera);
+    if (p.z > 1) { o.el.classList.add('hide'); return; }
+    o.el.classList.remove('hide');
+
+    var x = (p.x * 0.5 + 0.5) * rect.width;
+    var y = (-p.y * 0.5 + 0.5) * rect.height;
+    var dx = x - rect.width / 2, dy = y - rect.height / 2;
+    var len = Math.hypot(dx, dy) || 1;
+    var off = labelSize * 1.35;
+
+    pts.push({
+      el: o.el,
+      key: o.key,                                  // ★ 必须带上，否则 pLabelRect 恒为 null
+      bx: x + dx / len * off, by: y + dy / len * off,
+      x:  x + dx / len * off, y:  y + dy / len * off
+    });
+  });
+
+  // 松弛避让
+  var minD = labelSize * 1.05 + 18;
+  for (var it = 0; it < 12; it++) {
+    for (var i = 0; i < pts.length; i++) {
+      for (var j = i + 1; j < pts.length; j++) {
+        var ax = pts[i].x - pts[j].x, ay = pts[i].y - pts[j].y;
+        var d = Math.hypot(ax, ay);
+        if (d < minD && d > 0.01) {
+          var push = (minD - d) / 2;
+          ax /= d; ay /= d;
+          pts[i].x += ax * push; pts[i].y += ay * push;
+          pts[j].x -= ax * push; pts[j].y -= ay * push;
+        }
+      }
+    }
+  }
+
+  var lim = labelSize * 1.35 * 2.2;
+  pts.forEach(function (o) {
+    var dx = o.x - o.bx, dy = o.y - o.by, d = Math.hypot(dx, dy);
+    if (d > lim) { o.x = o.bx + dx / d * lim; o.y = o.by + dy / d * lim; }
+    o.el.style.transform = 'translate(-50%,-50%) translate(' + o.x + 'px,' + o.y + 'px)';
+    o.hit = {
+      x0: o.x - o.el.offsetWidth / 2, x1: o.x + o.el.offsetWidth / 2,
+      y0: o.y - o.el.offsetHeight / 2, y1: o.y + o.el.offsetHeight / 2
+    };
+    if (o.key === 'P') pLabelRect = o.hit;
+  });
+}
+
+function setPHot(on) {
+  if (pHot === on) return;
+  pHot = on;
+  labelEls.forEach(function (o) {
+    if (o.key === 'P') o.el.classList.toggle('hot', on);
+  });
+  applyPickStyles();
+}
+
+/* ---------- 读数 ---------- */
+function refreshPick() {
+  var box = document.getElementById('pickBox');
+  if (!box) return;
+  if (!selKeys.length) {
+    box.classList.remove('on');
+    box.textContent = '点一下顶点即可高亮（可多选）';
+    return;
+  }
+  box.classList.add('on');
+  var html = '<b>已选 ' + selKeys.length + ' 个顶点</b>';
+  selKeys.forEach(function (k) {
+    var pos = (k === 'P') ? computeP() : V[k];
+    if (!pos) return;
+    html += '<div class="pr"><i>' + (LABEL_NAME[k] || k) + '</i><span>(' +
+            fmt(pos.x) + ', ' + fmt(pos.y) + ', ' + fmt(pos.z) + ')</span></div>';
+  });
+  box.innerHTML = html;
+}
+
+function refreshReadout() {
+  var n1 = planeNormal(V.Ap, V.B, V.D);
+  var n2 = planeNormal(computeP(), V.B, V.D);
+  var ang = twoPlaneAngle(n1, n2);
+
+  document.getElementById('rT').textContent = state.t.toFixed(3);
+  var pc = 1 - state.t, pcp = state.t;
+  var ratio;
+  if (pc < 1e-6) ratio = '0 : 1';
+  else if (pcp < 1e-6) ratio = '1 : 0';
+  else ratio = '1 : ' + fmt(pcp / pc);
+  document.getElementById('rRatio').textContent = ratio;
+  document.getElementById('rAng').textContent = ang.toFixed(1) + '°';
+  document.getElementById('sTval').textContent =
+    fmt(pc === 0 ? 0 : pcp) + ' : ' + fmt(pc);
+
+  var mid = document.getElementById('rMid');
+  if (mid) mid.classList.toggle('on', Math.abs(state.t - 0.5) < 0.004);
+
+  var box = document.getElementById('readout');
+  if (Math.abs(ang - 90) < 0.35) box.classList.add('crit');
+  else box.classList.remove('crit');
+
+  if (isSel('P')) applyPickStyles();
+}
+
+/* ---------- 重建 ---------- */
+function buildDynamic() {
+  var groups = { planes: gPlanes, q1: gQ1, q3: gQ3, mover: gMover };
+  clearGroup(gPlanes); clearGroup(gQ1); clearGroup(gQ3); clearGroup(gMover);
+  buildDynamicLegacy(groups);
+  if (pMesh) pMesh.position.copy(computeP());
+}
+
+function setT(t, fromUser) {
+  state.t = Math.max(0, Math.min(1, t));
+  var sT = document.getElementById('sT');
+  if (sT) sT.value = state.t;      // 滑块与拖拽双向同步，共用这一个入口
+  buildDynamic();
+  refreshReadout();
+}
+
+/* ---------- 手势 ---------- */
+function pinchGeom() {
+  var a = Array.from(ptrs.values());
+  if (a.length < 2) return null;
+  return { d: Math.hypot(a[0].x - a[1].x, a[0].y - a[1].y),
+           cx: (a[0].x + a[1].x) / 2, cy: (a[0].y + a[1].y) / 2 };
+}
+
+canvas.addEventListener('contextmenu', function (e) { e.preventDefault(); });
+
+canvas.addEventListener('pointerdown', function (e) {
+  if (canvas.setPointerCapture) { try { canvas.setPointerCapture(e.pointerId); } catch (err) {} }
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  if (ptrs.size === 1) {
+    var r = canvas.getBoundingClientRect();
+    var hot = pickVertex(e.clientX - r.left, e.clientY - r.top, r.width, r.height, TOL_P);
+
+    // ① 最高优先级：按住动点 → 整个手势期间相机静止
+    if (hot === 'P' && MOVER.enabled && e.button !== 2 && !e.shiftKey) {
+      gesture = 'dragP';
+      tapInfo = null;
+      dragP = { r: r, startT: state.t, lastT: state.t, movedEnough: false, heldKey: 'P' };
+      setPHot(true);
+      canvas.style.cursor = 'grabbing';
+      return;
+    }
+    // ② 平移 / 旋转
+    gesture = (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate';
+    tapInfo = { x: e.clientX, y: e.clientY, t: performance.now(),
+                moved: false, type: e.pointerType, key: hot };
+
+  } else if (ptrs.size === 2) {
+    gesture = 'pinch';
+    tapInfo = null; dragP = null;
+    pinchStart = pinchGeom();
+    camStartDist = cam.dist;
+    targetStart.copy(target);
+  }
+});
+
+canvas.addEventListener('pointermove', function (e) {
+  // 悬停探测：鼠标端唯一的"此处可拖"暗示
+  if (!ptrs.has(e.pointerId)) {
+    if (e.pointerType === 'mouse' && !gesture && MOVER.enabled) {
+      var rr = canvas.getBoundingClientRect();
+      var hk = pickVertex(e.clientX - rr.left, e.clientY - rr.top, rr.width, rr.height, TOL_P);
+      setPHot(hk === 'P');
+      canvas.style.cursor = 'grab';
+    }
+    return;
+  }
+  var prev = ptrs.get(e.pointerId);
+  var dx = e.clientX - prev.x, dy = e.clientY - prev.y;
+  ptrs.set(e.pointerId, { x: e.clientX, y: e.clientY });
+
+  // ★ dragP 必须排在其它分支之前
+  if (gesture === 'dragP') {
+    var t = screenToT(e.clientX - dragP.r.left, e.clientY - dragP.r.top, dragP.r);
+    if (t !== null) {
+      if (Math.abs(t - dragP.startT) > 0.02) dragP.movedEnough = true;
+      setT(t, true);
+      dragP.lastT = t;
+    }
+    return;
+  }
+
+  if (gesture === 'pinch' && ptrs.size === 2) {
+    var g = pinchGeom();
+    if (g && pinchStart) {
+      var ratio = pinchStart.d / Math.max(g.d, 1);
+      cam.dist = Math.max(2.2, Math.min(24, camStartDist * ratio));
+      var r2 = canvas.getBoundingClientRect();
+      var right = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
+      var up    = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
+      var k = cam.dist * 0.0016;
+      target.copy(targetStart);
+      target.addScaledVector(right, -(g.cx - pinchStart.cx) * k);
+      target.addScaledVector(up,     (g.cy - pinchStart.cy) * k);
+      applyCamera();
+      canvas.style.cursor = 'grabbing';
+    }
+    return;
+  }
+
+  if (gesture === 'pan') {
+    var r3 = canvas.getBoundingClientRect();
+    var rightP = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 0);
+    var upP    = new THREE.Vector3().setFromMatrixColumn(camera.matrix, 1);
+    var kp = cam.dist * 0.0016;
+    target.addScaledVector(rightP, -dx * kp);
+    target.addScaledVector(upP,     dy * kp);
+    applyCamera();
+    if (tapInfo && Math.hypot(e.clientX - tapInfo.x, e.clientY - tapInfo.y) > 9) tapInfo.moved = true;
+    return;
+  }
+
+  if (gesture === 'rotate') {
+    if (tapInfo) {
+      if (!tapInfo.moved) {
+        if (Math.hypot(e.clientX - tapInfo.x, e.clientY - tapInfo.y) > 9) {
+          tapInfo.moved = true;
+          // ★ 越过阈值时补上"起点→当前"的完整位移，否则前 9px 白拖
+          cam.azim -= (e.clientX - tapInfo.x) * 0.008;
+          cam.elev += (e.clientY - tapInfo.y) * 0.008;
+          applyCamera();
+        }
+      } else {
+        cam.azim -= dx * 0.008;
+        cam.elev += dy * 0.008;
+        applyCamera();
+      }
+    }
+    canvas.style.cursor = 'grabbing';
+  }
+});
+
+function endPointer(e) {
+  var wasSingle = (ptrs.size === 1);
+  var wasDragP  = (gesture === 'dragP');
+  ptrs.delete(e.pointerId);
+  if (canvas.releasePointerCapture) { try { canvas.releasePointerCapture(e.pointerId); } catch (err) {} }
+
+  if (wasDragP) {
+    // ★ 复用按下时的判定结果，不二次命中
+    if (dragP && !dragP.movedEnough) doTapKey(dragP.heldKey);
+    dragP = null;
+    setPHot(false);
+    if (ptrs.size === 0) { gesture = null; canvas.style.cursor = 'grab'; }
+    return;
+  }
+
+  if (wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
+      performance.now() - tapInfo.t < 700) {
+    if (tapInfo.key) doTapKey(tapInfo.key);
+    else doTap(e.clientX, e.clientY, tapInfo.type);
+  }
+
+  if (ptrs.size === 0) {
+    gesture = null; tapInfo = null; pinchStart = null;
+    canvas.style.cursor = 'grab';
+  } else if (ptrs.size === 1) {
+    var rest = ptrs.values().next().value;
+    gesture = 'rotate';
+    tapInfo = { x: rest.x, y: rest.y, t: performance.now(), moved: true, type: 'touch' };
+  }
+}
+canvas.addEventListener('pointerup', endPointer);
+canvas.addEventListener('pointercancel', endPointer);
+
+canvas.addEventListener('wheel', function (e) {
+  e.preventDefault();
+  cam.dist = Math.max(2.2, Math.min(24, cam.dist * (1 + Math.sign(e.deltaY) * 0.09)));
+  applyCamera();
+}, { passive: false });
+
+// iOS Safari 兜底：防止橡皮筋与双击缩放
+canvas.addEventListener('touchmove', function (e) {
+  if (e.cancelable) e.preventDefault();
+}, { passive: false });
+
+// 键盘：Esc 清空高亮
+window.addEventListener('keydown', function (e) {
+  if (e.key === 'Escape') { selKeys.length = 0; applyPickStyles(); }
+});
+
+/* ---------- 控件绑定 ---------- */
+function bindCheck(id, key, rebuild) {
+  var el = document.getElementById(id);
+  if (!el) return;
+  el.checked = !!state[key];
+  el.addEventListener('change', function () {
+    state[key] = el.checked;
+    if (rebuild) buildDynamic();
+    if (key === 'solid') gSolid.visible = el.checked;
+    if (key === 'axes')  gAxes.visible  = el.checked;
+  });
+}
+function initControls() {
+  var sT = document.getElementById('sT');
+  sT.addEventListener('input', function () { setT(parseFloat(sT.value), true); });
+
+  var bMid = document.getElementById('bMid');
+  if (bMid) bMid.addEventListener('click', function () { setT(0.5, true); });
+
+  var sFont = document.getElementById('sFont');
+  sFont.addEventListener('input', function () {
+    var v = parseInt(sFont.value, 10);
+    setLabelSize(v);
+    document.getElementById('sFontval').textContent = v + ' px';
+  });
+
+  bindCheck('cLabels', 'labels', false);
+  bindCheck('cSolid', 'solid', false);
+  bindCheck('cAxes', 'axes', false);
+  bindCheck('cPlane1', 'plane1', true);
+  bindCheck('cPlane2', 'plane2', true);
+  bindCheck('cQ1', 'q1', true);
+  bindCheck('cQ3', 'q3', true);
+
+  var bClear = document.getElementById('bClearSel');
+  if (bClear) bClear.addEventListener('click', function () {
+    selKeys.length = 0; applyPickStyles();
+  });
+
+  // 抽屉
+  var panel = document.getElementById('panel');
+  var tgl = document.getElementById('toggle');
+  var scrim = document.getElementById('scrim');
+  function setDrawer(open) {
+    panel.classList.toggle('open', open);
+    scrim.classList.toggle('show', open);
+  }
+  tgl.addEventListener('click', function () { setDrawer(!panel.classList.contains('open')); });
+  scrim.addEventListener('click', function () { setDrawer(false); });
+  window.addEventListener('orientationchange', function () { setDrawer(false); });
+
+  // 提示文案按输入设备切换
+  var hint = document.getElementById('hint');
+  if (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) {
+    hint.textContent = '拖动 ' + MOVER.label + ' 点可滑动 · 点顶点高亮（再点取消）· 单指旋转 · 双指缩放移动';
+  }
+}
+
+/* ---------- 主循环 ---------- */
+function loop() {
+  requestAnimationFrame(loop);
+  if (gesture === 'dragP' && pMesh) {
+    pPulse += 0.16;
+    var s = 1.35 + Math.sin(pPulse) * 0.13;
+    pMesh.scale.setScalar(isSel('P') ? s * 1.7 : s);
+  }
+  renderer.render(scene, camera);
+  syncLabels();          // 必须在 render 之后
+}
+
+/* ---------- 启动 ---------- */
+function init() {
+  gSolid  = buildSolid();
+  gAxes   = buildAxes();
+  gPlanes = new THREE.Group();
+  gQ1     = new THREE.Group();
+  gQ3     = new THREE.Group();
+  gMover  = new THREE.Group();
+  gVerts  = buildVertices();
+
+  gSolid.visible = state.solid;
+  gAxes.visible  = state.axes;
+
+  scene.add(gSolid, gAxes, gPlanes, gQ1, gQ3, gMover, gVerts);
+
+  initControls();
+  setLabelSize(state.font);
+  buildLabels();
+  resize();
+  applyCamera();
+  setT(state.t);
+
+  window.addEventListener('resize', function () { resize(); applyCamera(); });
+  loop();
+}
+init();
+
+/* ---------- 调试句柄（生产可整块删除） ---------- */
+window.__S = {
+  state: state, cam: cam, camera: camera, selKeys: selKeys, renderer: renderer,
+  setT: setT, applyPickStyles: applyPickStyles, screenToT: screenToT,
+  pickVertex: pickVertex, computeP: computeP,
+  get pLabelRect() { return pLabelRect; }
+};
+window.__GEO = {};
+Object.keys(V).forEach(function (k) { window.__GEO[k] = V[k]; });
+
+})();
+</script>
+</body>
+</html>
