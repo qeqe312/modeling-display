@@ -193,7 +193,7 @@
     padding: 2px 10px;
     border-radius: 999px;
     background: var(--accent);
-    color: #FFFFFF;
+    color:#20130D;
     font-weight: 600;
     font-size: 12px;
     box-shadow: 0 0 0 1px rgba(255,122,69,.35), 0 2px 8px var(--glow-accent);
@@ -292,7 +292,7 @@
   }
   /* P 点被悬停或拖动中：加呼吸光环 + 加深底色，明确"这个点可以抓" */
   #labels .lab.p.hot {
-    color: #FFFFFF;
+    color:#20130D;
     background: var(--accent);
     border-color: #FFB392;
     animation: labPulse 1.15s ease-in-out infinite;
@@ -311,7 +311,7 @@
   #labels .lab.hide { display: none; }
   /* 被点选的顶点：橙底白字，与未选中态强对比 */
   #labels .lab.sel {
-    color: #FFFFFF;
+    color:#20130D;
     background: var(--accent);
     border-color: #FFB392;
     box-shadow: 0 0 0 3px rgba(255,122,69,.32), 0 0 14px rgba(255,122,69,.28);
@@ -620,18 +620,27 @@
 
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
-<script>if (!window.THREE) { document.write('<script src="three.min.js"><\/script>'); }</script>
+<!-- THREE_DEPENDENCY_START -->
+<script src="../assets/vendor/three.min.js"></script>
+<script>if (!window.THREE) { document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js" integrity="sha384-x9wDJy7yFtLLFyV/D2Aw4FtythXqOQNmB5PthOB+IlnSFXvS8/Kx7IzPEZWDgH7P" crossorigin="anonymous"><\/script>'); }</script>
+<!-- THREE_DEPENDENCY_END -->
 <script>
 (function () {
   'use strict';
 
-  if (!window.THREE) {
-    document.body.innerHTML = '<div style="padding:40px;font-family:sans-serif;line-height:1.8">' +
-      'Three.js 未能加载。<br>本页面通过 CDN（jsdelivr）引入 Three.js，请联网后重新打开；' +
-      '若需离线使用，请把 three.min.js 放在本 HTML 同一目录。</div>';
-    return;
-  }
+
+function showStartupError(message) {
+  var notice = document.createElement('div');
+  notice.setAttribute('role', 'alert');
+  notice.style.cssText = 'padding:40px;font-family:system-ui;line-height:1.8';
+  notice.textContent = message;
+  document.body.replaceChildren(notice);
+}
+if (!window.THREE) {
+  showStartupError('Three.js 未能加载。请使用离线打包工具，把 three.min.js 与 HTML 一起交付，或联网后重新打开。');
+  return;
+}
+
 
   // ============================================================
   // 一、题目几何参数
@@ -664,7 +673,8 @@
   var canvas   = document.getElementById('cv');
   var labelBox = document.getElementById('labels');
 
-  var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+  var renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true }); } catch (error) { showStartupError('浏览器无法启动 WebGL。请开启硬件加速或更换支持 WebGL 的浏览器。'); return; }
   renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   // 暗色主题：画布不透明，必须与 #stage 的 CSS 渐变同色系，
   // 否则 WebGL 会盖出一整块亮底，CSS 渐变根本看不见
@@ -956,6 +966,19 @@
     return '(' + f(c[0]) + ', ' + f(c[1]) + ', ' + f(c[2]) + ')';
   }
 
+function renderPickRows(box, keys, getCoord) {
+  box.textContent = '';
+  var heading = document.createElement('b');
+  heading.textContent = '已选 ' + keys.length + ' 个顶点';
+  box.appendChild(heading);
+  keys.forEach(function (key) {
+    var row = document.createElement('div'); row.className = 'pr';
+    var name = document.createElement('i'); name.textContent = LABEL_NAME[key] || key;
+    var coord = document.createElement('span'); coord.textContent = getCoord(key);
+    row.append(name, coord); box.appendChild(row);
+  });
+}
+
   function applyPickStyles() {
     // ---- 顶点小球：每个选中顶点都用完全相同的放大倍率与颜色 ----
     vertMeshes.forEach(function (o) {
@@ -1011,7 +1034,7 @@
       if (selKeys.length === 0) {
         list.textContent = '尚未选中顶点';
       } else {
-        list.innerHTML = '';
+        list.textContent = '';
         selKeys.forEach(function (k) {
           var chip = document.createElement('span');
           chip.className = 'chip';
@@ -1028,14 +1051,8 @@
         box.className = 'pick';
         box.textContent = '点一下顶点即可高亮（可多选）';
       } else {
-        var html = '<b>已选 ' + selKeys.length + ' 个顶点</b>';
-        selKeys.forEach(function (k) {
-          html += '<div class="pr"><i>' + LABEL_NAME[k] + '</i><span>' +
-                  coordText(k) + '</span></div>';
-        });
-        if (isSel('P')) html += '<div class="pr" style="opacity:.7">P 随滑块实时变化</div>';
         box.className = 'pick on';
-        box.innerHTML = html;
+        renderPickRows(box, selKeys, coordText);
       }
     }
   }
@@ -1102,7 +1119,7 @@
   // 六、顶点标注（DOM 叠加层）
   // ============================================================
   function buildLabels() {
-    labelBox.innerHTML = '';
+    labelBox.textContent = '';
     labelEls = [];
     Object.keys(V).forEach(function (k) {
       var d = document.createElement('div');
@@ -1223,7 +1240,7 @@
       ang = Math.acos(c) * 180 / Math.PI;
     }
 
-    var pc = 1 - state.t, pcp = state.t;
+    var pc = state.t, pcp = 1 - state.t;
     var ratioTxt;
     if (pc < 1e-6) ratioTxt = '0 : 1';
     else if (pcp < 1e-6) ratioTxt = '1 : 0';
@@ -1330,8 +1347,8 @@
   //
   // 为什么不用"把屏幕点投影到棱的屏幕线段上"这种更直觉的做法：
   // 透视投影下，三维棱上等距的点在屏幕上并不等距。本模型 C 与 C′ 的深度
-  // 相差约 0.26，实测最坏会让 t 偏 1.15%——把 P 拖到"看起来正是 C′ 的位置"
-  // 却得到 t=0.9885，学生一眼就能看出点没落在顶点上。
+  // 棱内点的屏幕线性参数不等于空间参数；偏差随深度与相机变化。
+  // 两端点仍必须分别对应 t=0 和 t=1，不使用历史误差作为普遍保证。
   //
   // 精确解：设棱 Q(t)=C+t·u（u=C′−C），射线 R(s)=O+s·d（d 为单位向量），
   // 最小化 |Q(t)−R(s)|² 得正规方程（w = O−C）：
@@ -1536,7 +1553,7 @@
     // 拖动 P 结束：若几乎没动，视为"点选 P"（走原有高亮逻辑），
     // 这样 P 既是可拖的、也仍然能被点选高亮，两个能力不冲突
     if (wasDragP) {
-      if (dragP && !dragP.movedEnough) {
+      if (e.type !== 'pointercancel' && dragP && !dragP.movedEnough) {
         doTapKey(dragP.heldKey);          // 复用按下时的判定结果，不做二次命中
       }
       dragP = null;
@@ -1549,7 +1566,7 @@
     }
 
     // 点选判定：单指/单键 + 几乎没移动 + 按下时间够短
-    if (wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
+    if (e.type !== 'pointercancel' && wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
         performance.now() - tapInfo.t < 700) {
       if (tapInfo.key) {
         doTapKey(tapInfo.key);            // 按下时已判定的顶点，直接用
@@ -1692,9 +1709,10 @@
 
   loop();
 
-  // 自动化测试挂钩：仅暴露只读句柄，不改变任何行为。
+  // 自动化测试挂钩：仅在 #geo-debug 模式暴露可变测试句柄。
   // 生产使用时可整块删除，不影响页面功能。
-  window.__S = {
+  if (window.location.hash === '#geo-debug') {
+window.__S = {
     state: state, cam: cam, camera: camera, selKeys: selKeys,
     setT: setT, applyPickStyles: applyPickStyles, screenToT: screenToT,
     pickVertex: pickVertex, computeP: computeP, renderer: renderer,
@@ -1702,6 +1720,7 @@
   };
   window.__GEO = {};
   Object.keys(V).forEach(function (k) { window.__GEO[k] = V[k]; });
+}
 
 })();
 </script>

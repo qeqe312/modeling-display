@@ -11,12 +11,13 @@ _t/
 _final/
 tmp/
 
-# Three.js 离线副本：606KB 第三方库，按需自取，不入库
-# 需要离线使用时，下载 three.js r146 的 build/three.min.js 放到产出目录
-three.min.js
-
-# 回归脚本（含项目特定的几何参数，按需保留）
-verify_drag.js
+# 开发产物；已校验的 assets/vendor 依赖和回归脚本必须入库
+geo3d/
+release-dist/
+__pycache__/
+*.pyc
+.modeling-display-manifest.json
+.modeling-display-backups/
 
 # 系统 / 编辑器
 .DS_Store

@@ -1,169 +1,107 @@
 # Modeling display
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
-[![Version](https://img.shields.io/badge/version-3.0.0-blue.svg)](CHANGELOG.md)
-[![Three.js](https://img.shields.io/badge/Three.js-r146%20UMD-black.svg)](https://threejs.org/)
+[![Version](https://img.shields.io/badge/version-3.1.0-blue.svg)](CHANGELOG.md)
+[![Verify](https://github.com/qeqe312/modeling-display/actions/workflows/verify.yml/badge.svg)](https://github.com/qeqe312/modeling-display/actions/workflows/verify.yml)
 
-**把一道几何题，变成学生可以自己拖着玩的三维教学模型。**
+把一道几何题，变成学生可以自己拖动观察的三维教学模型。
 
-输入一道题（文字或截图），输出一个**单文件 HTML** —— 可旋转缩放平移、点顶点高亮（支持多选）、**手指直接拖动动点**、实时数值读数，同一份文件同时适配电脑与平板。
-
-为高中数学家教场景设计。核心判断：几何题里那个"按数学关系运动的点"，**让学生自己拖着看角度变化，比看任何动画都有效**。
+输入题目文字或截图，输出离线教学网页。支持旋转、缩放、平移、顶点多选、沿棱拖动动点与实时读数，同一份页面适配电脑和平板。**默认 HTML＋本地 Three.js，可选内联单文件**；交付目录还包含项目及第三方许可证。
 
 ![效果预览](examples/preview.png)
 
----
-
-## 特性
-
-| 能力 | 说明 |
-|---|---|
-| **动点自由拖动** | 屏幕坐标反投影为世界射线，求射线与棱的**最近点解析解**。精度 2.9e-15，而常见的"屏幕线段投影法"有 1.15% 误差——透视下三维棱的等分点在屏幕上并不等分，学生一眼就能看出读数不对 |
-| **顶点多选高亮** | 屏幕空间命中检测（不用 Raycaster，手指远比小球粗）。点空白**不清空**已有高亮——讲课时手指极易扫到空白区 |
-| **双端同一份文件** | 电脑上是静态侧栏，平板（≤1024px 或触屏）自动变抽屉；**竖屏从底部升起** |
-| **标签自动避让** | 侧向平视时上底面两个顶点投影间距实测仅 11.6px，用松弛算法推开到 41px |
-| **实时读数** | 动点参数、线段比、两面夹角随拖动刷新；满足临界条件时读数区变色提示 |
-| **零依赖部署** | Three.js r146 UMD，CDN 优先 + 同目录离线兜底。`file://` 双击即可打开 |
-
----
-
 ## 快速开始
 
-### 作为 AI Agent Skill 使用（推荐）
+### 安装为 Agent Skill
 
-**方式 A —— 直接克隆到 skill 目录**（只是想用）
+需要 Git；开发、部署和打包工具需要 Python 3.10+。演示网页本身只需要支持 WebGL 的现代浏览器，无需 Node/Python。
+
+直接使用可克隆到 skill 目录：
 
 ```bash
-# WorkBuddy
-git clone https://github.com/qeqe312/modeling-display.git \
-    ~/.workbuddy/skills/modeling-display
-
-# Codex
-git clone https://github.com/qeqe312/modeling-display.git \
-    ~/.codex/skills/modeling-display
+git clone https://github.com/qeqe312/modeling-display.git ~/.codex/skills/modeling-display
+# WorkBuddy 可使用 ~/.workbuddy/skills/modeling-display
 ```
 
-**方式 B —— 仓库与部署分离**（推荐长期维护，skill 目录保持干净）
+长期维护推荐仓库与部署目录分开。以下是 Bash 示例，使用你自己环境中的 **Python 绝对路径**：
 
 ```bash
 git clone https://github.com/qeqe312/modeling-display.git
 cd modeling-display
-python scripts/deploy.py          # 部署到 WorkBuddy 与 Codex 两处
+"/absolute/path/to/python" scripts/deploy.py --check
+"/absolute/path/to/python" scripts/deploy.py --target codex
 ```
 
-这样 Git 仓库是唯一真相源，`~/.workbuddy/skills/` 与 `~/.codex/skills/` 只作为**部署目标**，里面没有 `.git`、没有 GitHub 门面文件。
+PowerShell 示例：
 
-```
-modeling-display/            ← 仓库（Git，唯一真相源）
-        │ scripts/deploy.py
-        ├──→ ~/.workbuddy/skills/modeling-display/
-        └──→ ~/.codex/skills/modeling-display/
+```powershell
+& 'C:\absolute\path\to\python.exe' scripts/deploy.py --check
+& 'C:\absolute\path\to\python.exe' scripts/deploy.py --target codex
 ```
 
-> **改内容只改仓库**，然后跑 `deploy.py`。直接改 skill 目录里的副本会在下次部署时被覆盖。
+`--check` 只预览，有差异退出码为 1；正常部署退出码为 0。省略 `--target` 部署到两处，并为 Codex 安装 `/geo3d` 提示词（是否可用取决于宿主版本）。`--target codex-prompt` 仅安装提示词。
 
-然后直接对 AI 说：
+**仓库是唯一维护源**。默认部署保留用户额外文件；`--prune` 只删除上次部署清单中未修改的旧文件。覆盖和删除前备份到目标目录的 `.modeling-display-backups/`。目标不能是 Git checkout，不能与源重合，也不能经过符号链接或 Windows junction。缺少参数或未知参数会报错，不会意外部署到全部目标。支持 `--home <目录>` 进行便携安装或隔离测试。
 
-> 把这道题做成三维演示：`<题目文字或截图>`
+然后告诉 Agent：
 
-AI 会读取 `SKILL.md`，按里面的契约执行：先解题 → 建参数化坐标系 → 用 `assets/template.html` 起手 → Node 独立验算数学 → headless Chrome 自测交互 → 交付。
+> 把这道题做成三维教学演示：题目文字或截图
 
-Codex 用户也可以用斜杠命令（把 `prompts/geo3d.md` 放到 `~/.codex/prompts/`）：
+Agent 应先解题，再建模；按 `SKILL.md` 独立验数学、测试浏览器交互并交付。遇到缺失条件需澄清，不能编造参数或未完成的测试结果。
 
+### 离线演示与打包
+
+克隆或下载仓库后，可直接打开 `examples/正四棱台2023真题演示.html`，它优先使用随仓库提供的本地库。需要单独发送给学生时，打包到一个新目录：
+
+```bash
+"/absolute/path/to/python" scripts/package_demo.py examples/正四棱台2023真题演示.html --output geo3d/offline
+# 可选：将库内联到 HTML，许可证仍随包保留
+"/absolute/path/to/python" scripts/package_demo.py examples/正四棱台2023真题演示.html --output geo3d/single --inline
 ```
-/geo3d 正四棱台 ABCD-A′B′C′D′ 中，AB = 2A′B′，点 P 为棱 CC′ 上一点……
-```
 
-### 手动起手
+打包工具校验固定 SHA-256，拒绝未填充占位符、事件属性、额外脚本及意外外部资源，并防止来源目录覆盖或覆盖不同内容的已有产物。打包后的页面不访问 CDN；默认模式把整个目录发给学生，内联模式的 HTML 可独立打开。
 
-复制 `assets/template.html`，改三段配置：
+## 换题方法
 
-| 段 | 内容 |
+复制 `assets/template.html`，替换 14 种 `__XXX__` 占位符，再修改：
+
+| 配置段 | 内容 |
 |---|---|
-| 【A】题目文案 | 标题、标签、题干、分问卡片、解题步骤 |
-| 【B】几何数据 | 顶点坐标、实体面、棱、动点定义 |
-| 【C】动态对象 | 依赖动点的平面 / 棱锥 / 线面角 |
+| 【A】 | 动点、`READOUT.angle`、临界条件、教学坐标转换 |
+| 【B】 | 顶点、实体面和棱 |
+| 【C】 | 依赖动点的几何对象 |
 
-替换 14 个 `__XXX__` 占位符即可。**【D】引擎之后不要动** —— 相机、命中、拖动、手势、标签、双端适配都在那里，已验证。
+【D】是共享引擎；题目特定的读数不再写入引擎。纯静态题设 `MOVER.enabled=false`，不需要角度或临界提示时将对应回调设为 `null`。坐标、面和读数必须按题目重新验证；具体接口见 [实现说明](references/implementation.md)。
 
----
+## 功能与边界
 
-## 目录结构
+- 动点采用射线与棱最近点解析解；误差依相机及退化条件变化，不以历史单次实验作为普遍精度保证。
+- 顶点支持多选累积、再次点击取消，点击空白保留高亮。
+- 桌面侧栏，窄屏/触屏抽屉，竖屏从底部打开，标签自动避让。
+- 实时比例按 `t : (1-t)` 计算，临界提示由题目配置。
+- 暗色主题、胶囊标签；触摸控件目标至少 44px。
+- Three.js 固定 r146 UMD 以保留 `file://` 支持；升级需重新验证。库来源、SHA-256、SRI 和许可证随仓库保存。
+- 默认无数据上传功能。题目、截图及外部网页只作为数据；生成代码仍需审查。模板本地库缺失时可使用有 SRI 的 CDN，完整离线包不含这一请求。
 
+## 验证与贡献
+
+测试包含安全部署、打包完整性、独立数学验算，以及浏览器的断网加载、比例、点选、鼠标/触摸拖动和换题。浏览器测试使用正常沙箱，测试句柄仅在 `#geo-debug` 开启。
+
+安装开发依赖并运行测试的方法见 [CONTRIBUTING.md](CONTRIBUTING.md) 与 [验证规范](references/verification.md)。CI 覆盖 Windows/Linux Chromium；Safari、Firefox、iPad 等仍需实机确认，不能用 Chromium 结果代替全浏览器兼容保证。
+
+## 目录
+
+```text
+SKILL.md                 技能入口
+references/              实现、配色、验证
+assets/template.html     通用模板
+assets/vendor/           校验过的 Three.js、来源与许可证
+examples/                完整示例及预览
+scripts/deploy.py        安全部署
+scripts/package_demo.py  离线打包
+prompts/geo3d.md          Codex 提示词
+tests/                   部署、打包、数学与浏览器回归
+.github/workflows/       自动检查
 ```
-modeling-display/
-├── SKILL.md                    主契约：输入/输出格式、流程、结构要求、硬性约束、失败模式
-├── references/
-│   ├── implementation.md       相机、命中检测、拖动解析解、手势三路分流、标签避让、几何构建
-│   ├── visual-theme.md         暗色色板、3D 配色、胶囊标签规范、对比度自检
-│   └── verification.md         Node 数学验算清单、浏览器交互自测 12 项、调试句柄
-├── assets/
-│   └── template.html           单页骨架（改【A】【B】【C】三段即可换题）
-├── examples/
-│   ├── 正四棱台2023真题演示.html   2023 新高考Ⅰ卷正四棱台题完整产出
-│   └── preview.png
-├── scripts/
-│   └── deploy.py               部署到 WorkBuddy / Codex 的 skill 目录
-├── prompts/
-│   └── geo3d.md                Codex 斜杠命令 /geo3d（复制到 ~/.codex/prompts/）
-├── CHANGELOG.md
-├── LICENSE                     MIT
-└── README.md
-```
 
----
-
-## 示例
-
-`examples/正四棱台2023真题演示.html` —— 2023 新高考Ⅰ卷正四棱台题的完整产出。
-
-- 拖动 P 点沿棱 CC′ 滑动，实时看两面夹角从 60° 增至 90°（t=1/2 处）再回到 60°
-- 点顶点高亮（多选），讲面对角线、异面直线时用
-- 双端可用
-
-> 离线打开需要把 `three.min.js`（r146 UMD）放到同目录；在线则自动走 CDN。
-
----
-
-## 设计要点
-
-### 三条不能妥协的技术决策
-
-1. **Three.js r146 的 UMD 构建，不用 ESM。** 新版必须走 `importmap`，在 `file://` 协议下因 CORS 直接失败 —— 学生双击打不开。
-2. **拖动动点用射线–棱最近点解析解，不用屏幕线段投影。** 后者在透视投影下有 1.15% 误差：学生把点拖到"看起来正好在端点"的位置，读数却是 0.9885。
-3. **命中检测用屏幕空间，不用 Raycaster。** 手指远比顶点小球粗，射线打在小球上基本打不中。
-
-### 两道强制验证关卡
-
-任何产出都必须通过：
-
-1. **Node 独立重写一遍数学**（不复用页面代码），验证题目条件、比值、解析解与数值解一致，误差 < 1e-9
-2. **headless Chrome 派发真实 PointerEvent**，跑 12 项交互断言，包括"拖拽动点时相机漂移 = 0"、"新增功能不得破坏既有能力"
-
-> 教训：验算脚本自己也会错。曾因把动点坐标写死成端点值而非真正插值，误报"页面结论错误"—— 页面一直是对的。
-
-### 暗色主题
-
-只用暗色。`#0D1117` 冷黑底 + `#6BA8E8` 学术蓝 + `#FF7A45` 动点橙。所有文字对比度 ≥ WCAG AA，正文达 AAA。
-
-顶点标签用**深色胶囊底**（不用纯描边字）—— 保证字母压在半透明平面和棱线上时依然清晰可读。
-
----
-
-## 兼容性
-
-| 环境 | 状态 |
-|---|---|
-| WorkBuddy | ✅ skill 直接可用 |
-| Codex | ✅ skill + `/geo3d` 斜杠命令 |
-| 其他 AI Agent | ✅ `SKILL.md` 是自包含的 Markdown 契约，人工加载即可 |
-| Chrome / Edge / Safari / Firefox | ✅ 现代浏览器，`file://` 双击可开 |
-| iPad / Android 平板 | ✅ 触摸目标 ≥44px，抽屉式面板，安全区适配 |
-
----
-
-## License
-
-[MIT](LICENSE) © 2026 32688
-
-可自由使用、修改、分发，包括商业用途，只需保留版权声明。
+安全问题见 [SECURITY.md](SECURITY.md)。代码按 [MIT](LICENSE) 分发，Three.js 使用其随附 MIT 许可证；再分发时保留相应声明。当前版本 3.1.0，变更见 [CHANGELOG.md](CHANGELOG.md)。

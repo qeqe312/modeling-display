@@ -27,8 +27,7 @@
 
 **打开方式**
 
-直接双击即可（走 CDN 加载 Three.js）。
-**离线使用**需把 three.js r146 的 `build/three.min.js` 放到本目录，页面会自动兜底加载。
+完整克隆/下载仓库后可直接双击，默认加载 `../assets/vendor/three.min.js`，不需要联网。单独分享时使用 `scripts/package_demo.py` 打包到新目录：默认 HTML＋本地库，可选 `--inline`，随包保留许可证。
 
 ---
 

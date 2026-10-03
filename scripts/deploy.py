@@ -1,203 +1,192 @@
-#!/usr/bin/env python3
-# -*- coding: utf-8 -*-
-"""
-部署本仓库为 AI Agent Skill。
-
-本仓库是【唯一真相源】；skill 目录只作为部署目标，保持干净（无 .git、无 GitHub 门面文件）。
-
-    modeling-display/            ← 本仓库（Git，唯一真相源）
-            │ scripts/deploy.py
-            ├──→ ~/.workbuddy/skills/modeling-display/
-            ├──→ ~/.codex/skills/modeling-display/
-            └──→ ~/.codex/prompts/geo3d.md          （斜杠命令）
-
-改内容只改本仓库，然后跑这个脚本。不要直接改 skill 目录里的副本 —— 下次部署会被覆盖。
-
-用法:
-    python scripts/deploy.py                       # 部署到全部目标
-    python scripts/deploy.py --check               # 只检查差异，不写入（有差异退出码 1）
-    python scripts/deploy.py --target workbuddy    # 只部署某一个目标
-"""
-import io
+"""Safe skill deployment: preview with --check, remove managed stale files with --prune."""
+import argparse
+from datetime import datetime, timezone
+import hashlib
+import json
 import os
+from pathlib import Path, PurePosixPath
+import shutil
+import stat
 import sys
+import tempfile
 
-HERE = os.path.dirname(os.path.abspath(__file__))
-REPO = os.path.dirname(HERE)
-
-# 部署哪些（GitHub 门面文件 README/CHANGELOG/LICENSE/.gitignore 不进 skill 目录）
-INCLUDE_FILES = ["SKILL.md"]
-INCLUDE_DIRS = ["references", "assets", "examples"]
-
-# 这些扩展名跳过（图片对 agent 无直接价值，还占体积）
-SKIP_EXT = {".png", ".jpg", ".jpeg", ".gif", ".webp", ".ico"}
-
-# 部署目标（skill 目录）
-TARGETS = {
-    "workbuddy": os.path.join(os.path.expanduser("~"), ".workbuddy", "skills", "modeling-display"),
-    "codex":     os.path.join(os.path.expanduser("~"), ".codex", "skills", "modeling-display"),
-}
-
-# 额外部署：Codex 斜杠命令要放到 ~/.codex/prompts/，不属于 skill 目录
-EXTRA = {
-    "codex-prompt": (
-        os.path.join(REPO, "prompts", "geo3d.md"),
-        os.path.join(os.path.expanduser("~"), ".codex", "prompts", "geo3d.md"),
-    ),
-}
-
-CHECK = "--check" in sys.argv
-ONLY = None
-if "--target" in sys.argv:
-    i = sys.argv.index("--target")
-    if i + 1 < len(sys.argv):
-        ONLY = sys.argv[i + 1]
+REPO = Path(__file__).resolve().parent.parent
+MANIFEST = '.modeling-display-manifest.json'
 
 
-def deploy_file(rel, dest_root, changed):
-    src = os.path.join(REPO, rel)
-    dst = os.path.join(dest_root, rel)
-    parent = os.path.dirname(dst)
-    if parent and not os.path.isdir(parent):
-        if not CHECK:
-            os.makedirs(parent, exist_ok=True)
-
-    new = io.open(src, encoding="utf-8").read()
-    if os.path.exists(dst):
-        if io.open(dst, encoding="utf-8").read() == new:
-            return False
-    if not CHECK:
-        io.open(dst, "w", encoding="utf-8", newline="").write(new)
-    changed.append(rel)
-    return True
+def digest(data):
+    return hashlib.sha256(data).hexdigest()
 
 
-def deploy_abs(src, dst):
-    """按绝对路径部署单个文件；返回是否发生变化"""
-    if not os.path.exists(src):
-        return False
-    parent = os.path.dirname(dst)
-    if parent and not os.path.isdir(parent):
-        if not CHECK:
-            os.makedirs(parent, exist_ok=True)
-    new = io.open(src, encoding="utf-8").read()
-    if os.path.exists(dst) and io.open(dst, encoding="utf-8").read() == new:
-        return False
-    if not CHECK:
-        io.open(dst, "w", encoding="utf-8", newline="").write(new)
-    return True
+def reject_links(path):
+    path = Path(os.path.abspath(path))
+    for component in (path, *path.parents):
+        if component.exists() or component.is_symlink():
+            info = component.lstat()
+            if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
+                raise ValueError(f'Refusing link/reparse point: {component}')
+    return path
 
 
-def prune_target(dest_root, keep_rels, removed):
-    """删除目标目录里不在部署清单中的文件，使目标成为仓库的镜像。
+def safe_file(root, rel):
+    p = PurePosixPath(rel)
+    if (not rel or '\\' in rel or ':' in rel or p.is_absolute()
+            or any(x.lower() in ('..', '.git') for x in p.parts) or p.as_posix() != rel or not p.parts):
+        raise ValueError(f'Unsafe manifest path: {rel!r}')
+    path = reject_links(root.joinpath(*p.parts))
+    if not path.resolve().is_relative_to(root.resolve()) or path == root:
+        raise ValueError(f'Path leaves deployment root: {rel!r}')
+    return path
 
-    skill 目录只是部署产物，不该出现 GitHub 门面文件（README/CHANGELOG/LICENSE）
-    或历史遗留文件。**绝不会碰 .git**。
-    """
-    if not os.path.isdir(dest_root):
+
+def validate_root(root, repo):
+    root = reject_links(root)
+    source, dest = repo.resolve(), root.resolve()
+    if dest.is_relative_to(source) or source.is_relative_to(dest):
+        raise ValueError('Source and destination must not overlap')
+    if root.exists() and not root.is_dir():
+        raise ValueError('Destination is not a directory')
+    if (root / '.git').exists() or (root / '.git').is_symlink():
+        raise ValueError('Destination is a Git checkout; use a separate directory')
+    return root
+
+
+def collect(repo):
+    files = {name: reject_links(repo / name).read_bytes()
+             for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')}
+    for name in ('references', 'assets', 'examples', 'scripts'):
+        directory = reject_links(repo / name)
+        for base, dirs, names in os.walk(directory, followlinks=False):
+            for child in dirs:
+                reject_links(Path(base) / child)
+            dirs[:] = sorted(d for d in dirs if d not in ('__pycache__', '.git'))
+            for child in sorted(names):
+                path = reject_links(Path(base) / child)
+                if path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pyc'}:
+                    continue
+                if name == 'scripts' and path.suffix != '.py':
+                    continue
+                files[path.relative_to(repo).as_posix()] = path.read_bytes()
+    return files
+
+
+def read_manifest(root):
+    path = safe_file(root, MANIFEST)
+    if not path.exists():
+        return {}
+    value = json.loads(path.read_text(encoding='utf-8'))
+    if not isinstance(value, dict) or value.get('schema') != 1 or not isinstance(value.get('files'), dict):
+        raise ValueError('Invalid deployment manifest')
+    for rel, sha in value['files'].items():
+        safe_file(root, rel)
+        if rel == MANIFEST or rel.startswith('.modeling-display-backups/'):
+            raise ValueError('Manifest cannot manage its metadata/backups')
+        if not isinstance(sha, str) or len(sha) != 64 or any(c not in '0123456789abcdef' for c in sha):
+            raise ValueError('Invalid manifest checksum')
+    return value['files']
+
+
+def atomic_write(path, data):
+    reject_links(path)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    fd, temporary = tempfile.mkstemp(prefix='.deploy-', dir=path.parent)
+    try:
+        with os.fdopen(fd, 'wb') as stream:
+            stream.write(data)
+        os.replace(temporary, path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+
+
+def plan_deployment(repo, root, files, prune=False):
+    root = validate_root(root, repo)
+    previous = read_manifest(root)
+    writes, deletes = [], []
+    for rel, data in files.items():
+        path = safe_file(root, rel)
+        if path.exists() and not path.is_file():
+            raise ValueError(f'Expected file: {path}')
+        if not path.exists() or path.read_bytes() != data:
+            writes.append((rel, data))
+    stale = {rel: sha for rel, sha in previous.items() if rel not in files}
+    if prune:
+        for rel, sha in stale.items():
+            path = safe_file(root, rel)
+            if path.exists():
+                if not path.is_file() or digest(path.read_bytes()) != sha:
+                    raise ValueError(f'Managed stale file was modified; preserve it manually: {rel}')
+                deletes.append(rel)
+        stale = {}
+    managed = {**stale, **{rel: digest(data) for rel, data in files.items()}}
+    manifest = (json.dumps({'schema': 1, 'files': managed}, ensure_ascii=False, indent=2) + '\n').encode()
+    path = safe_file(root, MANIFEST)
+    return root, writes, deletes, manifest, not path.exists() or path.read_bytes() != manifest
+
+
+def apply_plan(plan):
+    root, writes, deletes, manifest, manifest_changed = plan
+    if not (writes or deletes or manifest_changed):
         return
-    keep = set(r.replace("\\", "/") for r in keep_rels)
-
-    for dirpath, dirnames, filenames in os.walk(dest_root):
-        if ".git" in dirnames:
-            dirnames.remove(".git")          # 绝不触碰 git 元数据
-        for f in filenames:
-            full = os.path.join(dirpath, f)
-            rel = os.path.relpath(full, dest_root).replace("\\", "/")
-            if rel not in keep:
-                removed.append(rel)
-                if not CHECK:
-                    try:
-                        os.remove(full)
-                    except OSError:
-                        pass
-
-    if not CHECK:
-        # 自底向上清理空目录（保留 dest_root 自身）
-        for dirpath, dirnames, filenames in os.walk(dest_root, topdown=False):
-            if ".git" in dirpath or dirpath == dest_root:
-                continue
-            try:
-                if not os.listdir(dirpath):
-                    os.rmdir(dirpath)
-            except OSError:
-                pass
+    stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
+    backup = safe_file(root, f'.modeling-display-backups/{stamp}')
+    for rel in [r for r, _ in writes] + deletes + ([MANIFEST] if manifest_changed else []):
+        source = safe_file(root, rel)
+        if source.exists():
+            destination = safe_file(backup, rel)
+            destination.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(source, destination)
+    for rel, data in writes:
+        atomic_write(safe_file(root, rel), data)
+    for rel in deletes:
+        safe_file(root, rel).unlink()
+    if manifest_changed:
+        atomic_write(safe_file(root, MANIFEST), manifest)
 
 
-def collect():
-    """返回要部署的相对路径列表"""
-    rels = []
-    for f in INCLUDE_FILES:
-        if os.path.exists(os.path.join(REPO, f)):
-            rels.append(f)
-    for d in INCLUDE_DIRS:
-        dpath = os.path.join(REPO, d)
-        if not os.path.isdir(dpath):
-            continue
-        for name in sorted(os.listdir(dpath)):
-            if not os.path.isfile(os.path.join(dpath, name)):
-                continue
-            if os.path.splitext(name)[1].lower() in SKIP_EXT:
-                continue
-            rels.append(os.path.join(d, name))
-    return rels
+def main(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('--target', choices=('workbuddy', 'codex', 'codex-prompt'))
+    parser.add_argument('--check', action='store_true', help='Read-only preview; exit 1 if differences exist')
+    parser.add_argument('--prune', action='store_true', help='Remove unchanged stale files in previous manifest')
+    parser.add_argument('--home', type=Path, default=Path.home(), help='Home override for isolated installs')
+    args = parser.parse_args(argv)
+    try:
+        home = reject_links(args.home)
+        targets = {'workbuddy': home / '.workbuddy/skills/modeling-display',
+                   'codex': home / '.codex/skills/modeling-display'}
+        files = collect(REPO)
+        plans = [(name, plan_deployment(REPO, root, files, args.prune))
+                 for name, root in targets.items() if args.target in (None, name)]
+        prompt, prompt_changed = None, False
+        if args.target in (None, 'codex', 'codex-prompt'):
+            prompt = reject_links(home / '.codex/prompts/geo3d.md')
+            if prompt.resolve().is_relative_to(REPO.resolve()):
+                raise ValueError('Prompt destination overlaps source')
+            data = reject_links(REPO / 'prompts/geo3d.md').read_bytes()
+            if prompt.exists() and not prompt.is_file():
+                raise ValueError('Prompt destination is not a file')
+            prompt_changed = not prompt.exists() or prompt.read_bytes() != data
+        changed = any(p[1] or p[2] or p[4] for _, p in plans) or prompt_changed
+        # Preflight every target before the first write.
+        for name, plan in plans:
+            print(f'[{name}] update={len(plan[1])}, prune={len(plan[2])}, manifest={plan[4]} -> {plan[0]}')
+            if not args.check:
+                apply_plan(plan)
+        if prompt_changed:
+            print(f'[codex-prompt] update -> {prompt}')
+            if not args.check:
+                if prompt.exists():
+                    stamp = datetime.now(timezone.utc).strftime('%Y%m%dT%H%M%S.%fZ')
+                    backup = reject_links(prompt.parent / '.modeling-display-backups' / stamp / prompt.name)
+                    backup.parent.mkdir(parents=True, exist_ok=True)
+                    shutil.copy2(prompt, backup)
+                atomic_write(prompt, data)
+        return 1 if args.check and changed else 0
+    except (ValueError, OSError) as error:
+        print(f'Deployment failed: {error}', file=sys.stderr)
+        return 2
 
 
-def main():
-    if not os.path.isdir(os.path.join(REPO, ".git")):
-        print("✗ 未找到 .git —— 请从仓库的 scripts/ 目录运行本脚本。")
-        print("  仓库根: %s" % REPO)
-        sys.exit(2)
-
-    rels = collect()
-    if not rels:
-        print("✗ 没有找到可部署的文件。")
-        sys.exit(2)
-
-    targets = TARGETS
-    if ONLY:
-        if ONLY not in TARGETS:
-            print("✗ 未知目标 '%s'，可选: %s" % (ONLY, ", ".join(TARGETS)))
-            sys.exit(2)
-        targets = {ONLY: TARGETS[ONLY]}
-
-    any_change = False
-    for name, root in targets.items():
-        changed, removed = [], []
-        for rel in rels:
-            deploy_file(rel, root, changed)
-        prune_target(root, rels, removed)
-
-        if changed or removed:
-            any_change = True
-            verb = "需要" if CHECK else ""
-            parts = []
-            if changed:
-                parts.append("%s部署 %d" % (verb, len(changed)))
-            if removed:
-                parts.append("%s清理 %d" % (verb, len(removed)))
-            print("[%s] %s → %s" % (name, "、".join(parts), root))
-            for c in changed:
-                print("    + " + c.replace("\\", "/"))
-            for r in removed:
-                print("    - " + r)
-        else:
-            print("[%s] 已是最新 ✓  %s" % (name, root))
-
-    # 额外：Codex 斜杠命令
-    if not ONLY or ONLY in ("codex", "codex-prompt"):
-        for name, (src, dst) in EXTRA.items():
-            if deploy_abs(src, dst):
-                any_change = True
-                print("[%s] %s → %s" % (name, "需要部署" if CHECK else "已部署", dst))
-            else:
-                print("[%s] 已是最新 ✓  %s" % (name, dst))
-
-    if CHECK and any_change:
-        print()
-        print("有差异，运行 `python scripts/deploy.py` 同步。")
-        sys.exit(1)
-
-
-if __name__ == "__main__":
-    main()
+if __name__ == '__main__':
+    sys.exit(main())

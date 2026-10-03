@@ -118,7 +118,7 @@ h1 { font-size: 17px; font-weight: 600; margin: 0 0 9px; letter-spacing:.2px; li
 }
 .sel-list .chip {
   display:inline-block; padding:2px 10px; border-radius:999px;
-  background:var(--accent); color:#FFFFFF; font-weight:600; font-size:12px;
+  background:var(--accent); color:#20130D; font-weight:600; font-size:12px;
   box-shadow:0 0 0 1px rgba(255,122,69,.35), 0 2px 8px var(--glow-accent);
 }
 
@@ -173,7 +173,7 @@ h1 { font-size: 17px; font-weight: 600; margin: 0 0 9px; letter-spacing:.2px; li
   box-shadow:0 0 10px rgba(255,122,69,.20), 0 2px 8px rgba(0,0,0,.5);
 }
 #labels .lab.p.hot {
-  color:#FFFFFF; background:var(--accent); border-color:#FFB392;
+  color:#20130D; background:var(--accent); border-color:#FFB392;
   animation:labPulse 1.15s ease-in-out infinite;
 }
 /* ★ 呼吸动画只能动 box-shadow，绝不能碰 transform（syncLabels 每帧在写 transform） */
@@ -185,7 +185,7 @@ h1 { font-size: 17px; font-weight: 600; margin: 0 0 9px; letter-spacing:.2px; li
 #labels .lab.p::after { content:'⠿'; margin-left:6px; opacity:.6; font-size:.78em; }
 #labels .lab.hide { display:none; }
 #labels .lab.sel {
-  color:#FFFFFF; background:var(--accent); border-color:#FFB392;
+  color:#20130D; background:var(--accent); border-color:#FFB392;
   box-shadow:0 0 0 3px rgba(255,122,69,.32), 0 0 14px rgba(255,122,69,.28);
 }
 
@@ -379,11 +379,26 @@ h1 { font-size: 17px; font-weight: 600; margin: 0 0 9px; letter-spacing:.2px; li
 <button id="toggle"><span class="bars"></span>控制面板</button>
 <div id="scrim"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js"></script>
-<script>if (!window.THREE) { document.write('<script src="three.min.js"><\/script>'); }</script>
+<!-- THREE_DEPENDENCY_START -->
+<script src="three.min.js"></script>
+<script>if (!window.THREE) { document.write('<script src="https://cdn.jsdelivr.net/npm/three@0.146.0/build/three.min.js" integrity="sha384-x9wDJy7yFtLLFyV/D2Aw4FtythXqOQNmB5PthOB+IlnSFXvS8/Kx7IzPEZWDgH7P" crossorigin="anonymous"><\/script>'); }</script>
+<!-- THREE_DEPENDENCY_END -->
 <script>
 (function () {
 'use strict';
+
+function showStartupError(message) {
+  var notice = document.createElement('div');
+  notice.setAttribute('role', 'alert');
+  notice.style.cssText = 'padding:40px;font-family:system-ui;line-height:1.8';
+  notice.textContent = message;
+  document.body.replaceChildren(notice);
+}
+if (!window.THREE) {
+  showStartupError('Three.js 未能加载。请使用离线打包工具，把 three.min.js 与 HTML 一起交付，或联网后重新打开。');
+  return;
+}
+
 
 /* ════════════════════════════════════════════════════════════
    【A】题目配置  ← 换题改这里
@@ -399,7 +414,16 @@ var MOVER = {
   toName  : 'C′',
   t0      : 0.5,      // 初始位置
   midText : 'P 恰为 CC′ 中点',        // 拖到中点时的提示
-  critText: '两平面垂直（临界状态）'   // 满足临界条件时的提示（不需要就把 critTest 设为 null）
+  critText: '两平面垂直（临界状态）'   // 不需要临界提示时把 READOUT.critical 设为 null
+};
+
+// 题目特定读数与教学坐标：换题在这里修改，D 引擎不依赖具体顶点名。
+var READOUT = {
+  angle: function (P) {
+    return twoPlaneAngle(planeNormal(V.Ap, V.B, V.D), planeNormal(P, V.B, V.D));
+  },
+  critical: function (angle) { return angle !== null && Math.abs(angle - 90) < 0.35; },
+  coordinate: function (position) { return [position.x, position.y - Y0, position.z]; }
 };
 
 /* ════════════════════════════════════════════════════════════
@@ -487,7 +511,8 @@ var canvas = document.getElementById('cv');
 var stage  = document.getElementById('stage');
 var labelBox = document.getElementById('labels');
 
-var renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true });
+var renderer;
+try { renderer = new THREE.WebGLRenderer({ canvas: canvas, antialias: true }); } catch (error) { showStartupError('浏览器无法启动 WebGL。请开启硬件加速或更换支持 WebGL 的浏览器。'); return; }
 renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
 // ★ 画布不透明，必须与 #stage 的 CSS 渐变同色系（改主题时同步改这里）
 renderer.setClearColor(0x131A22, 1);
@@ -546,7 +571,7 @@ function planeNormal(a, b, c) {
   return new THREE.Vector3().crossVectors(u, v).normalize();
 }
 function twoPlaneAngle(n1, n2) {
-  if (n1.length() < 1e-9 || n2.length() < 1e-9) return 90;
+  if (n1.length() < 1e-9 || n2.length() < 1e-9) return null;
   var c = Math.abs(n1.dot(n2)) / (n1.length() * n2.length());
   return Math.acos(Math.max(-1, Math.min(1, c))) * 180 / Math.PI;
 }
@@ -567,6 +592,9 @@ function computeP() {
 /* ---------- 静态几何 ---------- */
 function buildSolid() {
   var g = new THREE.Group();
+  EDGES.forEach(function (edge) {
+    g.add(tube(V[edge[0]], V[edge[1]], 0.009, COL.edge));
+  });
   SOLID_FACES.forEach(function (f) {
     g.add(polyMesh(f.pts.map(function (k) { return V[k]; }), COL.solid, f.opacity));
   });
@@ -728,9 +756,11 @@ function applyPickStyles() {
   if (box) {
     if (!selKeys.length) box.textContent = '尚未选中顶点';
     else {
-      box.innerHTML = selKeys.map(function (k) {
-        return '<span class="chip">' + (LABEL_NAME[k] || k) + '</span>';
-      }).join('');
+      box.textContent = '';
+      selKeys.forEach(function (k) {
+        var chip = document.createElement('span'); chip.className = 'chip';
+        chip.textContent = LABEL_NAME[k] || k; box.appendChild(chip);
+      });
     }
   }
   refreshPick();
@@ -757,7 +787,7 @@ function setLabelSize(px) {
   document.documentElement.style.setProperty('--lab-size', px + 'px');
 }
 function buildLabels() {
-  labelBox.innerHTML = '';
+  labelBox.textContent = '';
   labelEls = [];
   function mk(key, getPos) {
     var el = document.createElement('div');
@@ -841,6 +871,19 @@ function setPHot(on) {
 }
 
 /* ---------- 读数 ---------- */
+function renderPickRows(box, keys, getCoord) {
+  box.textContent = '';
+  var heading = document.createElement('b');
+  heading.textContent = '已选 ' + keys.length + ' 个顶点';
+  box.appendChild(heading);
+  keys.forEach(function (key) {
+    var row = document.createElement('div'); row.className = 'pr';
+    var name = document.createElement('i'); name.textContent = LABEL_NAME[key] || key;
+    var coord = document.createElement('span'); coord.textContent = getCoord(key);
+    row.append(name, coord); box.appendChild(row);
+  });
+}
+
 function refreshPick() {
   var box = document.getElementById('pickBox');
   if (!box) return;
@@ -850,38 +893,27 @@ function refreshPick() {
     return;
   }
   box.classList.add('on');
-  var html = '<b>已选 ' + selKeys.length + ' 个顶点</b>';
-  selKeys.forEach(function (k) {
-    var pos = (k === 'P') ? computeP() : V[k];
-    if (!pos) return;
-    html += '<div class="pr"><i>' + (LABEL_NAME[k] || k) + '</i><span>(' +
-            fmt(pos.x) + ', ' + fmt(pos.y) + ', ' + fmt(pos.z) + ')</span></div>';
+  renderPickRows(box, selKeys, function (k) {
+    var position = k === 'P' ? computeP() : V[k];
+    return '(' + READOUT.coordinate(position).map(fmt).join(', ') + ')';
   });
-  box.innerHTML = html;
 }
 
 function refreshReadout() {
-  var n1 = planeNormal(V.Ap, V.B, V.D);
-  var n2 = planeNormal(computeP(), V.B, V.D);
-  var ang = twoPlaneAngle(n1, n2);
-
-  document.getElementById('rT').textContent = state.t.toFixed(3);
-  var pc = 1 - state.t, pcp = state.t;
-  var ratio;
-  if (pc < 1e-6) ratio = '0 : 1';
-  else if (pcp < 1e-6) ratio = '1 : 0';
-  else ratio = '1 : ' + fmt(pcp / pc);
+  var angle = typeof READOUT.angle === 'function' ? READOUT.angle(computeP()) : null;
+  var ratio = '—';
+  if (MOVER.enabled) {
+    var first = state.t, second = 1 - state.t;
+    ratio = first < 1e-6 ? '0 : 1' : second < 1e-6 ? '1 : 0' : '1 : ' + fmt(second / first);
+  }
+  document.getElementById('rT').textContent = MOVER.enabled ? state.t.toFixed(3) : '—';
   document.getElementById('rRatio').textContent = ratio;
-  document.getElementById('rAng').textContent = ang.toFixed(1) + '°';
-  document.getElementById('sTval').textContent =
-    fmt(pc === 0 ? 0 : pcp) + ' : ' + fmt(pc);
-
+  document.getElementById('rAng').textContent = angle !== null && isFinite(angle) ? angle.toFixed(1) + '°' : '—';
+  document.getElementById('sTval').textContent = ratio;
   var mid = document.getElementById('rMid');
-  if (mid) mid.classList.toggle('on', Math.abs(state.t - 0.5) < 0.004);
-
-  var box = document.getElementById('readout');
-  if (Math.abs(ang - 90) < 0.35) box.classList.add('crit');
-  else box.classList.remove('crit');
+  if (mid) mid.classList.toggle('on', MOVER.enabled && Math.abs(state.t - 0.5) < 0.004);
+  var critical = typeof READOUT.critical === 'function' && READOUT.critical(angle);
+  document.getElementById('readout').classList.toggle('crit', !!critical);
 
   if (isSel('P')) applyPickStyles();
 }
@@ -895,6 +927,7 @@ function buildDynamic() {
 }
 
 function setT(t, fromUser) {
+  if (!Number.isFinite(t)) return;
   state.t = Math.max(0, Math.min(1, t));
   var sT = document.getElementById('sT');
   if (sT) sT.value = state.t;      // 滑块与拖拽双向同步，共用这一个入口
@@ -1027,14 +1060,14 @@ function endPointer(e) {
 
   if (wasDragP) {
     // ★ 复用按下时的判定结果，不二次命中
-    if (dragP && !dragP.movedEnough) doTapKey(dragP.heldKey);
+    if (e.type !== 'pointercancel' && dragP && !dragP.movedEnough) doTapKey(dragP.heldKey);
     dragP = null;
     setPHot(false);
     if (ptrs.size === 0) { gesture = null; canvas.style.cursor = 'grab'; }
     return;
   }
 
-  if (wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
+  if (e.type !== 'pointercancel' && wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
       performance.now() - tapInfo.t < 700) {
     if (tapInfo.key) doTapKey(tapInfo.key);
     else doTap(e.clientX, e.clientY, tapInfo.type);
@@ -1082,6 +1115,7 @@ function bindCheck(id, key, rebuild) {
 }
 function initControls() {
   var sT = document.getElementById('sT');
+  sT.closest('.group').hidden = !MOVER.enabled;
   sT.addEventListener('input', function () { setT(parseFloat(sT.value), true); });
 
   var bMid = document.getElementById('bMid');
@@ -1166,6 +1200,7 @@ function init() {
 init();
 
 /* ---------- 调试句柄（生产可整块删除） ---------- */
+if (window.location.hash === '#geo-debug') {
 window.__S = {
   state: state, cam: cam, camera: camera, selKeys: selKeys, renderer: renderer,
   setT: setT, applyPickStyles: applyPickStyles, screenToT: screenToT,
@@ -1174,6 +1209,7 @@ window.__S = {
 };
 window.__GEO = {};
 Object.keys(V).forEach(function (k) { window.__GEO[k] = V[k]; });
+}
 
 })();
 </script>
