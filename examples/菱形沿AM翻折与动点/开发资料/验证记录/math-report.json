@@ -1,0 +1,18 @@
+{
+  "answer": "AC",
+  "checks": 9023,
+  "maximumAbsoluteError": 3.3306690738754696e-16,
+  "samples": 1001,
+  "CN": 1,
+  "lineAngleDegrees": 30,
+  "maxVolume": 0.5773502691896257,
+  "maxVolumeFoldDegrees": 90,
+  "sphereCenter": [
+    0.8660254037844386,
+    1,
+    0.5000000000000001
+  ],
+  "sphereRadius": 1.4142135623730951,
+  "distanceOC": 1,
+  "endpointNote": "B₁、M、C 共线，平面 B₁MC 未定义；A 对非退化翻折成立。"
+}

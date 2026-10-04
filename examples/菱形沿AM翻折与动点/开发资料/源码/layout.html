@@ -1,0 +1,60 @@
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">⌁</div><div><div class="eyebrow">GEOMETRY LAB <span>/ FOLDING</span></div><h1>菱形翻折 · 动点联动</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">2023 南京月考 · 多选题</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位视角</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2023 高三上 · 南京月考</span></div>
+        <div class="question"><p>如图，在菱形 <i>ABCD</i> 中，<i>AB＝2</i>，<i>∠ABC＝π/3</i>，<i>M</i> 为 <i>BC</i> 的中点。将 △<i>ABM</i> 沿直线 <i>AM</i> 翻折到 △<i>AB₁M</i> 的位置，连接 <i>B₁C</i> 和 <i>B₁D</i>，<i>N</i> 为 <i>B₁D</i> 的中点。在翻折过程中，则下列结论中正确的是：</p><div class="question-options"><p><b>A.</b> 面 AB₁M ⊥ 面 B₁MC</p><p><b>B.</b> 线段 CN 长度的取值范围为 [1, √3]</p><p><b>C.</b> 直线 AM 和 CN 所成的角始终为 π/6</p><p><b>D.</b> 当三棱锥 B₁–AMD 的体积最大时，点 C 在三棱锥 B₁–AMD 外接球的外部</p></div></div>
+        <div class="interaction-note">直接拖动橙色 B₁ 或它的字母，观察翻折和中点 N 的联动。播放、角度与关键位置控制均在“显示设置”。<b>答案：A、C。</b></div>
+        <div class="section-heading"><span>完整推导</span><span id="lesson-progress">全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" data-lesson="0" id="proof-0"><div class="lesson-title"><span class="step-number">A</span><h2>折痕垂直于两条面内直线</h2></div><p>△ABM 中，AB＝2、BM＝1、∠ABM＝60°，由余弦定理得 AM＝√3，故 AM²＋BM²＝AB²，AM ⊥ BM。翻折保持 AM ⊥ MB₁；同时 M、B、C 共线，AM ⊥ MC。</p><div class="formula">AM ⊥ MB₁，AM ⊥ MC<br>⇒ AM ⊥ 平面 B₁MC<br>AM ⊂ 平面 AB₁M<br><b>⇒ 平面 AB₁M ⊥ 平面 B₁MC</b></div><p>两条相交直线 MB₁、MC 确定平面，A 正确。</p><p class="proof-note">0°、180° 是演示端点，此时 B₁、M、C 共线，平面 B₁MC 未定义；A 的判断适用于非退化翻折。</p></article>
+          <article class="lesson-card" data-lesson="1" id="proof-1"><div class="lesson-title"><span class="step-number">B</span><h2>CN 的长度其实是定值</h2></div><p>以 M 为原点，MA 方向为 x 轴，MC 方向为 y 轴，z 轴垂直原菱形向上。设翻折角为 φ∈[0, π]：</p><div class="formula">A＝(√3, 0, 0)，D＝(√3, 2, 0)<br>C＝(0, 1, 0)<br>B₁＝(0, −cosφ, sinφ)<br>N＝(√3/2, 1−cosφ/2, sinφ/2)</div><p>N 是 B₁D 中点，因此：</p><div class="formula">CN＝(√3/2, −cosφ/2, sinφ/2)<br>|CN|²＝3/4＋(cos²φ＋sin²φ)/4<br><b>CN＝1，取值集合为 {1}</b></div><p>原选项声称范围为 [1, √3]，B 错误。图中紫色 CN 随翻折转动，但长度不变。</p></article>
+          <article class="lesson-card" data-lesson="2" id="proof-2"><div class="lesson-title"><span class="step-number">C</span><h2>平移 AM 的方向，看恒定夹角</h2></div><p>AM 平行于 x 轴，直线所成角取锐角或直角。记该角为 θ，由 CN 的坐标与长度：</p><div class="formula">cos θ＝|CN 的 x 分量| / |CN|<br>＝(√3/2) / 1＝√3/2<br><b>θ＝π/6＝30°</b></div><p>模型在 C 处画出与 AM 同向的虚线，并用角弧标出它与 CN 的夹角；这是将异面直线的方向平移到同一点后测角。C 正确。</p></article>
+          <article class="lesson-card answer-card" data-lesson="3" id="proof-3"><div class="lesson-title"><span class="step-number">D</span><h2>体积最大时，C 在球内</h2></div><p>△AMD 位于 z＝0，面积为 √3。三棱锥的高是 sinφ：</p><div class="formula">V＝(√3/3) sinφ<br><b>φ＝90° 时 V 最大，Vmax＝√3/3</b></div><p>此时 B₁＝(0, 0, 1)。设外接球心 O＝(u, v, w)，由 OM＝OA＝OD＝OB₁，解得：</p><div class="formula">O＝(√3/2, 1, 1/2)<br>R²＝OM²＝3/4＋1＋1/4＝2<br>OC²＝3/4＋1/4＝1＜R²<br><b>C 在外接球内部，D 错误</b></div><p>在设置中打开“最大体积时的外接球”，并用“90°”快捷位置查看：球面只在该关键位置显示，不将固定球误认为任意角度的外接球。</p><div class="answer compact-answer">A、C<span class="answer-badge">正确选项</span></div></article>
+        </div>
+        <details class="coordinate-details"><summary>建模坐标与运动约束</summary><div class="coordinate-table"><span>M</span><code>(0, 0, 0)</code><span>A</span><code>(√3, 0, 0)</code><span>B</span><code>(0, −1, 0)</code><span>C</span><code>(0, 1, 0)</code><span>D</span><code>(√3, 2, 0)</code></div><p>B 保留为原位置参考；B₁ 沿以 M 为圆心、半径 1、垂直于 AM 的上半圆运动，AB₁＝2、MB₁＝1。N 始终为 B₁D 中点，它的轨迹是半径 1/2 的半圆。只有一个独立翻折参数，N 由中点关系确定。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>翻折与动点</span><span>绕 AM 旋转</span></div><p class="motion-tip">拖动橙色 B₁ 或字母 B₁；N 自动联动。抓住 B₁ 时相机锁定，松手恢复。播放往返于 0° 与 180°。</p>
+        <label class="range-label" for="sT"><span>翻折角 φ</span><output id="sTval">60.0°</output></label><input type="range" id="sT" min="0" max="1" step="0.0005555555555555556" value="0.3333333333333333" aria-label="翻折角，0到180度">
+        <div class="motion-buttons" role="group" aria-label="翻折关键位置"><button class="button" data-t="0">0° 展开</button><button class="button" data-t="0.5">90° 最大体积</button><button class="button" data-t="1">180° 合拢</button></div>
+        <div class="playback-controls"><button id="play" class="button primary" aria-pressed="false">▶ 播放翻折</button><label for="speed">速度</label><select id="speed"><option value="15">慢 · 15°/s</option><option value="30" selected>中 · 30°/s</option><option value="60">快 · 60°/s</option></select></div>
+        <div class="motion-readings"><div><span>翻折角 φ</span><strong id="mRatio">60.0°</strong></div><div><span>CN 长度</span><strong id="mCN">1.0000</strong></div><div><span>两面夹角（A）</span><strong id="mAngle">90.0°</strong></div><div><span>AM 与 CN 夹角</span><strong id="mSin">30.0°</strong></div><div><span>三棱锥体积</span><strong id="mVolume">0.5000</strong></div><div><span>外接球展示</span><strong id="sphereStatus">仅 φ＝90° 时可见</strong></div></div>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>固定底面 AMCD</span><input type="checkbox" id="cSolid" checked></label>
+        <label class="switch-row"><span>原位置 △ABM 与 B</span><input type="checkbox" id="cOriginal" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>翻折三角形 AB₁M</span><input type="checkbox" id="cPlane1" checked></label>
+        <label class="switch-row"><span><span class="dot blue"></span>辅助平面 B₁MC</span><input type="checkbox" id="cPlane2" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>CN 与恒定夹角 30°</span><input type="checkbox" id="cLineAngle" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>B₁ 运动圆弧 / 翻折角</span><input type="checkbox" id="cAngles" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>N 的中点轨迹</span><input type="checkbox" id="cNTrack"></label>
+        <label class="switch-row"><span><span class="dot violet"></span>三棱锥 B₁–AMD</span><input type="checkbox" id="cVolume"></label>
+        <label class="switch-row"><span><span class="dot violet"></span>最大体积时的外接球</span><input type="checkbox" id="cSphere"></label>
+        <label class="switch-row"><span>空间坐标轴</span><input type="checkbox" id="cAxes"></label>
+        <div class="section-heading"><span>文字标注</span></div><label class="switch-row"><span>顶点字母</span><input type="checkbox" id="cLabels" checked></label><label class="switch-row"><span>边长数值</span><input type="checkbox" id="cLengths"></label>
+        <label class="range-label" for="sFont"><span>顶点字号</span><output id="sFontval">22 px</output></label><input type="range" id="sFont" min="14" max="32" value="22" step="1">
+        <label class="range-label" for="sOpacity"><span>底面与翻折面透明度</span><output id="sOpacityval">14%</output></label><input type="range" id="sOpacity" min="0" max="50" value="14" step="1">
+        <div class="section-heading"><span>顶点高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点模型中的顶点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div><p class="settings-hint">点击下方公式只定位推导，保留显示设置与翻折位置。球面仅在 90° 时展示；播放可随时暂停，拖动 B₁ 自动暂停。</p>
+      </section>
+    </div><div class="panel-footer"><span class="status-dot"></span>可离线使用<span class="footer-right">翻折约束 · 中点联动</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互三维翻折模型">
+    <canvas id="cv" aria-label="拖动 B₁ 翻折；拖动空白旋转；双指缩放平移；点击顶点高亮" tabindex="0"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="快捷视角"><button class="active" data-view="spatial" aria-pressed="true">立体</button><button data-view="front" aria-pressed="false">正视</button><button data-view="top" aria-pressed="false">俯视</button></div><button id="fit" class="icon-button" aria-label="将模型居中适配视口" title="模型居中">⌖</button></div>
+    <div id="readout" class="readout" aria-live="off"><div class="readout-heading"><span>当前翻折 · 实时读数</span><span class="readout-dot"></span></div><div class="readout-row"><span>翻折角 φ</span><strong id="rT">60.0°</strong></div><div class="readout-row"><span>CN 长度</span><strong id="rAngle">1.0000</strong></div><div class="readout-row"><span>体积 V</span><strong id="rSin">0.5000</strong></div><div id="midFlag" class="mid-flag">沿 AM 翻折 · N 为中点</div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 答案 A、C</span><h2 id="caption-title">翻折改变形状，保持长度与夹角</h2><p id="caption-body">AM 是固定折痕。拖动橙色 B₁，紫色 N 始终平分 B₁D；播放与角度控制在显示设置。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="四项判断，点击定位推导">
+      <button data-proof="0"><span class="overview-label">A · 正确</span><strong>两面垂直 90°</strong><span class="overview-detail">非退化翻折成立</span></button>
+      <button data-proof="1"><span class="overview-label">B · 错误</span><strong>CN ≡ 1</strong><span class="overview-detail">长度不随翻折改变</span></button>
+      <button data-proof="2"><span class="overview-label">C · 正确</span><strong>θ ≡ 30°</strong><span class="overview-detail">AM 与 CN 的夹角</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">D · 错误</span><strong>OC = 1 &lt; √2</strong><span class="overview-detail">体积最大时 C 在球内</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>固定底面</span><span><span class="dot orange"></span>翻折面 / B₁</span><span><span class="dot violet"></span>N / CN</span></div><div id="hint">拖动 B₁ 翻折 · 空白旋转 · 滚轮缩放 · 顶点多选</div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div><div id="scrim" aria-hidden="true"></div>

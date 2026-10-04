@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-04",
+  "migration": {
+    "name": "外接球题建模示例",
+    "previewUrl": "http://127.0.0.1:65316/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B.html",
+    "scriptsParse": true,
+    "offlinePages": [
+      {
+        "file": "examples\\外接球题建模示例\\成品\\外接球题建模示例.html",
+        "startup": true,
+        "networkResources": 0,
+        "drawerSettings": true
+      },
+      {
+        "file": "examples\\外接球题建模示例\\成品\\离线双文件版\\外接球题建模示例.html",
+        "startup": true,
+        "networkResources": 0,
+        "drawerSettings": true
+      }
+    ]
+  },
+  "note": "72 files moved and hash-verified before path/name updates; model interaction source unchanged; former regression reports retained."
+}

@@ -14,7 +14,9 @@ class PackageTests(unittest.TestCase):
         self.temp = tempfile.TemporaryDirectory(prefix="geo3d-package-test-")
         self.addCleanup(self.temp.cleanup)
         self.base = Path(self.temp.name)
-        self.source = next((ROOT / "examples").glob("*.html"))
+        # Use a retained, non-inlined working page after the examples migration.
+        self.source = (ROOT / "examples" / "外接球题建模示例" / "开发资料"
+                       / "源码" / "外接球题建模示例.html")
 
     def test_offline_modes_and_licenses(self):
         for inline in (False, True):

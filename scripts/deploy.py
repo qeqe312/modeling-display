@@ -59,10 +59,16 @@ def collect(repo):
         for base, dirs, names in os.walk(directory, followlinks=False):
             for child in dirs:
                 reject_links(Path(base) / child)
-            dirs[:] = sorted(d for d in dirs if d not in ('__pycache__', '.git'))
+            dirs[:] = sorted(d for d in dirs
+                             if d.lower() not in ('__pycache__', '.git', '.运行时',
+                                                  '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache')
+                             and not d.lower().startswith('.build-'))
             for child in sorted(names):
                 path = reject_links(Path(base) / child)
-                if path.suffix.lower() in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico', '.pyc'}:
+                suffix = path.suffix.lower()
+                if suffix in {'.pyc', '.log', '.tmp', '.temp', '.bak', '.swp'} or '.log' in [s.lower() for s in path.suffixes]:
+                    continue
+                if name != 'examples' and suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'}:
                     continue
                 if name == 'scripts' and path.suffix != '.py':
                     continue

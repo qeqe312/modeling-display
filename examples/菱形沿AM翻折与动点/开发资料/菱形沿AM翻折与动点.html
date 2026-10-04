@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>菱形沿AM翻折与动点</title>
+<!-- Working HTML assembled from source fragments; validate and package before delivery. -->
+<style>
+:root{color-scheme:dark;--bg:#0D1117;--surface:#161B22;--surface-2:#1C232C;--surface-3:#232B36;--line:#2A3441;--line-soft:#212A34;--ink:#E6EDF3;--ink-2:#A9B6C4;--ink-3:#8B99A8;--brand:#6BA8E8;--brand-lt:#17293E;--accent:#FF7A45;--accent-lt:#2E1A11;--violet:#A692E8;--violet-lt:#1E1B2E;--lab-size:22px;--header:80px}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:3px}button:disabled{opacity:.46;cursor:default}button{color:var(--ink);background:none;border:0}i{font-family:Georgia,"Times New Roman",serif;font-size:1.08em}p{margin:10px 0;line-height:1.8}code{font-family:Consolas,monospace;color:var(--ink-2)}[hidden]{display:none!important}
+.app-header{height:var(--header);padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line-soft);background:var(--bg);gap:16px;padding-top:env(safe-area-inset-top,0px)}.identity{display:flex;align-items:center;gap:13px;min-width:0}.brand-mark{width:42px;height:42px;border:1px solid #39546F;border-radius:13px;color:var(--brand);font-size:34px;line-height:34px;display:grid;place-items:center;background:var(--brand-lt);flex:none}.eyebrow{font-size:10px;letter-spacing:2.4px;color:var(--brand);line-height:1.5;font-weight:650}.eyebrow span{color:var(--ink-3);letter-spacing:1px;margin-left:6px}h1{font-size:20px;line-height:1.45;font-weight:600;margin:3px 0 0;letter-spacing:.6px;white-space:nowrap}.header-actions{display:flex;gap:8px;align-items:center}.topic-tag{font-size:12px;color:var(--ink-3);margin-right:14px}.button{min-height:46px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:550;transition:background .15s,color .15s}.button:active,.icon-button:active{background:var(--surface-3)}.button.primary{color:#20130D;background:var(--accent);border-color:var(--accent)}.button.primary:active{background:#FFB392}.button.active{color:var(--brand);background:var(--brand-lt);border-color:#39546F}.menu-button{display:none}.icon-button{display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:46px;height:46px;font-size:23px;flex:none}
+#app{display:flex;height:calc(100% - var(--header));height:calc(100dvh - var(--header))}#panel{width:348px;flex:none;background:var(--surface);border-right:1px solid var(--line-soft);display:flex;flex-direction:column;min-height:0;z-index:50}.panel-tabs{display:flex;border-bottom:1px solid var(--line-soft);padding:8px 20px 0;flex:none;gap:10px}.panel-tabs button{flex:1;min-height:48px;font-size:13px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent}.panel-tabs button[aria-selected=true]{color:var(--brand);border-bottom-color:var(--brand)}.panel-scroll{overflow:auto;flex:1;min-height:0;padding:22px 22px 26px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#39434F var(--surface)}.panel-scroll::-webkit-scrollbar{width:8px}.panel-scroll::-webkit-scrollbar-thumb{background:#39434F;border-radius:8px;border:2px solid var(--surface)}.section-heading{display:flex;justify-content:space-between;align-items:center;color:var(--ink-3);font-size:12px;margin:0 0 14px;gap:10px}.section-heading:not(:first-child){margin-top:26px}.source{font-size:10px}.question{border:1px solid var(--line);background:var(--surface-2);border-radius:13px;padding:16px}.source-line{font-size:11px;line-height:1.6;color:var(--ink-3)}.question p{font-size:14px;margin:10px 0 14px;line-height:1.95}.options{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink-2)}.options>div{border:1px solid var(--line);padding:9px 8px;border-radius:7px;display:flex;gap:5px}.options.reveal>[data-answer=B]{background:var(--accent-lt);border-color:var(--accent);color:var(--accent)}.interaction-note{font-size:12px;line-height:1.8;color:#FFB392;background:var(--accent-lt);border-radius:9px;padding:11px 13px;margin-top:14px;border:1px solid #543A2E}.lesson-card{padding:17px 16px;border:1px solid var(--line);border-radius:13px;background:var(--bg);border-top:2px solid var(--brand)}.lesson-title{display:flex;align-items:center;gap:9px}.step-number{font-size:11px;letter-spacing:.5px;color:var(--brand);background:var(--brand-lt);padding:6px;border-radius:6px}.lesson-title h2{font-size:15px;font-weight:600;margin:0}.lesson-card p{font-size:12px;color:var(--ink-2);line-height:1.9}.formula{font-family:"Cambria Math",Cambria,"Microsoft YaHei",serif;font-size:14px;line-height:1.95;color:#FFB392;background:var(--accent-lt);border-radius:8px;padding:10px 12px;margin-top:13px;overflow-wrap:anywhere}.answer-card{border-top-color:var(--accent)}.answer{font-family:Georgia,serif;font-size:44px;color:var(--accent);margin:18px 0 14px;display:flex;align-items:baseline;gap:3px}.answer>span:first-child{font-size:40px}.answer-badge{font-family:inherit!important;font-size:13px!important;margin-left:auto;border:1px solid #543A2E;border-radius:7px;padding:6px 10px;background:var(--accent-lt)}.panel-navigation{display:flex;gap:10px;margin:15px 0 22px}.panel-navigation button{flex:1}.coordinate-details{border-top:1px solid var(--line);padding-top:17px;color:var(--ink-3);font-size:12px}.coordinate-details summary{cursor:pointer;padding:9px 0;min-height:44px}.coordinate-details p{font-size:12px}.coordinate-table{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:10px;background:var(--surface-2);border-radius:8px}.coordinate-table>span{color:var(--violet)}.panel-footer{border-top:1px solid var(--line-soft);padding:14px 22px;display:flex;align-items:center;gap:7px;font-size:10px;color:var(--ink-3);flex:none}.status-dot{width:5px;height:5px;background:var(--brand);border-radius:50%}.footer-right{margin-left:auto}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:49px;font-size:13px;border-bottom:1px solid var(--line-soft);cursor:pointer}.switch-row>span{display:flex;align-items:center;gap:9px}.switch-row input{width:21px;height:21px;accent-color:var(--brand);cursor:pointer}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}.dot.blue{background:var(--brand)}.dot.orange{background:var(--accent)}.dot.violet{background:var(--violet)}.range-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-top:17px}.range-label output{font-size:11px;color:var(--brand);font-variant-numeric:tabular-nums}input[type=range]{display:block;width:100%;height:40px;margin:0;accent-color:var(--brand);cursor:pointer;touch-action:pan-y}.selection-list{display:flex;gap:6px;flex-wrap:wrap;min-height:30px;color:var(--ink-3);font-size:12px}.chip{padding:5px 9px;background:var(--accent);color:#20130D;border-radius:7px;font-weight:700}.pick-box{font-size:11px;color:var(--ink-2);line-height:1.8}.pick-box .pr{display:flex;justify-content:space-between;padding:2px 0}.pick-box .pr span:first-child{color:var(--violet)}.full-width{width:100%;margin-top:12px}.quality-control{display:flex;gap:7px}.quality-control button{flex:1}.settings-hint{font-size:12px;color:var(--ink-3);line-height:1.8;margin-top:20px}
+#stage{position:relative;min-width:0;flex:1;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#1B232E 0%,#131A22 62%,#0B0F14 100%)}#cv{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;outline-offset:-4px;-webkit-user-select:none;user-select:none}#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}#labels .lab{position:absolute;top:0;left:0;font-size:var(--lab-size);font-family:Georgia,serif;font-weight:600;color:#BBD7F5;background:#161B22;border:1px solid #39546F;border-radius:8px;padding:2px 9px;line-height:1.25;white-space:nowrap;will-change:transform;box-shadow:0 2px 5px #0005}#labels .lab.orange{color:#FFB392;border-color:#76513D}#labels .lab.violet{color:#C4B6F2;border-color:#564A75}#labels .lab.sel{color:#20130D;background:var(--accent);border-color:#FFB392;box-shadow:0 0 0 3px #FF7A4530}#labels .lab.edge-label{font-family:"Cambria Math",Georgia,serif;font-size:15px;font-weight:500;border:0;padding:2px 7px;box-shadow:none;border-radius:6px;color:var(--ink-2)}#labels .lab.edge-label.orange{color:#FFB392}#labels .lab.edge-label.violet{color:#C4B6F2}.stage-toolbar{position:absolute;left:24px;top:22px;display:flex;gap:8px;align-items:center}.view-switch{display:flex;gap:3px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.view-switch button{height:38px;min-width:58px;padding:0 15px;border-radius:7px;color:var(--ink-2);font-size:12px}.view-switch button.active{background:var(--surface-3);color:var(--ink)}.readout{position:absolute;right:26px;top:26px;width:170px;border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:14px 17px;font-variant-numeric:tabular-nums;pointer-events:none;box-shadow:0 5px 20px #0002}.readout-heading{display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:.6px;color:var(--ink-3);padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid var(--line)}.readout-dot{width:5px;height:5px;border-radius:50%;background:var(--brand)}.readout-row{display:flex;align-items:center;justify-content:space-between;line-height:1.9;gap:10px;font-size:13px;color:var(--ink-2)}.readout-row strong{font-family:"Cambria Math",Georgia,serif;font-size:16px;font-weight:500;color:var(--ink)}.readout.answer-readout .readout-row strong{color:#FFB392}.stage-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 24px calc(18px + env(safe-area-inset-bottom,0px));pointer-events:none}.step-caption{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:550px;margin:0 auto 16px;padding:13px 17px 14px;background:var(--surface);border:1px solid var(--line);border-radius:13px;pointer-events:auto;box-shadow:0 3px 15px #0002}.step-caption>div{min-width:0}#caption-index{font-size:10px;letter-spacing:1px;color:var(--brand)}.step-caption h2{font-size:16px;font-weight:600;margin:4px 0 3px}.step-caption p{font-size:11px;line-height:1.7;color:var(--ink-2);margin:0}.caption-next{border:1px solid var(--line);border-radius:50%;width:44px;height:44px;flex:none;background:var(--surface-2);color:var(--brand);font-size:22px}.step-dock{display:flex;gap:6px;justify-content:center;max-width:580px;margin:auto;pointer-events:auto}.step-dock button{min-height:50px;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:9px;white-space:nowrap;color:var(--ink-2)}.step-dock button>span{font-family:Consolas,monospace;font-size:10px;color:var(--ink-3)}.step-dock button[aria-current=step]{color:var(--brand);border-color:#39546F;background:var(--brand-lt)}.step-dock button[aria-current=step]>span{color:var(--brand)}.stage-meta{display:flex;justify-content:space-between;gap:15px;margin-top:15px;font-size:10px;color:var(--ink-3)}.legend{display:flex;gap:15px}.legend>span{display:flex;align-items:center;gap:6px}#hint{white-space:nowrap}.drawer-heading{display:none}#scrim{display:none;position:fixed;inset:var(--header) 0 0;background:#0006;z-index:45}.error-notice{position:absolute;top:28%;left:10%;right:10%;background:var(--surface);border:1px solid var(--accent);padding:28px;border-radius:15px;line-height:1.9;z-index:10;color:var(--ink)}
+body.focused #panel{position:fixed;top:var(--header);bottom:0;left:0;transform:translateX(-105%);border-right:1px solid var(--line);transition:transform .22s;box-shadow:12px 0 35px #0005}body.focused #panel.open{transform:translateX(0)}body.focused .drawer-heading{display:flex}body.focused .menu-button{display:block}body.drawer-open #scrim{display:block}.drawer-heading{padding:15px 20px 6px;align-items:center;justify-content:space-between;color:var(--ink-2);font-size:13px;flex:none}.drawer-heading .icon-button{border:0;background:var(--surface-2);font-size:26px}
+@media(hover:hover) and (pointer:fine){.button:hover:not(:disabled){background:var(--surface-3)}.button.primary:hover{background:#FFB392}.step-dock button:hover,.view-switch button:hover{background:var(--surface-3)}.caption-next:hover{background:var(--brand-lt)}}
+@media(max-width:1250px){#panel{width:326px}.app-header{padding-left:22px;padding-right:22px}.topic-tag{display:none}.stage-meta{justify-content:center}.stage-meta .legend{display:none}}
+@media(max-width:1100px),(pointer:coarse){:root{--header:72px}.app-header{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}.menu-button{display:block}.focus-button{display:none}#panel,body.focused #panel{position:fixed;left:0;top:var(--header);bottom:0;width:min(390px,86vw);transform:translateX(-105%);transition:transform .23s ease;box-shadow:12px 0 35px #0006;border-right:1px solid var(--line)}#panel.open,body.focused #panel.open{transform:translateX(0)}.drawer-heading{display:flex}.panel-scroll{padding:20px 24px}.panel-footer{padding-bottom:max(16px,env(safe-area-inset-bottom))}.button{min-height:48px}.view-switch button{height:44px}input[type=range]{height:44px}.icon-button{height:48px;width:48px}.stage-toolbar{top:18px;left:max(20px,env(safe-area-inset-left))}.readout{top:21px;right:max(20px,env(safe-area-inset-right))}.stage-bottom{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}.step-caption{max-width:550px}.step-dock button{min-height:52px}.stage-meta .legend{display:flex}.stage-meta{justify-content:space-between}}
+@media(orientation:portrait) and (max-width:1100px),(orientation:portrait) and (pointer:coarse){#panel,body.focused #panel{top:auto;left:0;right:0;bottom:0;width:100%;height:min(78vh,890px);height:min(78dvh,890px);border-radius:22px 22px 0 0;transform:translateY(105%);border:1px solid var(--line);box-shadow:0 -12px 35px #0006}#panel.open,body.focused #panel.open{transform:translateY(0)}.drawer-heading{padding-top:22px;position:relative}.drawer-heading::before{content:"";position:absolute;top:9px;left:calc(50% - 18px);width:36px;height:4px;border-radius:5px;background:#4B5868}.panel-tabs{padding-left:24px;padding-right:24px}.panel-scroll{padding:24px;max-width:740px;width:100%;margin:0 auto}.question p{font-size:15px}.options{font-size:14px}.source{font-size:11px}.lesson-card p{font-size:14px}.formula{font-size:16px}.lesson-title h2{font-size:17px}.stage-meta{flex-direction:column;align-items:center;gap:7px}}
+@media(max-width:600px){:root{--header:68px}.app-header{gap:7px;padding-left:12px;padding-right:12px}.brand-mark{height:34px;width:34px;font-size:29px;border-radius:10px}.identity{gap:8px}.eyebrow{font-size:8px;letter-spacing:1.3px}h1{font-size:15px;letter-spacing:0}.header-actions{gap:5px}.header-actions .button{font-size:11px;min-height:44px;padding:8px 9px}#reset{display:none}.stage-toolbar{left:14px;top:15px;gap:5px}.view-switch{padding:3px}.view-switch button{min-width:46px;padding:0 11px;font-size:11px}.stage-toolbar .icon-button{width:44px;height:48px}.readout{right:14px;top:80px;width:129px;padding:10px 12px}.readout-row{font-size:11px}.readout-row strong{font-size:14px}.readout-heading{font-size:9px}.stage-bottom{padding-left:12px;padding-right:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.step-caption{padding:11px 13px;margin-bottom:10px;gap:7px}.step-caption h2{font-size:14px}.step-caption p{font-size:10px}.step-dock{gap:4px}.step-dock button{font-size:10px;gap:4px;min-height:48px}.step-dock button>span{font-size:9px}.stage-meta{font-size:9px;margin-top:11px}.legend{gap:11px}.lab.edge-label{font-size:13px!important}}
+@media(max-height:700px) and (orientation:landscape){:root{--header:62px}.app-header{padding-top:0}.brand-mark{width:34px;height:34px;font-size:28px}h1{font-size:17px}.eyebrow{font-size:8px}.stage-toolbar{top:13px}.readout{top:16px;padding:9px 13px}.readout-heading{padding-bottom:5px;margin-bottom:1px}.readout-row{line-height:1.6}.stage-bottom{padding-bottom:10px}.step-caption{padding:9px 13px;margin-bottom:8px}.step-caption h2{font-size:14px}.step-caption p{font-size:10px}.step-dock button{min-height:46px}.stage-meta{margin-top:8px}.stage-meta .legend{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Full explanation is a separate variant. The approved settings styles stay intact. */
+.lesson-list{display:flex;flex-direction:column;gap:14px}
+.lesson-card{scroll-margin-top:12px}
+.lesson-card.proof-focus{border-color:var(--accent);border-top-color:var(--accent)}
+.coordinate-details{margin-top:22px}
+.step-caption{max-width:800px;margin-bottom:12px}
+.step-caption p{max-width:690px}
+.solution-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:800px;margin:auto;pointer-events:auto}
+.solution-overview button{text-align:left;border:1px solid var(--line);border-radius:11px;min-height:98px;padding:12px 15px;background:var(--surface);display:flex;flex-direction:column;justify-content:center;gap:5px;touch-action:manipulation}
+.overview-label{font-size:10px;color:var(--ink-3);letter-spacing:.2px;white-space:nowrap}
+.solution-overview strong{font-family:"Cambria Math",Georgia,serif;font-size:21px;font-weight:500;color:var(--brand);white-space:nowrap}
+.solution-overview button:nth-child(2) strong{color:#FFB392}
+.solution-overview button:nth-child(3) strong{color:#C4B6F2}
+.overview-detail{font-size:10px;color:var(--ink-2);line-height:1.55;white-space:nowrap}
+.solution-overview .overview-answer{border-color:#76513D;background:var(--accent-lt)}
+.solution-overview .overview-answer strong{color:#FFB392}
+.solution-overview .overview-answer .overview-detail{color:#FFB392}
+@media(hover:hover) and (pointer:fine){.solution-overview button:hover{background:var(--surface-3)}.solution-overview .overview-answer:hover{background:#3D251A}}
+@media(min-width:1101px) and (pointer:fine){#panel{width:390px}}
+@media(max-width:900px){.solution-overview strong{font-size:19px}.solution-overview button{padding:11px 12px}}
+@media(max-width:600px){.solution-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.solution-overview button{min-height:77px;padding:9px 12px;gap:3px}.solution-overview strong{font-size:19px}.overview-label{font-size:9px}.overview-detail{font-size:9px}.step-caption{margin-bottom:9px}.step-caption h2{font-size:13px}.step-caption p{font-size:10px;line-height:1.6}.readout{top:78px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 10px}.readout-heading{display:none}.readout-row{flex-direction:column;gap:0;line-height:1.6}.readout-row strong{font-size:14px}.stage-meta .legend{display:none}}
+@media(max-height:700px) and (orientation:landscape){.solution-overview button{min-height:73px;padding:8px 12px;gap:3px}.solution-overview strong{font-size:18px}.step-caption p{font-size:10px}.stage-meta{margin-top:7px}}
+
+/* Single constrained point; approved display controls and responsive drawers retained. */
+.dot.green{background:#8FBF5A}#labels .lab.green{color:#B9D899;border-color:#52653D}
+.motion-tip{font-size:12px;color:var(--ink-2);line-height:1.8;margin:0 0 7px}.motion-buttons{display:flex;gap:7px;margin:6px 0 12px}.motion-buttons .button{flex:1;padding:8px;font-size:12px}
+.motion-readings{padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:12px;line-height:2.1;font-variant-numeric:tabular-nums}.motion-readings>div{display:flex;justify-content:space-between;gap:12px}.motion-readings span{color:var(--ink-3)}.motion-readings strong{font-weight:500;color:var(--ink-2)}
+.mid-flag{font-size:10px;border-top:1px solid var(--line);padding-top:8px;margin-top:7px;color:var(--ink-3)}.mid-flag.at-mid{color:#B9D899}.moving-point .readout-dot{background:var(--accent)}
+.proof-note{font-size:11px!important;color:var(--ink-3);border-left:2px solid var(--line);padding-left:10px}.compact-answer{font-size:34px}.coordinate-table code{font-size:12px}.solution-overview strong{font-size:19px}.solution-overview button:last-child strong{font-size:18px}.readout{width:190px}
+@media(max-width:600px){.solution-overview strong{font-size:17px}.solution-overview button:last-child strong{font-size:16px}.readout{width:auto}.mid-flag{grid-column:1/-1;margin:0;padding-top:4px;text-align:center;font-size:9px}.motion-readings{font-size:13px}.readout-row strong{font-size:14px}#hint{font-size:9px}}
+@media(max-height:700px) and (orientation:landscape){.mid-flag{padding-top:5px;margin-top:4px}}
+
+/* Folding additions preserve the approved panel, drawer and control sizes. */
+.question-options p{font-size:13px;margin:9px 0!important;padding-top:9px;border-top:1px solid var(--line);line-height:1.85}
+.question-options b{color:var(--brand)}
+.playback-controls{display:flex;align-items:center;gap:9px;margin:10px 0 14px}
+.playback-controls button{flex:1}.playback-controls label{font-size:11px;color:var(--ink-2)}
+.playback-controls select{min-height:46px;max-width:128px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:9px;padding:8px;font:inherit;font-size:12px}
+.motion-buttons .button{font-size:11px;padding:8px 3px}
+.motion-readings>div:last-child strong{font-size:10px}
+.lesson-card:nth-child(2){border-top-color:var(--accent)}.lesson-card:nth-child(3){border-top-color:var(--violet)}
+#labels .lab.annotation-label{font-size:16px;padding:2px 6px}
+@media(max-width:600px){#labels .lab.annotation-label{font-size:14px}}
+@media(max-width:600px){.motion-buttons .button{font-size:12px}.question-options p{font-size:14px}.playback-controls select{min-height:48px}}
+
+</style>
+</head>
+<body>
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">⌁</div><div><div class="eyebrow">GEOMETRY LAB <span>/ FOLDING</span></div><h1>菱形翻折 · 动点联动</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">2023 南京月考 · 多选题</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位视角</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2023 高三上 · 南京月考</span></div>
+        <div class="question"><p>如图，在菱形 <i>ABCD</i> 中，<i>AB＝2</i>，<i>∠ABC＝π/3</i>，<i>M</i> 为 <i>BC</i> 的中点。将 △<i>ABM</i> 沿直线 <i>AM</i> 翻折到 △<i>AB₁M</i> 的位置，连接 <i>B₁C</i> 和 <i>B₁D</i>，<i>N</i> 为 <i>B₁D</i> 的中点。在翻折过程中，则下列结论中正确的是：</p><div class="question-options"><p><b>A.</b> 面 AB₁M ⊥ 面 B₁MC</p><p><b>B.</b> 线段 CN 长度的取值范围为 [1, √3]</p><p><b>C.</b> 直线 AM 和 CN 所成的角始终为 π/6</p><p><b>D.</b> 当三棱锥 B₁–AMD 的体积最大时，点 C 在三棱锥 B₁–AMD 外接球的外部</p></div></div>
+        <div class="interaction-note">直接拖动橙色 B₁ 或它的字母，观察翻折和中点 N 的联动。播放、角度与关键位置控制均在“显示设置”。<b>答案：A、C。</b></div>
+        <div class="section-heading"><span>完整推导</span><span id="lesson-progress">全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" data-lesson="0" id="proof-0"><div class="lesson-title"><span class="step-number">A</span><h2>折痕垂直于两条面内直线</h2></div><p>△ABM 中，AB＝2、BM＝1、∠ABM＝60°，由余弦定理得 AM＝√3，故 AM²＋BM²＝AB²，AM ⊥ BM。翻折保持 AM ⊥ MB₁；同时 M、B、C 共线，AM ⊥ MC。</p><div class="formula">AM ⊥ MB₁，AM ⊥ MC<br>⇒ AM ⊥ 平面 B₁MC<br>AM ⊂ 平面 AB₁M<br><b>⇒ 平面 AB₁M ⊥ 平面 B₁MC</b></div><p>两条相交直线 MB₁、MC 确定平面，A 正确。</p><p class="proof-note">0°、180° 是演示端点，此时 B₁、M、C 共线，平面 B₁MC 未定义；A 的判断适用于非退化翻折。</p></article>
+          <article class="lesson-card" data-lesson="1" id="proof-1"><div class="lesson-title"><span class="step-number">B</span><h2>CN 的长度其实是定值</h2></div><p>以 M 为原点，MA 方向为 x 轴，MC 方向为 y 轴，z 轴垂直原菱形向上。设翻折角为 φ∈[0, π]：</p><div class="formula">A＝(√3, 0, 0)，D＝(√3, 2, 0)<br>C＝(0, 1, 0)<br>B₁＝(0, −cosφ, sinφ)<br>N＝(√3/2, 1−cosφ/2, sinφ/2)</div><p>N 是 B₁D 中点，因此：</p><div class="formula">CN＝(√3/2, −cosφ/2, sinφ/2)<br>|CN|²＝3/4＋(cos²φ＋sin²φ)/4<br><b>CN＝1，取值集合为 {1}</b></div><p>原选项声称范围为 [1, √3]，B 错误。图中紫色 CN 随翻折转动，但长度不变。</p></article>
+          <article class="lesson-card" data-lesson="2" id="proof-2"><div class="lesson-title"><span class="step-number">C</span><h2>平移 AM 的方向，看恒定夹角</h2></div><p>AM 平行于 x 轴，直线所成角取锐角或直角。记该角为 θ，由 CN 的坐标与长度：</p><div class="formula">cos θ＝|CN 的 x 分量| / |CN|<br>＝(√3/2) / 1＝√3/2<br><b>θ＝π/6＝30°</b></div><p>模型在 C 处画出与 AM 同向的虚线，并用角弧标出它与 CN 的夹角；这是将异面直线的方向平移到同一点后测角。C 正确。</p></article>
+          <article class="lesson-card answer-card" data-lesson="3" id="proof-3"><div class="lesson-title"><span class="step-number">D</span><h2>体积最大时，C 在球内</h2></div><p>△AMD 位于 z＝0，面积为 √3。三棱锥的高是 sinφ：</p><div class="formula">V＝(√3/3) sinφ<br><b>φ＝90° 时 V 最大，Vmax＝√3/3</b></div><p>此时 B₁＝(0, 0, 1)。设外接球心 O＝(u, v, w)，由 OM＝OA＝OD＝OB₁，解得：</p><div class="formula">O＝(√3/2, 1, 1/2)<br>R²＝OM²＝3/4＋1＋1/4＝2<br>OC²＝3/4＋1/4＝1＜R²<br><b>C 在外接球内部，D 错误</b></div><p>在设置中打开“最大体积时的外接球”，并用“90°”快捷位置查看：球面只在该关键位置显示，不将固定球误认为任意角度的外接球。</p><div class="answer compact-answer">A、C<span class="answer-badge">正确选项</span></div></article>
+        </div>
+        <details class="coordinate-details"><summary>建模坐标与运动约束</summary><div class="coordinate-table"><span>M</span><code>(0, 0, 0)</code><span>A</span><code>(√3, 0, 0)</code><span>B</span><code>(0, −1, 0)</code><span>C</span><code>(0, 1, 0)</code><span>D</span><code>(√3, 2, 0)</code></div><p>B 保留为原位置参考；B₁ 沿以 M 为圆心、半径 1、垂直于 AM 的上半圆运动，AB₁＝2、MB₁＝1。N 始终为 B₁D 中点，它的轨迹是半径 1/2 的半圆。只有一个独立翻折参数，N 由中点关系确定。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>翻折与动点</span><span>绕 AM 旋转</span></div><p class="motion-tip">拖动橙色 B₁ 或字母 B₁；N 自动联动。抓住 B₁ 时相机锁定，松手恢复。播放往返于 0° 与 180°。</p>
+        <label class="range-label" for="sT"><span>翻折角 φ</span><output id="sTval">60.0°</output></label><input type="range" id="sT" min="0" max="1" step="0.0005555555555555556" value="0.3333333333333333" aria-label="翻折角，0到180度">
+        <div class="motion-buttons" role="group" aria-label="翻折关键位置"><button class="button" data-t="0">0° 展开</button><button class="button" data-t="0.5">90° 最大体积</button><button class="button" data-t="1">180° 合拢</button></div>
+        <div class="playback-controls"><button id="play" class="button primary" aria-pressed="false">▶ 播放翻折</button><label for="speed">速度</label><select id="speed"><option value="15">慢 · 15°/s</option><option value="30" selected>中 · 30°/s</option><option value="60">快 · 60°/s</option></select></div>
+        <div class="motion-readings"><div><span>翻折角 φ</span><strong id="mRatio">60.0°</strong></div><div><span>CN 长度</span><strong id="mCN">1.0000</strong></div><div><span>两面夹角（A）</span><strong id="mAngle">90.0°</strong></div><div><span>AM 与 CN 夹角</span><strong id="mSin">30.0°</strong></div><div><span>三棱锥体积</span><strong id="mVolume">0.5000</strong></div><div><span>外接球展示</span><strong id="sphereStatus">仅 φ＝90° 时可见</strong></div></div>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>固定底面 AMCD</span><input type="checkbox" id="cSolid" checked></label>
+        <label class="switch-row"><span>原位置 △ABM 与 B</span><input type="checkbox" id="cOriginal" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>翻折三角形 AB₁M</span><input type="checkbox" id="cPlane1" checked></label>
+        <label class="switch-row"><span><span class="dot blue"></span>辅助平面 B₁MC</span><input type="checkbox" id="cPlane2" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>CN 与恒定夹角 30°</span><input type="checkbox" id="cLineAngle" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>B₁ 运动圆弧 / 翻折角</span><input type="checkbox" id="cAngles" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>N 的中点轨迹</span><input type="checkbox" id="cNTrack"></label>
+        <label class="switch-row"><span><span class="dot violet"></span>三棱锥 B₁–AMD</span><input type="checkbox" id="cVolume"></label>
+        <label class="switch-row"><span><span class="dot violet"></span>最大体积时的外接球</span><input type="checkbox" id="cSphere"></label>
+        <label class="switch-row"><span>空间坐标轴</span><input type="checkbox" id="cAxes"></label>
+        <div class="section-heading"><span>文字标注</span></div><label class="switch-row"><span>顶点字母</span><input type="checkbox" id="cLabels" checked></label><label class="switch-row"><span>边长数值</span><input type="checkbox" id="cLengths"></label>
+        <label class="range-label" for="sFont"><span>顶点字号</span><output id="sFontval">22 px</output></label><input type="range" id="sFont" min="14" max="32" value="22" step="1">
+        <label class="range-label" for="sOpacity"><span>底面与翻折面透明度</span><output id="sOpacityval">14%</output></label><input type="range" id="sOpacity" min="0" max="50" value="14" step="1">
+        <div class="section-heading"><span>顶点高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点模型中的顶点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div><p class="settings-hint">点击下方公式只定位推导，保留显示设置与翻折位置。球面仅在 90° 时展示；播放可随时暂停，拖动 B₁ 自动暂停。</p>
+      </section>
+    </div><div class="panel-footer"><span class="status-dot"></span>可离线使用<span class="footer-right">翻折约束 · 中点联动</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互三维翻折模型">
+    <canvas id="cv" aria-label="拖动 B₁ 翻折；拖动空白旋转；双指缩放平移；点击顶点高亮" tabindex="0"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="快捷视角"><button class="active" data-view="spatial" aria-pressed="true">立体</button><button data-view="front" aria-pressed="false">正视</button><button data-view="top" aria-pressed="false">俯视</button></div><button id="fit" class="icon-button" aria-label="将模型居中适配视口" title="模型居中">⌖</button></div>
+    <div id="readout" class="readout" aria-live="off"><div class="readout-heading"><span>当前翻折 · 实时读数</span><span class="readout-dot"></span></div><div class="readout-row"><span>翻折角 φ</span><strong id="rT">60.0°</strong></div><div class="readout-row"><span>CN 长度</span><strong id="rAngle">1.0000</strong></div><div class="readout-row"><span>体积 V</span><strong id="rSin">0.5000</strong></div><div id="midFlag" class="mid-flag">沿 AM 翻折 · N 为中点</div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 答案 A、C</span><h2 id="caption-title">翻折改变形状，保持长度与夹角</h2><p id="caption-body">AM 是固定折痕。拖动橙色 B₁，紫色 N 始终平分 B₁D；播放与角度控制在显示设置。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="四项判断，点击定位推导">
+      <button data-proof="0"><span class="overview-label">A · 正确</span><strong>两面垂直 90°</strong><span class="overview-detail">非退化翻折成立</span></button>
+      <button data-proof="1"><span class="overview-label">B · 错误</span><strong>CN ≡ 1</strong><span class="overview-detail">长度不随翻折改变</span></button>
+      <button data-proof="2"><span class="overview-label">C · 正确</span><strong>θ ≡ 30°</strong><span class="overview-detail">AM 与 CN 的夹角</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">D · 错误</span><strong>OC = 1 &lt; √2</strong><span class="overview-detail">体积最大时 C 在球内</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>固定底面</span><span><span class="dot orange"></span>翻折面 / B₁</span><span><span class="dot violet"></span>N / CN</span></div><div id="hint">拖动 B₁ 翻折 · 空白旋转 · 滚轮缩放 · 顶点多选</div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div><div id="scrim" aria-hidden="true"></div>
+
+<!-- THREE_DEPENDENCY_START -->
+<script src="three.min.js"></script>
+<!-- THREE_DEPENDENCY_END -->
+<script>
+(function () {
+  'use strict';
+  const $=id=>document.getElementById(id);
+  const compactQuery=matchMedia('(max-width:1100px), (pointer:coarse)'),coarseQuery=matchMedia('(pointer:coarse)'),reducedQuery=matchMedia('(prefers-reduced-motion:reduce)');
+  function fail(message){$('error').hidden=false;$('error').textContent=message;}
+  if(!window.THREE){fail('三维库未能加载，请打开完整的离线单文件。');return;}
+  const SQ3=Math.sqrt(3),R=1.85,DEFAULT_VIEW={azim:.42,elev:.46},DEFAULT_T=1/3;
+  // Teaching (x,y,z) -> render (x-√3/2,z-.45,.5-y). Base z=0 stays horizontal.
+  const STANDARD={A:[SQ3,0,0],B:[0,-1,0],M:[0,0,0],C:[0,1,0],D:[SQ3,2,0],B1:[0,-.5,SQ3/2],N:[SQ3/2,.75,SQ3/4],O:[SQ3/2,1,.5]};
+  const names={B1:'B₁'},state={t:DEFAULT_T,playing:false,speed:30,solid:true,original:true,plane1:true,plane2:true,lineAngle:true,volume:false,angles:true,nTrack:false,sphere:false,axes:false,labels:true,lengths:false,font:22,opacity:.14,quality:'auto'};
+  const COLORS={blue:0x6BA8E8,orange:0xFF7A45,violet:0xA692E8,edge:0xB9C9DD,mute:0x73849A};
+  const canvas=$('cv'),stage=$('stage');let renderer;
+  try{renderer=new THREE.WebGLRenderer({canvas,antialias:true,alpha:true,powerPreference:'low-power'});}catch(error){fail('浏览器无法启动 WebGL，请在支持硬件加速的浏览器中打开。');return;}
+  renderer.setClearColor(0x131A22,0);
+  const scene=new THREE.Scene(),camera=new THREE.PerspectiveCamera(40,1,.1,200),cam={...DEFAULT_VIEW,dist:8},target=new THREE.Vector3();
+  let dimensions={width:1,height:1,left:0,top:0,bottom:195},fitDistance=8,frame=0,tween=null,contextLost=false,metricsDirty=true,renderCount=0;
+  const statistics={durations:[],geometries:0},V={};
+  const toRender=(p,out)=>out.set(p[0]-SQ3/2,p[2]-.45,.5-p[1]);
+  for(const [key,p]of Object.entries(STANDARD))V[key]=toRender(p,new THREE.Vector3());
+  const groups={};for(const key of ['faces','edges','original','plane1','plane2','lineAngle','volume','angles','nTrack','sphere','axes','vertices']){groups[key]=new THREE.Group();scene.add(groups[key]);}
+  function material(color,opacity=1){return new THREE.MeshBasicMaterial({color,transparent:opacity<1,opacity,side:THREE.DoubleSide,depthWrite:opacity===1});}
+  const lineMaterials={},axisY=new THREE.Vector3(0,1,0),lineDirection=new THREE.Vector3(),unitTube=new THREE.TubeGeometry(new THREE.LineCurve3(new THREE.Vector3(),axisY),1,1,6,false);
+  function positionTube(mesh,a,b,r){lineDirection.subVectors(b,a);const length=lineDirection.length();mesh.visible=length>1e-10;if(length>1e-10){mesh.position.copy(a);mesh.quaternion.setFromUnitVectors(axisY,lineDirection.multiplyScalar(1/length));mesh.scale.set(r,length,r);}return mesh;}
+  function tube(a,b,color,r=.011,opacity=1){const key=color+':'+opacity;if(!lineMaterials[key])lineMaterials[key]=material(color,opacity);return positionTube(new THREE.Mesh(unitTube,lineMaterials[key]),a,b,r);}
+  function triangle(keys,color,opacity){const geometry=new THREE.BufferGeometry();geometry.setAttribute('position',new THREE.Float32BufferAttribute(new Float32Array(9),3));const mesh=new THREE.Mesh(geometry,material(color,opacity));mesh.frustumCulled=false;writeTriangle(mesh,keys);return mesh;}
+  function writeTriangle(mesh,keys){const a=mesh.geometry.attributes.position.array;for(let i=0;i<3;i++){const p=V[keys[i]];a[i*3]=p.x;a[i*3+1]=p.y;a[i*3+2]=p.z;}mesh.geometry.attributes.position.needsUpdate=true;}
+  function dashed(a,b,color){const mesh=new THREE.Line(new THREE.BufferGeometry().setFromPoints([a,b]),new THREE.LineDashedMaterial({color,transparent:true,opacity:.5,dashSize:.07,gapSize:.06,depthWrite:false}));mesh.computeLineDistances();return mesh;}
+  const faceMaterials=[],dynamicFaces=[],dynamicLines=[];
+  function movingFace(group,keys,color,opacity){const mesh=triangle(keys,color,opacity);groups[group].add(mesh);dynamicFaces.push({mesh,keys});return mesh;}
+  function movingLine(group,a,b,color,r=.011,opacity=1){const mesh=tube(V[a],V[b],color,r,opacity);groups[group].add(mesh);dynamicLines.push({mesh,a,b,r});return mesh;}
+  for(const keys of [['A','M','C'],['A','C','D']]){const mesh=triangle(keys,COLORS.blue,state.opacity);groups.faces.add(mesh);faceMaterials.push(mesh.material);}
+  for(const [a,b]of [['A','M'],['M','C'],['C','D'],['D','A']])groups.edges.add(tube(V[a],V[b],COLORS.blue,a==='A'&&b==='M'?.022:.012));
+  groups.original.add(triangle(['A','B','M'],COLORS.mute,.045),dashed(V.A,V.B,COLORS.mute),dashed(V.B,V.M,COLORS.mute));
+  const foldedFace=movingFace('plane1',['A','B1','M'],COLORS.orange,state.opacity);faceMaterials.push(foldedFace.material);
+  // Structural edges and all selectable points survive hidden face layers.
+  movingLine('edges','A','B1',COLORS.orange,.015);movingLine('edges','M','B1',COLORS.orange,.015);
+  movingLine('edges','B1','C',COLORS.blue,.010,.75);movingLine('edges','B1','D',COLORS.edge,.010,.75);
+  movingFace('plane2',['B1','M','C'],COLORS.blue,.11);
+  movingLine('lineAngle','C','N',COLORS.violet,.019);
+  const cDirection=V.C.clone().add(new THREE.Vector3(1.12,0,0));groups.lineAngle.add(dashed(V.C,cDirection,COLORS.violet));
+  const thetaPieces=[];for(let i=0;i<16;i++){const mesh=tube(V.C,V.C,COLORS.violet,.006);thetaPieces.push(mesh);groups.lineAngle.add(mesh);}
+  for(const keys of [['B1','A','M'],['B1','M','D'],['B1','D','A'],['A','D','M']])movingFace('volume',keys,COLORS.violet,.10);
+  groups.volume.add(tube(V.M,V.D,COLORS.violet,.008,.6));
+  const arcA=new THREE.Vector3(),arcB=new THREE.Vector3(),foldPoint=(t,out)=>out.set(-SQ3/2,Math.sin(Math.PI*t)-.45,.5+Math.cos(Math.PI*t));
+  // Constant unit tubes are transformed, never rebuilt during folding.
+  for(let i=0;i<64;i++){foldPoint(i/64,arcA);foldPoint((i+.72)/64,arcB);groups.angles.add(tube(arcA,arcB,COLORS.orange,.005,.38));
+    const a=toRender([SQ3/2,1-Math.cos(Math.PI*i/64)/2,Math.sin(Math.PI*i/64)/2],new THREE.Vector3()),b=toRender([SQ3/2,1-Math.cos(Math.PI*(i+.65)/64)/2,Math.sin(Math.PI*(i+.65)/64)/2],new THREE.Vector3());groups.nTrack.add(tube(a,b,COLORS.violet,.004,.6));}
+  const phiPieces=[];for(let i=0;i<24;i++){const mesh=tube(V.M,V.M,COLORS.orange,.006);phiPieces.push(mesh);groups.angles.add(mesh);}
+  const sphereMesh=new THREE.Mesh(new THREE.SphereGeometry(Math.sqrt(2),48,32),material(COLORS.violet,.06));sphereMesh.position.copy(V.O);groups.sphere.add(sphereMesh);
+  // Three great circles make the transparent sphere readable without a dense wireframe.
+  const sphereLineMaterial=new THREE.LineBasicMaterial({color:COLORS.violet,transparent:true,opacity:.40,depthWrite:false});
+  for(let plane=0;plane<3;plane++){const pts=[];for(let i=0;i<=96;i++){const a=2*Math.PI*i/96,u=Math.sqrt(2)*Math.cos(a),v=Math.sqrt(2)*Math.sin(a);pts.push(V.O.clone().add(new THREE.Vector3(plane===0?0:u,plane===1?0:plane===0?u:v,plane===2?0:v)));}groups.sphere.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),sphereLineMaterial));}
+  groups.sphere.add(dashed(V.O,V.C,COLORS.violet));
+  const axesLabels=[];for(const [label,dir]of [['x',new THREE.Vector3(1,0,0)],['y',new THREE.Vector3(0,0,-1)],['z',axisY]]){groups.axes.add(new THREE.ArrowHelper(dir,V.M,1.25,COLORS.blue,.10,.045));axesLabels.push({label,position:V.M.clone().addScaledVector(dir,1.34)});}
+  const pointGeometry=new THREE.SphereGeometry(.034,16,10),haloGeometry=new THREE.SphereGeometry(.034,12,8),haloMaterial=material(COLORS.orange,.15),vertexMeshes={},halos={},selected=new Set();
+  function pointColor(key){return key==='B1'?COLORS.orange:key==='N'||key==='O'?COLORS.violet:key==='B'?COLORS.mute:COLORS.edge;}
+  for(const key of Object.keys(V)){const mesh=new THREE.Mesh(pointGeometry,material(pointColor(key)));mesh.position.copy(V[key]);mesh.scale.setScalar(key==='B1'?1.65:1);vertexMeshes[key]=mesh;groups.vertices.add(mesh);const halo=new THREE.Mesh(haloGeometry,haloMaterial);halo.position.copy(V[key]);halo.scale.setScalar(key==='B1'?3.1:2.5);halos[key]=halo;groups.vertices.add(halo);}
+  const labels=[],projection=new THREE.Vector3();
+  function addLabel(key,text,position,color,kind,offset,when){const el=document.createElement('div');el.className='lab'+(color?' '+color:'')+(kind==='edge'?' edge-label':kind==='annotation'?' annotation-label':'');el.textContent=text;$('labels').appendChild(el);const item={key,el,position,kind,offset:offset||[0,0],when:when||(()=>true),width:0,height:0,x:0,y:0,hit:null,visible:false};labels.push(item);return item;}
+  const atMaximum=()=>Math.abs(state.t-.5)<1e-7,nondegenerate=()=>state.t>1e-9&&state.t<1-1e-9;
+  function keyVisible(key){return key==='B'?state.original:key==='O'?state.sphere&&atMaximum():true;}
+  for(const key of Object.keys(V))addLabel(key,names[key]||key,V[key],key==='B1'?'orange':key==='N'||key==='O'?'violet':'','vertex',null,()=>keyVisible(key));
+  const midpoint=(a,b)=>new THREE.Vector3().addVectors(V[a],V[b]).multiplyScalar(.5),lengthAB=midpoint('A','B1'),lengthBM=midpoint('B1','M'),lengthCN=midpoint('C','N');
+  addLabel(null,'AM = √3',midpoint('A','M'),'','edge',[0,18]);addLabel(null,'MC = 1',midpoint('M','C'),'','edge',[0,18]);addLabel(null,'AB₁ = 2',lengthAB,'orange','edge',[0,-15]);addLabel(null,'MB₁ = 1',lengthBM,'orange','edge',[-35,0]);addLabel(null,'CN = 1',lengthCN,'violet','edge',[0,19],()=>state.lineAngle);
+  const thetaPosition=new THREE.Vector3(),phiPosition=new THREE.Vector3();addLabel(null,'θ = 30°',thetaPosition,'violet','annotation',[0,0],()=>state.lineAngle);const phiLabel=addLabel(null,'φ',phiPosition,'orange','annotation',[0,0],()=>state.angles&&state.t>.015);
+  for(const entry of axesLabels)addLabel(null,entry.label,entry.position,'','axis',[8,0],()=>state.axes);
+  function measureLabels(){for(const item of labels)if(item.visible){item.width=item.el.offsetWidth;item.height=item.el.offsetHeight;}metricsDirty=false;}
+  function updateVisibility(){for(const key of ['faces','original','plane1','plane2','lineAngle','volume','angles','nTrack','sphere','axes'])groups[key].visible=key==='faces'?state.solid:key==='plane2'?state.plane2&&nondegenerate():key==='sphere'?state.sphere&&atMaximum():state[key];for(const key of Object.keys(V)){vertexMeshes[key].visible=keyVisible(key);halos[key].visible=(key==='B1'||selected.has(key))&&keyVisible(key);}for(const item of labels){item.visible=item.when()&&(item.kind==='edge'?state.lengths:state.labels);item.el.hidden=!item.visible;item.hit=null;}syncSphereStatus();metricsDirty=true;invalidate();}
+  function syncLabels(){
+    if(metricsDirty)measureLabels();const w=dimensions.width,h=dimensions.height,placed=[];
+    for(const item of labels){item.hit=null;if(!item.visible)continue;projection.copy(item.position).project(camera);if(projection.z<-1||projection.z>1){item.el.hidden=true;continue;}item.el.hidden=false;const px=(projection.x*.5+.5)*w,py=(-projection.y*.5+.5)*h;let x=px+item.offset[0],y=py+item.offset[1];if(item.kind==='vertex'){let dx=px-w/2,dy=py-(h/2-camera.view.offsetY),length=Math.hypot(dx,dy);if(length<18){dx=-1;dy=-.75;length=1.25;}x+=dx/length*(state.font*.72+12);y+=dy/length*(state.font*.72+12);}placed.push({item,x,y,px,py});}
+    for(let iteration=0;iteration<18;iteration++)for(let i=0;i<placed.length;i++)for(let j=i+1;j<placed.length;j++){const a=placed[i],b=placed[j],dx=b.x-a.x,dy=b.y-a.y,ox=(a.item.width+b.item.width)/2+7-Math.abs(dx),oy=(a.item.height+b.item.height)/2+7-Math.abs(dy);if(ox>0&&oy>0){if(ox<oy){const shift=(ox+.3)*.5*(dx<0?-1:1);a.x-=shift;b.x+=shift;}else{const shift=(oy+.3)*.5*(dy<0?-1:1);a.y-=shift;b.y+=shift;}}}
+    // Keep labels away from top controls as well as the formula dock.
+    for(const o of placed){const item=o.item;o.x=Math.max(item.width/2+6,Math.min(w-item.width/2-6,o.x));o.y=Math.max(item.height/2+6,Math.min(h-dimensions.bottom-item.height/2-10,o.y));item.x=o.px;item.y=o.py;item.el.style.transform='translate3d('+o.x.toFixed(2)+'px,'+o.y.toFixed(2)+'px,0) translate(-50%,-50%)';item.hit={x0:o.x-item.width/2-3,x1:o.x+item.width/2+3,y0:o.y-item.height/2-3,y1:o.y+item.height/2+3};}
+  }
+  function pickVertex(px,py,type){const visible=labels.filter(item=>item.kind==='vertex'&&keyVisible(item.key)),touch=type==='touch'||type==='pen',tol=touch?40:22;projection.copy(V.B1).project(camera);const pOnScreen=projection.z>=-1&&projection.z<=1,pDistance=Math.hypot(px-(projection.x*.5+.5)*dimensions.width,py-(-projection.y*.5+.5)*dimensions.height);
+    if(pOnScreen&&pDistance<(touch?18:12))return 'B1';for(const item of visible){const r=item.hit;if(r&&px>=r.x0&&px<=r.x1&&py>=r.y0&&py<=r.y1)return item.key;}if(pOnScreen&&pDistance<tol)return 'B1';let best=null,distance=tol;for(const key of Object.keys(V)){if(!keyVisible(key))continue;projection.copy(V[key]).project(camera);if(projection.z>1||projection.z<-1)continue;const d=Math.hypot(px-(projection.x*.5+.5)*dimensions.width,py-(-projection.y*.5+.5)*dimensions.height);if(d<distance){distance=d;best=key;}}return best;}
+  function refreshSelection(){const list=$('selList'),box=$('pickBox');list.textContent=selected.size?'':'点模型中的顶点或字母';box.textContent='';for(const key of Object.keys(V)){const chosen=selected.has(key);vertexMeshes[key].scale.setScalar(chosen?1.9:key==='B1'?1.65:1);vertexMeshes[key].material.color.setHex(chosen?COLORS.orange:pointColor(key));halos[key].visible=(chosen||key==='B1')&&keyVisible(key);}for(const item of labels)item.el.classList.toggle('sel',item.kind==='vertex'&&selected.has(item.key));for(const key of selected){const chip=document.createElement('span');chip.className='chip';chip.textContent=names[key]||key;list.appendChild(chip);const row=document.createElement('div');row.className='pr';const name=document.createElement('span'),coord=document.createElement('span');name.textContent=names[key]||key;coord.textContent='('+STANDARD[key].map(v=>Number(v.toFixed(3))).join(', ')+')';row.append(name,coord);box.append(row);}metricsDirty=true;invalidate();}
+  function updateSelectedP(){for(const key of ['B1','N']){if(!selected.has(key))continue;const index=[...selected].indexOf(key);$('pickBox').children[index].lastElementChild.textContent='('+STANDARD[key].map(v=>Number(v.toFixed(3))).join(', ')+')';}}
+  function toggleSelection(key){if(!key)return;if(selected.has(key))selected.delete(key);else selected.add(key);refreshSelection();}
+  const values={phi:60,planeAngle:90,CN:1,theta:30,volume:.5};
+  function calculate(){values.phi=state.t*180;values.planeAngle=nondegenerate()?90:null;values.CN=V.C.distanceTo(V.N);values.theta=Math.acos(Math.min(1,Math.abs(V.N.x-V.C.x)/values.CN))*180/Math.PI;values.volume=SQ3*Math.sin(Math.PI*state.t)/3;}
+  function syncSphereStatus(){$('sphereStatus').textContent=!state.sphere?'图层未开启':atMaximum()?'R＝√2，OC＝1（球内）':'仅 φ＝90° 时可见';}
+  function syncReadings(){const angle=values.phi.toFixed(1)+'°';$('sT').value=String(state.t);$('sTval').textContent=angle;$('sT').setAttribute('aria-valuetext',angle);$('mRatio').textContent=angle;$('mCN').textContent=values.CN.toFixed(4);$('mAngle').textContent=values.planeAngle===null?'未定义':values.planeAngle.toFixed(1)+'°';$('mSin').textContent=values.theta.toFixed(1)+'°';$('mVolume').textContent=values.volume.toFixed(4);$('rT').textContent=angle;$('rAngle').textContent=values.CN.toFixed(4);$('rSin').textContent=values.volume.toFixed(4);$('midFlag').textContent=atMaximum()?'90° · 体积最大 √3/3':!nondegenerate()?'共面端点 · 平面 B₁MC 未定义':state.playing?'播放翻折中 · N 为中点':'沿 AM 翻折 · N 为中点';$('midFlag').classList.toggle('at-mid',atMaximum());syncSphereStatus();for(const el of document.querySelectorAll('[data-t]')){const active=Math.abs(state.t-Number(el.dataset.t))<1e-7;el.classList.toggle('active',active);el.setAttribute('aria-pressed',String(active));}}
+  const cnUnit=new THREE.Vector3(),thetaOrth=new THREE.Vector3();
+  function updateDynamic(){for(const {mesh,keys}of dynamicFaces)writeTriangle(mesh,keys);for(const {mesh,a,b,r}of dynamicLines)positionTube(mesh,V[a],V[b],r);for(const key of ['B1','N']){vertexMeshes[key].position.copy(V[key]);halos[key].position.copy(V[key]);}
+    lengthAB.addVectors(V.A,V.B1).multiplyScalar(.5);lengthBM.addVectors(V.M,V.B1).multiplyScalar(.5);lengthCN.addVectors(V.C,V.N).multiplyScalar(.5);
+    cnUnit.subVectors(V.N,V.C).normalize();thetaOrth.set(0,cnUnit.y,cnUnit.z).normalize();for(let i=0;i<16;i++){const a=Math.PI/6*i/16,b=Math.PI/6*(i+1)/16;arcA.copy(V.C).addScaledVector(thetaOrth,.28*Math.sin(a));arcA.x+=.28*Math.cos(a);arcB.copy(V.C).addScaledVector(thetaOrth,.28*Math.sin(b));arcB.x+=.28*Math.cos(b);positionTube(thetaPieces[i],arcA,arcB,.006);}thetaPosition.copy(V.C).addScaledVector(thetaOrth,.48*Math.sin(Math.PI/12));thetaPosition.x+=.48*Math.cos(Math.PI/12);
+    for(let i=0;i<24;i++){const a=Math.PI*state.t*i/24,b=Math.PI*state.t*(i+1)/24;arcA.set(V.M.x,V.M.y+.33*Math.sin(a),V.M.z+.33*Math.cos(a));arcB.set(V.M.x,V.M.y+.33*Math.sin(b),V.M.z+.33*Math.cos(b));positionTube(phiPieces[i],arcA,arcB,.006);}phiPosition.set(V.M.x,V.M.y+.52*Math.sin(Math.PI*state.t/2),V.M.z+.52*Math.cos(Math.PI*state.t/2));
+  }
+  // Sole update entry: drag, native slider, shortcuts and animation all call here.
+  function setT(value,fromPlayback=false){if(!Number.isFinite(value))return;if(!fromPlayback)pausePlayback();const before=nondegenerate(),oldMaximum=atMaximum();state.t=Math.max(0,Math.min(1,value));const angle=Math.PI*state.t;STANDARD.B1[1]=-Math.cos(angle);STANDARD.B1[2]=Math.sin(angle);for(let i=0;i<3;i++)STANDARD.N[i]=(STANDARD.B1[i]+STANDARD.D[i])/2;toRender(STANDARD.B1,V.B1);toRender(STANDARD.N,V.N);calculate();updateDynamic();syncReadings();updateSelectedP();if(before!==nondegenerate()||oldMaximum!==atMaximum())updateVisibility();invalidate();}
+  const rayO=new THREE.Vector3(),rayD=new THREE.Vector3(),rayW=new THREE.Vector3(),rayScores=new Float64Array(129);
+  function screenToT(px,py){
+    rayO.copy(camera.position);rayD.set(px/dimensions.width*2-1,1-py/dimensions.height*2,.5).unproject(camera).sub(rayO).normalize();
+    // Ray intersects B₁'s circle plane x=-√3/2; recover φ using atan2(z,-y).
+    if(Math.abs(rayD.x)>1e-6){const distance=(-SQ3/2-rayO.x)/rayD.x;if(distance<=0)return null;const z=rayO.y+distance*rayD.y+.45,minusY=rayO.z+distance*rayD.z-.5;if(Math.hypot(z,minusY)<1e-9)return null;let a=Math.atan2(z,minusY);if(a< -Math.PI/2)a+=2*Math.PI;return a/Math.PI;}
+    // Edge-on circle: choose a locally continuous minimum of distance to the world ray.
+    const score=t=>{foldPoint(t,rayW);rayW.sub(rayO);const along=Math.max(0,rayW.dot(rayD));return rayW.addScaledVector(rayD,-along).lengthSq();};
+    for(let i=0;i<=128;i++)rayScores[i]=score(i/128);
+    let best=state.t,min=Infinity;
+    for(let j=0;j<=128;j++){if(j>0&&rayScores[j]>rayScores[j-1]||j<128&&rayScores[j]>rayScores[j+1])continue;let lo=Math.max(0,(j-1)/128),hi=Math.min(1,(j+1)/128);for(let i=0;i<55;i++){const a=lo+(hi-lo)/3,b=hi-(hi-lo)/3;if(score(a)<score(b))hi=b;else lo=a;}const t=(lo+hi)/2,s=score(t);if(s<min-1e-10||Math.abs(s-min)<=1e-10&&Math.abs(t-state.t)<Math.abs(best-state.t)){min=s;best=t;}}
+    return best;
+  }
+  let playLast=null,playDirection=1;
+  function pausePlayback(){state.playing=false;playLast=null;$('play').textContent='▶ 播放翻折';$('play').setAttribute('aria-pressed','false');}
+  function togglePlayback(){if(state.playing){pausePlayback();syncReadings();return;}cancelGesture();state.playing=true;playLast=null;playDirection=state.t>=1?-1:1;$('play').textContent='Ⅱ 暂停翻折';$('play').setAttribute('aria-pressed','true');syncReadings();invalidate();}
+  function advancePlayback(now){if(!state.playing)return;if(playLast===null){playLast=now;return;}const elapsed=Math.min(.1,(now-playLast)/1000);playLast=now;let next=state.t+playDirection*elapsed*state.speed/180;if(next>=1){next=2-next;playDirection=-1;}if(next<=0){next=-next;playDirection=1;}setT(next,true);}
+  let focusedProof=0;
+  function focusProof(index){focusedProof=Math.max(0,Math.min(3,index));tabSelect('lesson');if(compact())setDrawer(true);const card=$('proof-'+focusedProof);for(const el of document.querySelectorAll('[data-lesson]'))el.classList.toggle('proof-focus',el===card);card.scrollIntoView({behavior:reducedQuery.matches?'auto':'smooth',block:'start'});}
+  const checks={cSolid:'solid',cOriginal:'original',cPlane1:'plane1',cPlane2:'plane2',cLineAngle:'lineAngle',cVolume:'volume',cAngles:'angles',cNTrack:'nTrack',cSphere:'sphere',cAxes:'axes',cLabels:'labels',cLengths:'lengths'};
+  function synchronizeChecks(){for(const [id,key]of Object.entries(checks))$(id).checked=state[key];}
+
+  // 【D】Demand rendering. Input events are coalesced into one animation frame.
+  function invalidate(){if(!frame&&!contextLost&&!document.hidden)frame=requestAnimationFrame(render);}
+  function applyCamera(){cam.elev=Math.max(-1.49,Math.min(1.49,cam.elev));const ce=Math.cos(cam.elev);camera.position.set(target.x+cam.dist*ce*Math.sin(cam.azim),target.y+cam.dist*Math.sin(cam.elev),target.z+cam.dist*ce*Math.cos(cam.azim));camera.lookAt(target);camera.updateMatrixWorld();invalidate();}
+  function render(now){
+    frame=0;if(contextLost||document.hidden)return;const start=performance.now();advancePlayback(now);
+    if(tween){const t=Math.min(1,(now-tween.start)/tween.duration),ease=1-Math.pow(1-t,3);cam.azim=tween.from.azim+(tween.to.azim-tween.from.azim)*ease;cam.elev=tween.from.elev+(tween.to.elev-tween.from.elev)*ease;cam.dist=tween.from.dist+(tween.to.dist-tween.from.dist)*ease;target.lerpVectors(tween.origin,tween.destination,ease);applyCamera();if(t===1)tween=null;}
+    renderer.render(scene,camera);syncLabels();renderCount++;
+    if(window.location.hash==='#geo-debug'){statistics.durations.push(performance.now()-start);if(statistics.durations.length>300)statistics.durations.shift();statistics.geometries=renderer.info.memory.geometries;}
+    if(tween||state.playing)invalidate();
+  }
+  function pixelRatio(){const device=window.devicePixelRatio||1,budget=state.quality==='sharp'?3500000:2000000;const maximum=state.quality==='save'?1:state.quality==='sharp'?2:coarseQuery.matches?1.35:1.65;return Math.min(device,maximum,Math.sqrt(budget/Math.max(1,dimensions.width*dimensions.height)));}
+  function resize(){
+    const rect=stage.getBoundingClientRect();if(rect.width<2||rect.height<2)return;
+    const oldFit=fitDistance;dimensions={width:rect.width,height:rect.height,left:rect.left,top:rect.top,bottom:document.querySelector('.stage-bottom').getBoundingClientRect().height};
+    renderer.setPixelRatio(pixelRatio());renderer.setSize(rect.width,rect.height,false);camera.aspect=rect.width/rect.height;
+    const top=dimensions.width<600?150:68,bottom=dimensions.bottom+44,usableHeight=Math.max(130,rect.height-top-bottom),usableWidth=Math.max(200,rect.width-84);
+    camera.setViewOffset(rect.width,rect.height,0,(bottom-top)/2,rect.width,rect.height);
+    const vhalf=THREE.MathUtils.degToRad(camera.fov/2),hhalf=Math.atan(Math.tan(vhalf)*camera.aspect);
+    fitDistance=Math.max(R/Math.sin(vhalf)*rect.height/usableHeight,R/Math.sin(hhalf)*rect.width/usableWidth)*1.05;
+    if(!Number.isFinite(fitDistance))fitDistance=8;
+    cam.dist=Math.max(3,Math.min(45,cam.dist*fitDistance/oldFit));tween=null;camera.updateProjectionMatrix();applyCamera();metricsDirty=true;
+  }
+  function setView(view,fitOnly=false){
+    cancelGesture();const views={spatial:DEFAULT_VIEW,front:{azim:Math.PI/2,elev:.02},top:{azim:DEFAULT_VIEW.azim,elev:1.48}};
+    const destination=fitOnly?{azim:cam.azim,elev:cam.elev}:views[view];
+    if(reducedQuery.matches){Object.assign(cam,destination,{dist:fitDistance});target.set(0,0,0);applyCamera();}
+    else{tween={start:performance.now(),duration:300,from:{...cam},to:{...destination,dist:fitDistance},origin:target.clone(),destination:new THREE.Vector3()};invalidate();}
+    for(const button of document.querySelectorAll('[data-view]')){const active=!fitOnly&&button.dataset.view===view;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}
+  }
+  function manualCamera(){tween=null;for(const button of document.querySelectorAll('[data-view]')){button.classList.remove('active');button.setAttribute('aria-pressed','false');}}
+
+  // Pointer capture preserves the down hit. A point gesture owns the camera lock.
+  const pointers=new Map();let gesture=null,tap=null,pinchStart=null,camStartDist=0,pointPointer=null,dragOffset=0;
+  const targetStart=new THREE.Vector3(),right=new THREE.Vector3(),up=new THREE.Vector3();
+  function pinchGeometry(){const p=[...pointers.values()];return p.length>=2?{distance:Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y),x:(p[0].x+p[1].x)/2,y:(p[0].y+p[1].y)/2}:null;}
+  function pan(dx,dy,origin){right.setFromMatrixColumn(camera.matrixWorld,0);up.setFromMatrixColumn(camera.matrixWorld,1);const k=2*cam.dist*Math.tan(THREE.MathUtils.degToRad(camera.fov/2))/dimensions.height;if(origin)target.copy(origin);target.addScaledVector(right,-dx*k);target.addScaledVector(up,dy*k);}
+  function cancelGesture(){for(const id of pointers.keys()){try{canvas.releasePointerCapture(id);}catch(error){}}pointers.clear();gesture=null;tap=null;pinchStart=null;pointPointer=null;canvas.style.cursor='grab';stage.classList.remove('moving-point');}
+  canvas.addEventListener('contextmenu',e=>e.preventDefault());
+  canvas.addEventListener('pointerdown',e=>{
+    if(e.button!==0&&e.button!==2)return;manualCamera();const rect=canvas.getBoundingClientRect();dimensions.left=rect.left;dimensions.top=rect.top;
+    try{canvas.setPointerCapture(e.pointerId);}catch(error){}pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pointers.size===1){const key=pickVertex(e.clientX-rect.left,e.clientY-rect.top,e.pointerType);gesture=e.button===2||e.shiftKey?'pan':key==='B1'?'point':'rotate';tap={x:e.clientX,y:e.clientY,time:performance.now(),moved:false,key};
+      if(gesture==='point'){pausePlayback();syncReadings();pointPointer=e.pointerId;const raw=screenToT(e.clientX-rect.left,e.clientY-rect.top);dragOffset=raw===null?0:state.t-raw;stage.classList.add('moving-point');canvas.style.cursor='grabbing';}}
+    else if(pointers.size===2&&gesture!=='point'&&gesture!=='blocked'){gesture='pinch';tap=null;pinchStart=pinchGeometry();camStartDist=cam.dist;targetStart.copy(target);}
+  });
+  canvas.addEventListener('pointermove',e=>{
+    if(!pointers.has(e.pointerId))return;const before=pointers.get(e.pointerId),dx=e.clientX-before.x,dy=e.clientY-before.y;pointers.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(gesture==='blocked')return;
+    if(gesture==='point'){
+      if(e.pointerId!==pointPointer)return;if(tap&&!tap.moved){if(Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=9)return;tap.moved=true;}
+      const raw=screenToT(e.clientX-dimensions.left,e.clientY-dimensions.top);if(raw!==null)setT(raw+dragOffset);return;
+    }
+    if(gesture==='pinch'&&pointers.size>=2){const p=pinchGeometry();if(p&&pinchStart){cam.dist=Math.max(3,Math.min(45,camStartDist*pinchStart.distance/Math.max(p.distance,2)));pan(p.x-pinchStart.x,p.y-pinchStart.y,targetStart);applyCamera();}return;}
+    if(tap&&!tap.moved){if(Math.hypot(e.clientX-tap.x,e.clientY-tap.y)<=9)return;tap.moved=true;if(gesture==='rotate'){cam.azim-=(e.clientX-tap.x)*.006;cam.elev+=(e.clientY-tap.y)*.006;}else pan(e.clientX-tap.x,e.clientY-tap.y);}
+    else if(gesture==='rotate'){cam.azim-=dx*.006;cam.elev+=dy*.006;}else if(gesture==='pan')pan(dx,dy);
+    canvas.style.cursor='grabbing';applyCamera();
+  });
+  function endPointer(e){
+    if(!pointers.has(e.pointerId))return;const single=pointers.size===1,wasPoint=gesture==='point';
+    if(e.type==='pointerup'&&single&&(gesture==='rotate'||wasPoint)&&tap&&!tap.moved&&performance.now()-tap.time<700)toggleSelection(tap.key);
+    pointers.delete(e.pointerId);try{canvas.releasePointerCapture(e.pointerId);}catch(error){}
+    if(!pointers.size){gesture=null;tap=null;pinchStart=null;pointPointer=null;canvas.style.cursor='grab';stage.classList.remove('moving-point');}
+    else if(wasPoint&&e.pointerId===pointPointer){gesture='blocked';tap=null;pointPointer=null;stage.classList.remove('moving-point');}
+    else if(!wasPoint&&gesture!=='blocked'&&pointers.size===1){const rest=pointers.values().next().value;gesture='rotate';tap={x:rest.x,y:rest.y,time:performance.now(),moved:true,key:null};}
+  }
+  canvas.addEventListener('pointerup',endPointer);canvas.addEventListener('pointercancel',endPointer);
+  canvas.addEventListener('lostpointercapture',e=>{if(pointers.has(e.pointerId)){pointers.delete(e.pointerId);if(pointPointer===e.pointerId){gesture='blocked';pointPointer=null;tap=null;stage.classList.remove('moving-point');}if(!pointers.size){gesture=null;tap=null;pinchStart=null;canvas.style.cursor='grab';}}});
+  canvas.addEventListener('wheel',e=>{e.preventDefault();if(gesture==='point'||gesture==='blocked')return;manualCamera();cam.dist=Math.max(3,Math.min(45,cam.dist*Math.exp(Math.max(-180,Math.min(180,e.deltaY))*.0013)));applyCamera();},{passive:false});
+  canvas.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault();},{passive:false});
+  canvas.addEventListener('webglcontextlost',e=>{e.preventDefault();contextLost=true;pausePlayback();cancelGesture();if(frame)cancelAnimationFrame(frame);frame=0;fail('图形显示已暂停，等待浏览器恢复。若未自动恢复，请重新打开页面。');});
+  canvas.addEventListener('webglcontextrestored',()=>{contextLost=false;$('error').hidden=true;invalidate();});
+  // Drawer focus, scroll, and orientation are independent of WebGL input.
+  let panelReturnFocus=null;
+  function compact(){return compactQuery.matches||document.body.classList.contains('focused');}
+  function setDrawer(open){
+    const active=open&&compact();if(active){panelReturnFocus=document.activeElement;cancelGesture();}
+    $('panel').classList.toggle('open',active);document.body.classList.toggle('drawer-open',active);$('menu').setAttribute('aria-expanded',String(active));
+    if(compact()){$('panel').inert=!active;if(active){$('panel').setAttribute('role','dialog');$('panel').setAttribute('aria-modal','true');$('close').focus();}else{$('panel').removeAttribute('role');$('panel').removeAttribute('aria-modal');if(panelReturnFocus&&panelReturnFocus.isConnected)panelReturnFocus.focus();}}
+    else $('panel').inert=false;
+  }
+  function tabSelect(name){for(const id of ['lesson','settings']){const active=id===name;$('tab-'+id).setAttribute('aria-selected',String(active));$('tab-'+id).tabIndex=active?0:-1;$(id+'-panel').hidden=!active;}}
+  $('menu').addEventListener('click',()=>setDrawer(!$('panel').classList.contains('open')));$('close').addEventListener('click',()=>setDrawer(false));$('scrim').addEventListener('click',()=>setDrawer(false));
+  $('focus').addEventListener('click',()=>{setDrawer(false);const active=document.body.classList.toggle('focused');$('focus').setAttribute('aria-pressed',String(active));$('focus').textContent=active?'退出专注':'专注模式';$('panel').inert=compact();});
+  for(const name of ['lesson','settings'])$('tab-'+name).addEventListener('click',()=>tabSelect(name));
+  document.querySelector('.panel-tabs').addEventListener('keydown',e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const current=$('tab-lesson').getAttribute('aria-selected')==='true'?'lesson':'settings';const next=e.key==='Home'?'lesson':e.key==='End'?'settings':current==='lesson'?'settings':'lesson';tabSelect(next);$('tab-'+next).focus();}});
+  for(const [id,key] of Object.entries(checks))$(id).addEventListener('change',()=>{state[key]=$(id).checked;updateVisibility();});
+  $('sFont').addEventListener('input',()=>{state.font=Number($('sFont').value);document.documentElement.style.setProperty('--lab-size',state.font+'px');$('sFontval').textContent=state.font+' px';metricsDirty=true;invalidate();});
+  $('sOpacity').addEventListener('input',()=>{state.opacity=Number($('sOpacity').value)/100;for(const material of faceMaterials)material.opacity=state.opacity;$('sOpacityval').textContent=Math.round(state.opacity*100)+'%';invalidate();});
+  for(const el of document.querySelectorAll('[data-quality]'))el.addEventListener('click',()=>{state.quality=el.dataset.quality;for(const button of document.querySelectorAll('[data-quality]')){const active=button===el;button.classList.toggle('active',active);button.setAttribute('aria-pressed',String(active));}renderer.setPixelRatio(pixelRatio());renderer.setSize(dimensions.width,dimensions.height,false);invalidate();});
+  $('play').addEventListener('click',togglePlayback);$('speed').addEventListener('change',()=>{state.speed=Number($('speed').value);});
+  $('sT').addEventListener('input',()=>setT(Number($('sT').value)));
+  for(const button of document.querySelectorAll('[data-t]'))button.addEventListener('click',()=>setT(Number(button.dataset.t)));
+  $('clear').addEventListener('click',()=>{selected.clear();refreshSelection();});
+  $('stage-next').addEventListener('click',()=>focusProof(0));for(const button of document.querySelectorAll('[data-proof]'))button.addEventListener('click',()=>focusProof(Number(button.dataset.proof)));
+  for(const button of document.querySelectorAll('[data-view]'))button.addEventListener('click',()=>setView(button.dataset.view));$('reset').addEventListener('click',()=>setView('spatial'));$('fit').addEventListener('click',()=>setView('spatial',true));
+  window.addEventListener('keydown',e=>{
+    if(e.key==='Escape'){if($('panel').classList.contains('open'))setDrawer(false);else{selected.clear();refreshSelection();}return;}
+    if(e.key==='Tab'&&document.body.classList.contains('drawer-open')){const items=[...$('panel').querySelectorAll('button,input,select,summary')].filter(el=>!el.disabled&&el.getClientRects().length);const first=items[0],last=items[items.length-1];if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus();}else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus();}return;}
+    if(['INPUT','TEXTAREA','SELECT'].includes(e.target.tagName))return;
+    if(e.defaultPrevented)return;if(e.key==='ArrowRight'){e.preventDefault();focusProof(focusedProof+1);}if(e.key==='ArrowLeft'){e.preventDefault();focusProof(focusedProof-1);}if(e.key==='0')setView('spatial');
+  });
+  function updateInputHint(){$('hint').textContent=coarseQuery.matches?'拖动 B₁ 翻折 · 空白旋转 · 双指缩放 / 平移':'拖动 B₁ 翻折 · 空白旋转 · 滚轮缩放 · 顶点多选';}
+  const mediaListen=(query,fn)=>query.addEventListener?query.addEventListener('change',fn):query.addListener(fn);
+  mediaListen(compactQuery,()=>{setDrawer(false);$('panel').inert=compact();resize();});mediaListen(coarseQuery,()=>{updateInputHint();resize();});
+  mediaListen(matchMedia('(orientation:portrait)'),()=>{setDrawer(false);cancelGesture();resize();});
+  window.addEventListener('orientationchange',()=>{setDrawer(false);cancelGesture();});window.addEventListener('blur',()=>{cancelGesture();pausePlayback();syncReadings();});
+  document.addEventListener('visibilitychange',()=>{if(document.hidden){pausePlayback();syncReadings();cancelGesture();tween=null;if(frame)cancelAnimationFrame(frame);frame=0;}else invalidate();});
+  const observer=new ResizeObserver(resize);observer.observe(stage);observer.observe(document.querySelector('.stage-bottom'));window.addEventListener('resize',resize);if(window.visualViewport)window.visualViewport.addEventListener('resize',resize);
+  setDrawer(false);$('panel').inert=compact();synchronizeChecks();setT(DEFAULT_T);updateVisibility();updateInputHint();resize();cam.dist=fitDistance;applyCamera();
+
+  if(location.hash==='#geo-debug'){
+    window.__GEO=V;
+    window.__S={state,cam,camera,renderer,groups,target,selected,labels,statistics,values,STANDARD,DEFAULT_VIEW,vertexMeshes,foldPoint,toRender,pausePlayback,togglePlayback,setT,screenToT,focusProof,setView,resize,applyCamera,refreshSelection,pickVertex,setDrawer,updateVisibility,get renderCount(){return renderCount;},get dimensions(){return dimensions;},get pointers(){return pointers.size;},get gesture(){return gesture;},get fitDistance(){return fitDistance;}};
+  }
+})();
+
+</script>
+</body>
+</html>

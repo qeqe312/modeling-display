@@ -1,0 +1,129 @@
+{
+  "passed": 30,
+  "checks": [
+    "外接球题建模示例: mouse sensitivity is 0.006 rad/pixel at (460,320)",
+    "外接球题建模示例: mouse sensitivity is 0.006 rad/pixel at (500,590)",
+    "外接球题建模示例: world vertical stays upright",
+    "外接球题建模示例: rotation uses trusted browser input",
+    "外接球题建模示例: no page errors",
+    "正四棱台2023真题演示: mouse sensitivity is 0.006 rad/pixel at (460,320)",
+    "正四棱台2023真题演示: mouse sensitivity is 0.006 rad/pixel at (500,590)",
+    "正四棱台2023真题演示: world vertical stays upright",
+    "正四棱台2023真题演示: rotation uses trusted browser input",
+    "正四棱台2023真题演示: no page errors",
+    "正四面体内外接球与对棱夹角: mouse sensitivity is 0.006 rad/pixel at (460,320)",
+    "正四面体内外接球与对棱夹角: mouse sensitivity is 0.006 rad/pixel at (500,590)",
+    "正四面体内外接球与对棱夹角: world vertical stays upright",
+    "正四面体内外接球与对棱夹角: rotation uses trusted browser input",
+    "正四面体内外接球与对棱夹角: no page errors",
+    "外接球题建模示例: touch sensitivity is 0.006 rad/pixel at (70,320)",
+    "外接球题建模示例: touch sensitivity is 0.006 rad/pixel at (110,590)",
+    "外接球题建模示例: world vertical stays upright",
+    "外接球题建模示例: rotation uses trusted browser input",
+    "外接球题建模示例: no page errors",
+    "正四棱台2023真题演示: touch sensitivity is 0.006 rad/pixel at (70,320)",
+    "正四棱台2023真题演示: touch sensitivity is 0.006 rad/pixel at (110,590)",
+    "正四棱台2023真题演示: world vertical stays upright",
+    "正四棱台2023真题演示: rotation uses trusted browser input",
+    "正四棱台2023真题演示: no page errors",
+    "正四面体内外接球与对棱夹角: touch sensitivity is 0.006 rad/pixel at (70,320)",
+    "正四面体内外接球与对棱夹角: touch sensitivity is 0.006 rad/pixel at (110,590)",
+    "正四面体内外接球与对棱夹角: world vertical stays upright",
+    "正四面体内外接球与对棱夹角: rotation uses trusted browser input",
+    "正四面体内外接球与对棱夹角: no page errors"
+  ],
+  "results": [
+    {
+      "example": "外接球题建模示例",
+      "input": "mouse",
+      "deltas": [
+        [
+          -0.4800000000000001,
+          0.23999999999999994
+        ],
+        [
+          -0.4800000000000004,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "075ff80b8fabd46bca74bdc266a48d07bd21622a9b36253ff0c79866b5f39775"
+    },
+    {
+      "example": "正四棱台2023真题演示",
+      "input": "mouse",
+      "deltas": [
+        [
+          -0.4800000000000004,
+          0.24
+        ],
+        [
+          -0.4800000000000004,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "07523251799bfb8c6a3c8e5aeb88edfc5907f31e1899fe853c01aeff0a9edace"
+    },
+    {
+      "example": "正四面体内外接球与对棱夹角",
+      "input": "mouse",
+      "deltas": [
+        [
+          -0.4799999999999999,
+          0.23999999999999994
+        ],
+        [
+          -0.4800000000000004,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc"
+    },
+    {
+      "example": "外接球题建模示例",
+      "input": "trusted touch",
+      "deltas": [
+        [
+          -0.47999999999999987,
+          0.23999999999999994
+        ],
+        [
+          -0.47999999999999954,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "075ff80b8fabd46bca74bdc266a48d07bd21622a9b36253ff0c79866b5f39775"
+    },
+    {
+      "example": "正四棱台2023真题演示",
+      "input": "trusted touch",
+      "deltas": [
+        [
+          -0.47999999999999954,
+          0.24
+        ],
+        [
+          -0.47999999999999954,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "07523251799bfb8c6a3c8e5aeb88edfc5907f31e1899fe853c01aeff0a9edace"
+    },
+    {
+      "example": "正四面体内外接球与对棱夹角",
+      "input": "trusted touch",
+      "deltas": [
+        [
+          -0.48000000000000004,
+          0.23999999999999994
+        ],
+        [
+          -0.47999999999999965,
+          0.23999999999999977
+        ]
+      ],
+      "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc"
+    }
+  ],
+  "browserVersion": "154.0.8037.93",
+  "scope": "Chromium mouse and trusted CDP touch; compares the three final example files"
+}

@@ -1,0 +1,56 @@
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">◎</div><div><div class="eyebrow">GEOMETRY LAB <span>/ FULL</span></div><h1>外接球题建模示例</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">完整解题版 · 全部展开</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位视角</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2023—2024 · 高一下</span></div>
+        <div class="question"><div class="source-line">江苏南京期末 · 第 2 题</div><p>设 <i>P、A、B、C</i> 是球 <i>O</i> 表面上的四个点，<i>PA</i> ⊥ 平面 <i>ABC</i>，∠<i>ABC</i>＝90°，<i>PA</i>＝5，<i>AB</i>＝3，<i>BC</i>＝4。求球 <i>O</i> 的表面积。</p><div class="options" id="options"><div>A. <span>50π / 3</span></div><div data-answer="B">B. <span>50π</span></div><div>C. <span>75π</span></div><div>D. <span>200π</span></div></div></div>
+        <div class="interaction-note">解题关键：两个直角三角形共用斜边 PC，PC 是外接球的直径。</div>
+        <div class="section-heading"><span>完整推导</span><span id="lesson-progress">全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" data-lesson="0" id="proof-0"><div class="lesson-title"><span class="step-number">01</span><h2>从两个直角出发</h2></div><p>先观察蓝色底面 <i>ABC</i> 与橙色高 <i>PA</i>。底面在 <i>B</i> 处成直角；<i>PA</i> 垂直于底面上的所有过 <i>A</i> 的直线。</p><div class="formula">AC＝√(AB²＋BC²)＝√(3²＋4²)＝5</div></article>
+          <article class="lesson-card" data-lesson="1" id="proof-1"><div class="lesson-title"><span class="step-number">02</span><h2>把 PC 看成一条直径</h2></div><p><i>PA</i> ⊥ <i>AC</i>，所以 ∠<i>PAC</i>＝90°。又因为 <i>BC</i> 同时垂直于 <i>BA</i> 与 <i>PA</i>，所以 <i>BC</i> ⊥ 平面 <i>PAB</i>，从而 ∠<i>PBC</i>＝90°。</p><p>两片直角三角形 <i>PAC、PBC</i> 共用斜边 <i>PC</i>；以 <i>PC</i> 为直径的球同时经过 <i>A、B、P、C</i>。四点不共面，外接球唯一。</p><div class="formula">AC＝5<br>PC＝√(PA²＋AC²)＝5√2</div></article>
+          <article class="lesson-card" data-lesson="2" id="proof-2"><div class="lesson-title"><span class="step-number">03</span><h2>球心就在 PC 的中点</h2></div><p>取 <i>PC</i> 的中点为 <i>O</i>。直角三角形斜边上的中线等于斜边的一半，因此四条半径相等。</p><div class="formula">OA＝OB＝OC＝OP＝PC / 2<br>R＝5√2 / 2 ≈ 3.536</div><p>紫色辅助点 <i>M</i> 为 <i>AC</i> 的中点，也是 <i>O</i> 在底面上的投影。</p></article>
+          <article class="lesson-card answer-card" data-lesson="3" id="proof-3"><div class="lesson-title"><span class="step-number">04</span><h2>由直径直接求表面积</h2></div><div class="answer">50<span>π</span><span class="answer-badge">选 B</span></div><div class="formula">S＝4πR²＝π·PC²<br>＝π(3²＋4²＋5²)＝50π</div><p>面积约为 157.080。记住关键关系：球面积等于 π 乘以直径的平方。</p></article>
+        </div>
+        <details class="coordinate-details"><summary>查看建模坐标</summary><p>以 B 为原点，BA、BC、AP 的方向分别为 x、y、z 正方向：</p><div class="coordinate-table"><span>B</span><code>(0, 0, 0)</code><span>A</span><code>(3, 0, 0)</code><span>C</span><code>(0, 4, 0)</code><span>P</span><code>(3, 0, 5)</code><span>O</span><code>(1.5, 2, 2.5)</code><span>M</span><code>(1.5, 2, 0)</code></div></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>底面与侧面</span><input type="checkbox" id="cSolid" checked></label>
+        <label class="switch-row"><span><span class="dot blue"></span>外接球</span><input type="checkbox" id="cSphere"></label>
+        <label class="switch-row"><span><span class="dot orange"></span>直径 PC</span><input type="checkbox" id="cDiameter"></label>
+        <label class="switch-row"><span><span class="dot violet"></span>球心与辅助线</span><input type="checkbox" id="cGuide"></label>
+        <label class="switch-row"><span>直角标记</span><input type="checkbox" id="cAngles" checked></label>
+        <label class="switch-row"><span>空间坐标轴</span><input type="checkbox" id="cAxes"></label>
+        <div class="section-heading"><span>文字标注</span></div>
+        <label class="switch-row"><span>顶点字母</span><input type="checkbox" id="cLabels" checked></label>
+        <label class="switch-row"><span>边长数值</span><input type="checkbox" id="cLengths" checked></label>
+        <label class="range-label" for="sFont"><span>顶点字号</span><output id="sFontval">22 px</output></label><input type="range" id="sFont" min="14" max="32" value="22" step="1">
+        <label class="range-label" for="sOpacity"><span>球面透明度</span><output id="sOpacityval">8%</output></label><input type="range" id="sOpacity" min="0" max="20" value="8" step="1">
+        <div class="section-heading"><span>顶点高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点模型中的顶点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div>
+        <p class="settings-hint">本题的四个顶点位置固定。拖动画面调整视角，轻点顶点可高亮。</p>
+      </section>
+    </div>
+    <div class="panel-footer"><span class="status-dot"></span>可离线使用<span class="footer-right">数学模型 · 精确构建</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互三维模型">
+    <canvas id="cv" aria-label="单指或鼠标拖动旋转；双指缩放平移；点击顶点高亮" tabindex="0"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="快捷视角"><button class="active" data-view="spatial" aria-pressed="true">立体</button><button data-view="front" aria-pressed="false">正视</button><button data-view="top" aria-pressed="false">俯视</button></div><button id="fit" class="icon-button" aria-label="将模型居中适配视口" title="模型居中">⌖</button></div>
+    <div id="readout" class="readout" aria-live="polite"><div class="readout-heading"><span id="readout-title">题目条件</span><span class="readout-dot"></span></div><div class="readout-row"><span id="rKey1">PA</span><strong id="rValue1">5</strong></div><div class="readout-row"><span id="rKey2">AB</span><strong id="rValue2">3</strong></div><div class="readout-row"><span id="rKey3">BC</span><strong id="rValue3">4</strong></div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 全部展开</span><h2 id="caption-title">两个直角确定直径，PC 的中点确定球心</h2><p id="caption-body">∠PAC＝∠PBC＝90°，以 PC 为直径的球经过 P、A、B、C。球心 O 是 PC 的中点。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导" title="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="完整解题公式，点击查看相应推导">
+      <button data-proof="0"><span class="overview-label">01 · 底面勾股</span><strong>AC = 5</strong><span class="overview-detail">√(3² + 4²)</span></button>
+      <button data-proof="1"><span class="overview-label">02 · 球的直径</span><strong>PC = 5√2</strong><span class="overview-detail">√(PA² + AC²)</span></button>
+      <button data-proof="2"><span class="overview-label">03 · 球的半径</span><strong>R = 5√2 / 2</strong><span class="overview-detail">球心 O 是 PC 中点</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">04 · 球的面积</span><strong>S = 50π</strong><span class="overview-detail">4πR² · 选择 B</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>底面 ABC</span><span><span class="dot orange"></span>高 / 直径</span><span><span class="dot violet"></span>球心 / 半径</span></div><div id="hint">拖动旋转 · 滚轮缩放 · 右键平移 · 点顶点多选</div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div>
+<div id="scrim" aria-hidden="true"></div>

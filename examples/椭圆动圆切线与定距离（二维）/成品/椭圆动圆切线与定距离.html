@@ -1,0 +1,323 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="dark"><title>椭圆 · 动圆切线与定距离（二维）</title>
+<style>
+:root{color-scheme:dark;--bg:#0D1117;--surface:#161B22;--surface-2:#1C232C;--surface-3:#232B36;--line:#2A3441;--line-soft:#212A34;--ink:#E6EDF3;--ink-2:#A9B6C4;--ink-3:#8B99A8;--brand:#6BA8E8;--brand-lt:#17293E;--accent:#FF7A45;--accent-lt:#2E1A11;--violet:#A692E8;--violet-lt:#1E1B2E;--lab-size:22px;--header:80px}
+*{box-sizing:border-box}html,body{height:100%;margin:0}body{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",system-ui,sans-serif;background:var(--bg);color:var(--ink);overflow:hidden;-webkit-font-smoothing:antialiased;overscroll-behavior:none}button,input{font:inherit}button{cursor:pointer;-webkit-tap-highlight-color:transparent;touch-action:manipulation}button:focus-visible,input:focus-visible,summary:focus-visible{outline:2px solid var(--brand);outline-offset:3px}button:disabled{opacity:.46;cursor:default}button{color:var(--ink);background:none;border:0}i{font-family:Georgia,"Times New Roman",serif;font-size:1.08em}p{margin:10px 0;line-height:1.8}code{font-family:Consolas,monospace;color:var(--ink-2)}[hidden]{display:none!important}
+.app-header{height:var(--header);padding:0 28px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line-soft);background:var(--bg);gap:16px;padding-top:env(safe-area-inset-top,0px)}.identity{display:flex;align-items:center;gap:13px;min-width:0}.brand-mark{width:42px;height:42px;border:1px solid #39546F;border-radius:13px;color:var(--brand);font-size:34px;line-height:34px;display:grid;place-items:center;background:var(--brand-lt);flex:none}.eyebrow{font-size:10px;letter-spacing:2.4px;color:var(--brand);line-height:1.5;font-weight:650}.eyebrow span{color:var(--ink-3);letter-spacing:1px;margin-left:6px}h1{font-size:20px;line-height:1.45;font-weight:600;margin:3px 0 0;letter-spacing:.6px;white-space:nowrap}.header-actions{display:flex;gap:8px;align-items:center}.topic-tag{font-size:12px;color:var(--ink-3);margin-right:14px}.button{min-height:46px;padding:10px 16px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:13px;font-weight:550;transition:background .15s,color .15s}.button:active,.icon-button:active{background:var(--surface-3)}.button.primary{color:#20130D;background:var(--accent);border-color:var(--accent)}.button.primary:active{background:#FFB392}.button.active{color:var(--brand);background:var(--brand-lt);border-color:#39546F}.menu-button{display:none}.icon-button{display:grid;place-items:center;border:1px solid var(--line);border-radius:10px;background:var(--surface);width:46px;height:46px;font-size:23px;flex:none}
+#app{display:flex;height:calc(100% - var(--header));height:calc(100dvh - var(--header))}#panel{width:348px;flex:none;background:var(--surface);border-right:1px solid var(--line-soft);display:flex;flex-direction:column;min-height:0;z-index:50}.panel-tabs{display:flex;border-bottom:1px solid var(--line-soft);padding:8px 20px 0;flex:none;gap:10px}.panel-tabs button{flex:1;min-height:48px;font-size:13px;font-weight:600;color:var(--ink-3);border-bottom:2px solid transparent}.panel-tabs button[aria-selected=true]{color:var(--brand);border-bottom-color:var(--brand)}.panel-scroll{overflow:auto;flex:1;min-height:0;padding:22px 22px 26px;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#39434F var(--surface)}.panel-scroll::-webkit-scrollbar{width:8px}.panel-scroll::-webkit-scrollbar-thumb{background:#39434F;border-radius:8px;border:2px solid var(--surface)}.section-heading{display:flex;justify-content:space-between;align-items:center;color:var(--ink-3);font-size:12px;margin:0 0 14px;gap:10px}.section-heading:not(:first-child){margin-top:26px}.source{font-size:10px}.question{border:1px solid var(--line);background:var(--surface-2);border-radius:13px;padding:16px}.source-line{font-size:11px;line-height:1.6;color:var(--ink-3)}.question p{font-size:14px;margin:10px 0 14px;line-height:1.95}.options{display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px;color:var(--ink-2)}.options>div{border:1px solid var(--line);padding:9px 8px;border-radius:7px;display:flex;gap:5px}.options.reveal>[data-answer=B]{background:var(--accent-lt);border-color:var(--accent);color:var(--accent)}.interaction-note{font-size:12px;line-height:1.8;color:#FFB392;background:var(--accent-lt);border-radius:9px;padding:11px 13px;margin-top:14px;border:1px solid #543A2E}.lesson-card{padding:17px 16px;border:1px solid var(--line);border-radius:13px;background:var(--bg);border-top:2px solid var(--brand)}.lesson-title{display:flex;align-items:center;gap:9px}.step-number{font-size:11px;letter-spacing:.5px;color:var(--brand);background:var(--brand-lt);padding:6px;border-radius:6px}.lesson-title h2{font-size:15px;font-weight:600;margin:0}.lesson-card p{font-size:12px;color:var(--ink-2);line-height:1.9}.formula{font-family:"Cambria Math",Cambria,"Microsoft YaHei",serif;font-size:14px;line-height:1.95;color:#FFB392;background:var(--accent-lt);border-radius:8px;padding:10px 12px;margin-top:13px;overflow-wrap:anywhere}.answer-card{border-top-color:var(--accent)}.answer{font-family:Georgia,serif;font-size:44px;color:var(--accent);margin:18px 0 14px;display:flex;align-items:baseline;gap:3px}.answer>span:first-child{font-size:40px}.answer-badge{font-family:inherit!important;font-size:13px!important;margin-left:auto;border:1px solid #543A2E;border-radius:7px;padding:6px 10px;background:var(--accent-lt)}.panel-navigation{display:flex;gap:10px;margin:15px 0 22px}.panel-navigation button{flex:1}.coordinate-details{border-top:1px solid var(--line);padding-top:17px;color:var(--ink-3);font-size:12px}.coordinate-details summary{cursor:pointer;padding:9px 0;min-height:44px}.coordinate-details p{font-size:12px}.coordinate-table{display:grid;grid-template-columns:28px 1fr;gap:8px;padding:10px;background:var(--surface-2);border-radius:8px}.coordinate-table>span{color:var(--violet)}.panel-footer{border-top:1px solid var(--line-soft);padding:14px 22px;display:flex;align-items:center;gap:7px;font-size:10px;color:var(--ink-3);flex:none}.status-dot{width:5px;height:5px;background:var(--brand);border-radius:50%}.footer-right{margin-left:auto}
+.switch-row{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:49px;font-size:13px;border-bottom:1px solid var(--line-soft);cursor:pointer}.switch-row>span{display:flex;align-items:center;gap:9px}.switch-row input{width:21px;height:21px;accent-color:var(--brand);cursor:pointer}.dot{display:inline-block;width:6px;height:6px;border-radius:50%;flex:none}.dot.blue{background:var(--brand)}.dot.orange{background:var(--accent)}.dot.violet{background:var(--violet)}.range-label{display:flex;align-items:center;justify-content:space-between;font-size:12px;color:var(--ink-2);margin-top:17px}.range-label output{font-size:11px;color:var(--brand);font-variant-numeric:tabular-nums}input[type=range]{display:block;width:100%;height:40px;margin:0;accent-color:var(--brand);cursor:pointer;touch-action:pan-y}.selection-list{display:flex;gap:6px;flex-wrap:wrap;min-height:30px;color:var(--ink-3);font-size:12px}.chip{padding:5px 9px;background:var(--accent);color:#20130D;border-radius:7px;font-weight:700}.pick-box{font-size:11px;color:var(--ink-2);line-height:1.8}.pick-box .pr{display:flex;justify-content:space-between;padding:2px 0}.pick-box .pr span:first-child{color:var(--violet)}.full-width{width:100%;margin-top:12px}.quality-control{display:flex;gap:7px}.quality-control button{flex:1}.settings-hint{font-size:12px;color:var(--ink-3);line-height:1.8;margin-top:20px}
+#stage{position:relative;min-width:0;flex:1;isolation:isolate;overflow:hidden;background:radial-gradient(ellipse at 50% 42%,#1B232E 0%,#131A22 62%,#0B0F14 100%)}#cv{display:block;position:absolute;inset:0;width:100%;height:100%;touch-action:none;cursor:grab;outline-offset:-4px;-webkit-user-select:none;user-select:none}#labels{position:absolute;inset:0;pointer-events:none;overflow:hidden}#labels .lab{position:absolute;top:0;left:0;font-size:var(--lab-size);font-family:Georgia,serif;font-weight:600;color:#BBD7F5;background:#161B22;border:1px solid #39546F;border-radius:8px;padding:2px 9px;line-height:1.25;white-space:nowrap;will-change:transform;box-shadow:0 2px 5px #0005}#labels .lab.orange{color:#FFB392;border-color:#76513D}#labels .lab.violet{color:#C4B6F2;border-color:#564A75}#labels .lab.sel{color:#20130D;background:var(--accent);border-color:#FFB392;box-shadow:0 0 0 3px #FF7A4530}#labels .lab.edge-label{font-family:"Cambria Math",Georgia,serif;font-size:15px;font-weight:500;border:0;padding:2px 7px;box-shadow:none;border-radius:6px;color:var(--ink-2)}#labels .lab.edge-label.orange{color:#FFB392}#labels .lab.edge-label.violet{color:#C4B6F2}.stage-toolbar{position:absolute;left:24px;top:22px;display:flex;gap:8px;align-items:center}.view-switch{display:flex;gap:3px;padding:4px;border:1px solid var(--line);border-radius:12px;background:var(--surface)}.view-switch button{height:38px;min-width:58px;padding:0 15px;border-radius:7px;color:var(--ink-2);font-size:12px}.view-switch button.active{background:var(--surface-3);color:var(--ink)}.readout{position:absolute;right:26px;top:26px;width:170px;border:1px solid var(--line);border-radius:13px;background:var(--surface);padding:14px 17px;font-variant-numeric:tabular-nums;pointer-events:none;box-shadow:0 5px 20px #0002}.readout-heading{display:flex;align-items:center;justify-content:space-between;font-size:10px;letter-spacing:.6px;color:var(--ink-3);padding-bottom:10px;margin-bottom:4px;border-bottom:1px solid var(--line)}.readout-dot{width:5px;height:5px;border-radius:50%;background:var(--brand)}.readout-row{display:flex;align-items:center;justify-content:space-between;line-height:1.9;gap:10px;font-size:13px;color:var(--ink-2)}.readout-row strong{font-family:"Cambria Math",Georgia,serif;font-size:16px;font-weight:500;color:var(--ink)}.readout.answer-readout .readout-row strong{color:#FFB392}.stage-bottom{position:absolute;bottom:0;left:0;right:0;padding:0 24px calc(18px + env(safe-area-inset-bottom,0px));pointer-events:none}.step-caption{display:flex;align-items:center;justify-content:space-between;gap:14px;max-width:550px;margin:0 auto 16px;padding:13px 17px 14px;background:var(--surface);border:1px solid var(--line);border-radius:13px;pointer-events:auto;box-shadow:0 3px 15px #0002}.step-caption>div{min-width:0}#caption-index{font-size:10px;letter-spacing:1px;color:var(--brand)}.step-caption h2{font-size:16px;font-weight:600;margin:4px 0 3px}.step-caption p{font-size:11px;line-height:1.7;color:var(--ink-2);margin:0}.caption-next{border:1px solid var(--line);border-radius:50%;width:44px;height:44px;flex:none;background:var(--surface-2);color:var(--brand);font-size:22px}.step-dock{display:flex;gap:6px;justify-content:center;max-width:580px;margin:auto;pointer-events:auto}.step-dock button{min-height:50px;flex:1;display:flex;align-items:center;justify-content:center;gap:8px;font-size:12px;border:1px solid var(--line);background:var(--surface);border-radius:9px;white-space:nowrap;color:var(--ink-2)}.step-dock button>span{font-family:Consolas,monospace;font-size:10px;color:var(--ink-3)}.step-dock button[aria-current=step]{color:var(--brand);border-color:#39546F;background:var(--brand-lt)}.step-dock button[aria-current=step]>span{color:var(--brand)}.stage-meta{display:flex;justify-content:space-between;gap:15px;margin-top:15px;font-size:10px;color:var(--ink-3)}.legend{display:flex;gap:15px}.legend>span{display:flex;align-items:center;gap:6px}#hint{white-space:nowrap}.drawer-heading{display:none}#scrim{display:none;position:fixed;inset:var(--header) 0 0;background:#0006;z-index:45}.error-notice{position:absolute;top:28%;left:10%;right:10%;background:var(--surface);border:1px solid var(--accent);padding:28px;border-radius:15px;line-height:1.9;z-index:10;color:var(--ink)}
+body.focused #panel{position:fixed;top:var(--header);bottom:0;left:0;transform:translateX(-105%);border-right:1px solid var(--line);transition:transform .22s;box-shadow:12px 0 35px #0005}body.focused #panel.open{transform:translateX(0)}body.focused .drawer-heading{display:flex}body.focused .menu-button{display:block}body.drawer-open #scrim{display:block}.drawer-heading{padding:15px 20px 6px;align-items:center;justify-content:space-between;color:var(--ink-2);font-size:13px;flex:none}.drawer-heading .icon-button{border:0;background:var(--surface-2);font-size:26px}
+@media(hover:hover) and (pointer:fine){.button:hover:not(:disabled){background:var(--surface-3)}.button.primary:hover{background:#FFB392}.step-dock button:hover,.view-switch button:hover{background:var(--surface-3)}.caption-next:hover{background:var(--brand-lt)}}
+@media(max-width:1250px){#panel{width:326px}.app-header{padding-left:22px;padding-right:22px}.topic-tag{display:none}.stage-meta{justify-content:center}.stage-meta .legend{display:none}}
+@media(max-width:1100px),(pointer:coarse){:root{--header:72px}.app-header{padding-left:max(18px,env(safe-area-inset-left));padding-right:max(18px,env(safe-area-inset-right))}.menu-button{display:block}.focus-button{display:none}#panel,body.focused #panel{position:fixed;left:0;top:var(--header);bottom:0;width:min(390px,86vw);transform:translateX(-105%);transition:transform .23s ease;box-shadow:12px 0 35px #0006;border-right:1px solid var(--line)}#panel.open,body.focused #panel.open{transform:translateX(0)}.drawer-heading{display:flex}.panel-scroll{padding:20px 24px}.panel-footer{padding-bottom:max(16px,env(safe-area-inset-bottom))}.button{min-height:48px}.view-switch button{height:44px}input[type=range]{height:44px}.icon-button{height:48px;width:48px}.stage-toolbar{top:18px;left:max(20px,env(safe-area-inset-left))}.readout{top:21px;right:max(20px,env(safe-area-inset-right))}.stage-bottom{padding-left:max(20px,env(safe-area-inset-left));padding-right:max(20px,env(safe-area-inset-right))}.step-caption{max-width:550px}.step-dock button{min-height:52px}.stage-meta .legend{display:flex}.stage-meta{justify-content:space-between}}
+@media(orientation:portrait) and (max-width:1100px),(orientation:portrait) and (pointer:coarse){#panel,body.focused #panel{top:auto;left:0;right:0;bottom:0;width:100%;height:min(78vh,890px);height:min(78dvh,890px);border-radius:22px 22px 0 0;transform:translateY(105%);border:1px solid var(--line);box-shadow:0 -12px 35px #0006}#panel.open,body.focused #panel.open{transform:translateY(0)}.drawer-heading{padding-top:22px;position:relative}.drawer-heading::before{content:"";position:absolute;top:9px;left:calc(50% - 18px);width:36px;height:4px;border-radius:5px;background:#4B5868}.panel-tabs{padding-left:24px;padding-right:24px}.panel-scroll{padding:24px;max-width:740px;width:100%;margin:0 auto}.question p{font-size:15px}.options{font-size:14px}.source{font-size:11px}.lesson-card p{font-size:14px}.formula{font-size:16px}.lesson-title h2{font-size:17px}.stage-meta{flex-direction:column;align-items:center;gap:7px}}
+@media(max-width:600px){:root{--header:68px}.app-header{gap:7px;padding-left:12px;padding-right:12px}.brand-mark{height:34px;width:34px;font-size:29px;border-radius:10px}.identity{gap:8px}.eyebrow{font-size:8px;letter-spacing:1.3px}h1{font-size:15px;letter-spacing:0}.header-actions{gap:5px}.header-actions .button{font-size:11px;min-height:44px;padding:8px 9px}#reset{display:none}.stage-toolbar{left:14px;top:15px;gap:5px}.view-switch{padding:3px}.view-switch button{min-width:46px;padding:0 11px;font-size:11px}.stage-toolbar .icon-button{width:44px;height:48px}.readout{right:14px;top:80px;width:129px;padding:10px 12px}.readout-row{font-size:11px}.readout-row strong{font-size:14px}.readout-heading{font-size:9px}.stage-bottom{padding-left:12px;padding-right:12px;padding-bottom:calc(12px + env(safe-area-inset-bottom,0px))}.step-caption{padding:11px 13px;margin-bottom:10px;gap:7px}.step-caption h2{font-size:14px}.step-caption p{font-size:10px}.step-dock{gap:4px}.step-dock button{font-size:10px;gap:4px;min-height:48px}.step-dock button>span{font-size:9px}.stage-meta{font-size:9px;margin-top:11px}.legend{gap:11px}.lab.edge-label{font-size:13px!important}}
+@media(max-height:700px) and (orientation:landscape){:root{--header:62px}.app-header{padding-top:0}.brand-mark{width:34px;height:34px;font-size:28px}h1{font-size:17px}.eyebrow{font-size:8px}.stage-toolbar{top:13px}.readout{top:16px;padding:9px 13px}.readout-heading{padding-bottom:5px;margin-bottom:1px}.readout-row{line-height:1.6}.stage-bottom{padding-bottom:10px}.step-caption{padding:9px 13px;margin-bottom:8px}.step-caption h2{font-size:14px}.step-caption p{font-size:10px}.step-dock button{min-height:46px}.stage-meta{margin-top:8px}.stage-meta .legend{display:none}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+
+/* Full explanation is a separate variant. The approved settings styles stay intact. */
+.lesson-list{display:flex;flex-direction:column;gap:14px}
+.lesson-card{scroll-margin-top:12px}
+.lesson-card.proof-focus{border-color:var(--accent);border-top-color:var(--accent)}
+.coordinate-details{margin-top:22px}
+.step-caption{max-width:800px;margin-bottom:12px}
+.step-caption p{max-width:690px}
+.solution-overview{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;max-width:800px;margin:auto;pointer-events:auto}
+.solution-overview button{text-align:left;border:1px solid var(--line);border-radius:11px;min-height:98px;padding:12px 15px;background:var(--surface);display:flex;flex-direction:column;justify-content:center;gap:5px;touch-action:manipulation}
+.overview-label{font-size:10px;color:var(--ink-3);letter-spacing:.2px;white-space:nowrap}
+.solution-overview strong{font-family:"Cambria Math",Georgia,serif;font-size:21px;font-weight:500;color:var(--brand);white-space:nowrap}
+.solution-overview button:nth-child(2) strong{color:#FFB392}
+.solution-overview button:nth-child(3) strong{color:#C4B6F2}
+.overview-detail{font-size:10px;color:var(--ink-2);line-height:1.55;white-space:nowrap}
+.solution-overview .overview-answer{border-color:#76513D;background:var(--accent-lt)}
+.solution-overview .overview-answer strong{color:#FFB392}
+.solution-overview .overview-answer .overview-detail{color:#FFB392}
+@media(hover:hover) and (pointer:fine){.solution-overview button:hover{background:var(--surface-3)}.solution-overview .overview-answer:hover{background:#3D251A}}
+@media(min-width:1101px) and (pointer:fine){#panel{width:390px}}
+@media(max-width:900px){.solution-overview strong{font-size:19px}.solution-overview button{padding:11px 12px}}
+@media(max-width:600px){.solution-overview{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.solution-overview button{min-height:77px;padding:9px 12px;gap:3px}.solution-overview strong{font-size:19px}.overview-label{font-size:9px}.overview-detail{font-size:9px}.step-caption{margin-bottom:9px}.step-caption h2{font-size:13px}.step-caption p{font-size:10px;line-height:1.6}.readout{top:78px;left:14px;right:14px;width:auto;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;padding:8px 10px}.readout-heading{display:none}.readout-row{flex-direction:column;gap:0;line-height:1.6}.readout-row strong{font-size:14px}.stage-meta .legend{display:none}}
+@media(max-height:700px) and (orientation:landscape){.solution-overview button{min-height:73px;padding:8px 12px;gap:3px}.solution-overview strong{font-size:18px}.step-caption p{font-size:10px}.stage-meta{margin-top:7px}}
+
+/* Single constrained point; approved display controls and responsive drawers retained. */
+.dot.green{background:#8FBF5A}#labels .lab.green{color:#B9D899;border-color:#52653D}
+.motion-tip{font-size:12px;color:var(--ink-2);line-height:1.8;margin:0 0 7px}.motion-buttons{display:flex;gap:7px;margin:6px 0 12px}.motion-buttons .button{flex:1;padding:8px;font-size:12px}
+.motion-readings{padding:10px 13px;border:1px solid var(--line);border-radius:10px;background:var(--bg);font-size:12px;line-height:2.1;font-variant-numeric:tabular-nums}.motion-readings>div{display:flex;justify-content:space-between;gap:12px}.motion-readings span{color:var(--ink-3)}.motion-readings strong{font-weight:500;color:var(--ink-2)}
+.mid-flag{font-size:10px;border-top:1px solid var(--line);padding-top:8px;margin-top:7px;color:var(--ink-3)}.mid-flag.at-mid{color:#B9D899}.moving-point .readout-dot{background:var(--accent)}
+.proof-note{font-size:11px!important;color:var(--ink-3);border-left:2px solid var(--line);padding-left:10px}.compact-answer{font-size:34px}.coordinate-table code{font-size:12px}.solution-overview strong{font-size:19px}.solution-overview button:last-child strong{font-size:18px}.readout{width:190px}
+@media(max-width:600px){.solution-overview strong{font-size:17px}.solution-overview button:last-child strong{font-size:16px}.readout{width:auto}.mid-flag{grid-column:1/-1;margin:0;padding-top:4px;text-align:center;font-size:9px}.motion-readings{font-size:13px}.readout-row strong{font-size:14px}#hint{font-size:9px}}
+@media(max-height:700px) and (orientation:landscape){.mid-flag{padding-top:5px;margin-top:4px}}
+
+/* The approved page structure is retained; the viewport is an equal-unit plane. */
+.motion-buttons{display:grid;grid-template-columns:repeat(3,minmax(0,1fr))}.motion-buttons .button{min-height:44px;padding:7px 3px;font-size:11px}
+.motion-readings .proof-note{margin:8px 0 0;font-size:11px!important;line-height:1.7}
+.formula{font-size:15px}.math{font-family:"Cambria Math",Georgia,serif}.lesson-card:nth-child(3){border-top-color:var(--violet)}
+.readout{width:208px}.mid-flag{line-height:1.6;letter-spacing:0}.mid-flag.valid{color:#B9D899}.mid-flag.invalid{color:#FFB392}
+.readout-row strong{font-size:17px}.stage-toolbar .view-switch button{min-width:44px}.stage-toolbar .view-switch button:first-child{min-width:64px}
+#labels .lab.draggable{border-color:#A76A4E}#labels .lab.small{font-size:15px!important}#labels .lab.dragging{box-shadow:0 0 0 4px #FF7A4538}
+.solution-overview button:last-child strong{font-size:20px}.pick-box .pr{gap:8px}.pick-box code{font-size:11px}
+#stage-next{width:44px;height:44px;font-size:23px}.stage-meta{font-size:10px}.settings-hint{font-size:12px}
+@media(max-width:600px){h1{font-size:14px}.eyebrow{letter-spacing:1px}.brand-mark{width:30px;height:32px}.identity{gap:6px}.header-actions .button{padding:8px}.readout{width:auto}.readout-row strong{font-size:16px}.readout .mid-flag{grid-column:1/-1;padding-top:5px;font-size:10px}.step-caption{padding:10px 12px}.step-caption h2{font-size:13px}.step-caption p{font-size:10px}.solution-overview strong,.solution-overview button:last-child strong{font-size:17px}.stage-meta{margin-top:9px}#hint{font-size:9px}.lab.small{font-size:13px!important}}
+
+</style></head><body>
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">◎</div><div><div class="eyebrow">GEOMETRY LAB <span>/ PLANE</span></div><h1>椭圆 · 动圆切线与定距离</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">二维探索 · 完整解题</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位画面</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2022 高三 · 铜鼓月考</span></div>
+        <div class="question"><p>已知椭圆 <i>C</i>：<span class="math">x²/a²＋y²/b²＝1</span>（<i>a＞b＞0</i>）的左顶点为 <i>A(−2, 0)</i>，焦距为 <i>2√3</i>。动圆 <i>D</i> 的圆心坐标是 <i>(0, 2)</i>，过点 <i>A</i> 作圆 <i>D</i> 的两条切线，分别交椭圆于 <i>M、N</i> 两点，记直线 <i>AM、AN</i> 的斜率分别为 <i>k₁、k₂</i>。</p><p><b>（1）</b>求证：<i>k₁k₂＝1</i>；</p><p><b>（2）</b>若 <i>O</i> 为坐标原点，作 <i>OP ⊥ MN</i>，垂足为 <i>P</i>。是否存在定点 <i>Q</i>，使得 <i>|PQ|</i> 为定值？</p></div>
+        <div class="interaction-note">直接拖动橙色圆周或半径手柄 R，观察两条切线和垂足 P。也可沿亮橙轨迹拖 P，反向改变动圆半径。</div>
+        <div class="section-heading"><span>完整推导</span><span>全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" id="proof-0" data-lesson="0"><div class="lesson-title"><span class="step-number">01</span><h2>由条件确定椭圆</h2></div><p>左顶点给出 <i>a＝2</i>，焦距是两焦点的距离 <i>2c＝2√3</i>，因此 <i>c＝√3</i>。由 <i>a²＝b²＋c²</i>：</p><div class="formula">b²＝4−3＝1<br><b>C：x²/4＋y²＝1</b></div><p>固定点为 <i>A(−2, 0)</i>、<i>D(0, 2)</i>、<i>O(0, 0)</i>；圆心 D 不动，只有半径 r 变化。</p></article>
+          <article class="lesson-card" id="proof-1" data-lesson="1"><div class="lesson-title"><span class="step-number">02</span><h2>切线条件给出斜率乘积</h2></div><p>设过 A 的切线为 <i>y＝k(x＋2)</i>。圆心到切线的距离等于半径 r：</p><div class="formula">|2k−2|/√(k²＋1)＝r<br>（4−r²）k²−8k＋4−r²＝0</div><p>两条切线的有限斜率 k₁、k₂ 正是方程的两根。由韦达定理：</p><div class="formula"><b>k₁k₂＝1</b><br>s＝k₁＋k₂＝8/(4−r²)</div><p class="proof-note">题意有效范围：0＜r＜2√2 且 r≠2。r＝0 或 2√2 时两条切线重合；r＝2 时一条切线为 x＝−2，斜率未定义，且与椭圆仅交于 A。页面允许展示这些边界，但不把它们当作题设的有效位置。</p></article>
+          <article class="lesson-card" id="proof-2" data-lesson="2"><div class="lesson-title"><span class="step-number">03</span><h2>直线 MN 恒过定点 E</h2></div><p>将 <i>y＝k(x＋2)</i> 代入椭圆，排除已知交点 A。第二交点的坐标为：</p><div class="formula">x＝2(1−4k²)/(1＋4k²)<br>y＝4k/(1＋4k²)</div><p>由 <i>k₁k₂＝1</i>，k₁、k₂ 都满足 <i>k²−sk＋1＝0</i>。对上述交点计算：</p><div class="formula">−3x＋4sy<br>＝(−6＋24k²＋16sk)/(1＋4k²)<br>＝(10＋40k²)/(1＋4k²)＝10</div><p>故 M、N 均在这条直线上。它们不同，因而：</p><div class="formula"><b>MN：−3x＋4sy＝10</b><br>即 y＝[3(4−r²)/32](x＋10/3)</div><p>令 y＝0，得到固定交点 <i>E(−10/3, 0)</i>。拖动圆周，直线 MN 始终围绕 E 转动。画面只显示弦段 MN；E 位于它所在直线的延长线上。</p></article>
+          <article class="lesson-card answer-card" id="proof-3" data-lesson="3"><div class="lesson-title"><span class="step-number">04</span><h2>直角三角形的斜边中点</h2></div><p>E、P 在 MN 上，而 <i>OP ⊥ MN</i>，所以 <i>∠OPE＝90°</i>。P 位于以 OE 为直径的圆上。取 OE 中点：</p><div class="formula"><b>Q＝(−5/3, 0)</b><br>|PQ|＝|OQ|＝|EQ|＝|OE|/2</div><div class="answer compact-answer">5/3<span class="answer-badge">≈ 1.6667</span></div><p><b>存在定点 Q(−5/3, 0)，使 |PQ| 恒为 5/3。</b></p><p class="proof-note">紫色虚线是证明用的完整辅助圆；亮橙色才是本题 P 可达到的两段弧。r 的限制使 P 不会遍历整圆，O 及两弧端点均不属于有效轨迹。</p></article>
+        </div>
+        <details class="coordinate-details"><summary>查看垂足坐标与实际轨迹范围</summary><p>记 <i>m＝3(4−r²)/32</i>，则：</p><div class="formula">P＝(−10m²/[3(1＋m²)],<br>　　 10m/[3(1＋m²)])<br>(x＋5/3)²＋y²＝25/9</div><p>m∈(−3/8, 3/8) 且 m≠0。P 的两弧端点极限为 (−30/73, ±80/73)，r→2 时 P→O。这三点都不能作为题设的有效位置。切线接触点 T₁、T₂ 是辅助构造，与椭圆上的 M、N 不同。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>动圆半径 r</span><span>圆心 D 固定</span></div>
+        <p class="motion-tip">拖圆周、R 标签或亮橙轨迹上的 P。调整时锁定画面；松手后恢复平移缩放。滑条与画布双向同步。</p>
+        <label class="range-label" for="sR"><span>半径 r（0 到 2√2）</span><output id="sRval"></output></label><input type="range" id="sR" min="0" max="2.8284271247461903" step="0.001" value="1.4">
+        <div class="motion-buttons" role="group" aria-label="半径快捷位置"><button class="button" data-r="0.8">r＝0.8</button><button class="button" data-r="1.4">r＝1.4</button><button class="button" data-r="2.45">r＝2.45</button><button class="button" data-r="0">r＝0</button><button class="button" data-r="2">r＝2</button><button class="button" data-r="max">r＝2√2</button></div>
+        <div class="motion-readings"><div><span>k₁（AM）</span><strong id="mK1"></strong></div><div><span>k₂（AN）</span><strong id="mK2"></strong></div><div><span>k₁k₂</span><strong id="mProduct"></strong></div><div><span>MN 斜率 m</span><strong id="mSlope"></strong></div><div><span>P 坐标</span><strong id="mP"></strong></div><div><span>|PQ|</span><strong id="mLength"></strong></div><p id="motionStatus" class="proof-note"></p></div>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>椭圆 C</span><input id="cEllipse" data-layer="ellipse" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>动圆 D 与半径手柄</span><input id="cCircle" data-layer="circle" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>切线射线（椭圆外为虚线）</span><input id="cTangents" data-layer="tangents" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>弦 MN</span><input id="cChord" data-layer="chord" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>垂线 OP、定长 PQ</span><input id="cProjection" data-layer="projection" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>P 的实际轨迹（两段弧）</span><input id="cTrace" data-layer="trace" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>以 OE 为直径的辅助圆</span><input id="cAux" data-layer="aux" type="checkbox" checked></label>
+        <label class="switch-row"><span>切点 T₁、T₂ 与垂直半径</span><input id="cContact" data-layer="contact" type="checkbox"></label>
+        <label class="switch-row"><span>坐标轴与等距网格</span><input id="cGrid" data-layer="grid" type="checkbox" checked></label>
+        <div class="section-heading"><span>文字标注</span></div>
+        <label class="switch-row"><span>点的字母</span><input id="cLabels" type="checkbox" checked></label>
+        <label class="switch-row"><span>半径、定长数值</span><input id="cLengths" type="checkbox"></label>
+        <label class="range-label" for="sFont"><span>点标签字号</span><output id="sFontval">22 px</output></label><input id="sFont" type="range" min="14" max="32" step="1" value="22">
+        <label class="range-label" for="sOpacity"><span>圆与椭圆填充透明度</span><output id="sOpacityval">8%</output></label><input id="sOpacity" type="range" min="0" max="30" step="1" value="8">
+        <div class="section-heading"><span>点的高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点图中的点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div>
+        <p class="settings-hint">所有坐标使用题目的平面直角坐标系，横纵单位等长。底部公式只定位推导，保留半径、图层、缩放与高亮。</p>
+      </section>
+    </div>
+    <div class="panel-footer"><span class="status-dot"></span>单文件 · 可离线<span class="footer-right">二维约束 · 实时读数</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互二维解析几何模型">
+    <canvas id="cv" tabindex="0" aria-label="拖圆周改变半径；拖空白平移；滚轮或双指缩放；点字母多选"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="画面操作"><button id="fit" title="显示完整构造">全图</button><button id="zoomIn" aria-label="放大">＋</button><button id="zoomOut" aria-label="缩小">−</button></div></div>
+    <div id="readout" class="readout moving-point"><div class="readout-heading"><span>当前动圆 · 实时读数</span><span class="readout-dot"></span></div><div class="readout-row"><span>半径 r</span><strong id="rRadius"></strong></div><div class="readout-row"><span>k₁k₂</span><strong id="rProduct"></strong></div><div class="readout-row"><span>|PQ|</span><strong id="rLength"></strong></div><div id="validFlag" class="mid-flag"></div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 二维探索</span><h2>圆在变，弦过定点，距离不变</h2><p>橙色圆周可拖动；亮橙弧是 P 的实际轨迹，紫色虚线圆是证明用的辅助圆。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="关键公式，点击定位推导">
+      <button data-proof="0"><span class="overview-label">01 · 椭圆方程</span><strong>x²/4＋y²＝1</strong><span class="overview-detail">a＝2，b＝1</span></button>
+      <button data-proof="1"><span class="overview-label">02 · 斜率乘积</span><strong>k₁k₂＝1</strong><span class="overview-detail">切线条件＋韦达定理</span></button>
+      <button data-proof="2"><span class="overview-label">03 · 直线 MN 过定点</span><strong>E(−10/3, 0)</strong><span class="overview-detail">MN 所在直线围绕 E 转动</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">04 · 定点与定长</span><strong>|PQ|＝5/3</strong><span class="overview-detail">Q(−5/3, 0)</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>椭圆</span><span><span class="dot orange"></span>动圆 / 轨迹</span><span><span class="dot violet"></span>弦 / 辅助圆</span></div><div id="hint"></div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div><div id="scrim" aria-hidden="true"></div>
+
+<script>
+/* Canvas 2D reference. Sections: problem data -> model -> planar rendering -> gestures -> UI.
+ * Change the problem model deliberately; retain equal-unit transforms, pointer ownership,
+ * cached label sizes, responsive drawers and demand rendering when adapting another problem.
+ */
+(()=>{'use strict';
+const $=id=>document.getElementById(id),cv=$('cv'),stage=$('stage'),panel=$('panel'),ctx=cv.getContext('2d');
+if(!ctx){$('error').hidden=false;$('error').textContent='浏览器未能创建二维画布，请用现代浏览器重新打开。';return;}
+const MAX=Math.sqrt(8),RHO=5/3,AMAX=2*Math.atan(3/8),EPS=1e-10;
+const color={blue:'#6BA8E8',orange:'#FF7A45',violet:'#A692E8',ink:'#B9C9DD',grid:'#2A3441'};
+const state={r:1.4,ellipse:true,circle:true,tangents:true,chord:true,projection:true,trace:true,aux:true,contact:false,grid:true,labels:true,lengths:false,font:22,opacity:.08,quality:'auto'};
+const view={cx:0,cy:0,scale:70},selected=new Set(),pointers=new Map(),labels=[];
+const metrics={renders:0,labelMeasurements:0,paths:4,trustedMouse:0,trustedTouch:0};
+let W=1,H=1,dpr=1,frame=0,gesture=null,values=null,metricsDirty=true,needsFit=true,drawer=false,tab='lesson',returnFocus=null;
+const ellipsePath=new Path2D(),unitCircle=new Path2D(),upperTrace=new Path2D(),lowerTrace=new Path2D();
+ellipsePath.ellipse(0,0,2,1,0,0,2*Math.PI);unitCircle.arc(0,0,1,0,2*Math.PI);
+for(let i=0;i<=200;i++){let a=AMAX*i/200,x=-RHO+RHO*Math.cos(a),y=RHO*Math.sin(a);if(i===0){upperTrace.moveTo(x,y);lowerTrace.moveTo(x,-y);}else{upperTrace.lineTo(x,y);lowerTrace.lineTo(x,-y);}}
+const points={A:[-2,0],D:[0,2],O:[0,0],E:[-10/3,0],Q:[-5/3,0],M:[0,0],N:[0,0],P:[0,0],R:[1.4,2],T1:[0,0],T2:[0,0]};
+const labelDefs=[['A','blue',[-44,-40]],['D','orange',[-36,-43]],['O','blue',[9,12]],['E','violet',[-42,12]],['Q','violet',[-18,20]],['M','orange',[-42,-44]],['N','orange',[10,-42]],['P','orange',[12,-43]],['R','orange',[15,-14]],['T1','orange',[10,12]],['T2','orange',[10,12]]];
+for(const [key,kind,offset] of labelDefs){const el=document.createElement('div');el.className='lab '+kind+(key==='R'||key==='P'?' draggable':'')+(key.startsWith('T')?' small':'');el.textContent=key==='T1'?'T₁':key==='T2'?'T₂':key;$('labels').append(el);labels.push({key,el,offset,kind,hit:null,w:0,h:0,visible:false});}
+for(const [key,text,kind] of [['radius','r','orange'],['length','|PQ|','violet']]){const el=document.createElement('div');el.className='lab edge-label '+kind;el.textContent=text;$('labels').append(el);labels.push({key,el,offset:[4,4],kind,hit:null,w:0,h:0,visible:false,length:true});}
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+const fmt=(n,d=4)=>Number.isFinite(n)?(Math.abs(n)<.5*10**(-d)?0:n).toFixed(d):'—';
+const dist=(a,b)=>Math.hypot(a[0]-b[0],a[1]-b[1]);
+// Problem-specific analytic model. The contact-directed rays need not contain M for r > 2.
+function compute(r){
+  const alpha=Math.asin(clamp(r/MAX,0,1)),angles=[Math.PI/4+alpha,Math.PI/4-alpha];
+  const dirs=angles.map(a=>[Math.cos(a),Math.sin(a)]);
+  const cross=dirs.map(u=>{let t=u[0]/(u[0]*u[0]/4+u[1]*u[1]);return [-2+t*u[0],t*u[1]];});
+  const contacts=dirs.map(u=>{let t=2*(u[0]+u[1]);return [-2+t*u[0],t*u[1]];});
+  const m=3*(4-r*r)/32,valid=r>EPS&&r<MAX-EPS&&Math.abs(r-2)>EPS;
+  const P=[-(10/3)*m*m/(1+m*m),(10/3)*m/(1+m*m)];
+  let reason='有效位置 · 两条切线与两个不同交点';
+  if(r<=EPS)reason='r＝0：圆退化，两条切线重合';
+  else if(r>=MAX-EPS)reason='r＝2√2：A 在圆上，两条切线重合';
+  else if(Math.abs(r-2)<=EPS)reason='r＝2：一条切线竖直，M 与 A 重合';
+  return {valid,reason,m,dirs,cross,contacts,P,k:dirs.map(u=>Math.abs(u[0])<EPS?null:u[1]/u[0]),length:valid?dist(P,points.Q):null};
+}
+function setR(raw){
+  if(!Number.isFinite(raw))return;
+  const oldValid=values?.valid;state.r=clamp(raw,0,MAX);values=compute(state.r);
+  points.M=values.cross[0];points.N=values.cross[1];points.P=values.P;points.R=[state.r,2];points.T1=values.contacts[0];points.T2=values.contacts[1];
+  $('sR').value=state.r;$('sRval').textContent=fmt(state.r,3);$('rRadius').textContent=fmt(state.r,3);
+  $('mK1').textContent=values.k[0]===null?'未定义（竖直）':fmt(values.k[0]);$('mK2').textContent=values.k[1]===null?'未定义（竖直）':fmt(values.k[1]);
+  $('mProduct').textContent=$('rProduct').textContent=values.valid?'1.0000':'未定义';
+  $('mSlope').textContent=values.valid?fmt(values.m):'未定义';$('mP').textContent=values.valid?'('+fmt(points.P[0],3)+', '+fmt(points.P[1],3)+')':'未定义';
+  $('rLength').textContent=$('mLength').textContent=values.valid?fmt(values.length):'未定义';
+  $('validFlag').textContent=values.valid?(state.r>2?'有效位置 · M 在射线反向':'有效位置 · |PQ| 恒定'):values.reason;$('validFlag').className='mid-flag '+(values.valid?'valid':'invalid');$('motionStatus').textContent=values.reason+(values.valid?(state.r>2?'。M 位于对应射线的反向；题目中的 AM 仍按整条直线计算。':'。半径改变时，P 仍沿两段弧运动。'):'。此时 MN、P 与 |PQ| 不按题意定义。');
+  document.querySelectorAll('[data-r]').forEach(b=>b.classList.toggle('active',Math.abs(state.r-(b.dataset.r==='max'?MAX:+b.dataset.r))<1e-7));
+  const rl=labels.find(l=>l.key==='radius'),ll=labels.find(l=>l.key==='length');rl.el.textContent='r＝'+fmt(state.r,2);ll.el.textContent='|PQ|＝5/3';
+  if(oldValid!==values.valid)metricsDirty=true;rl.dirty=true;updateSelection();invalidate();
+}
+// Planar view. Both axes share one CSS-pixel scale; device pixel ratio affects only raster size.
+function screen(p){return [W/2+(p[0]-view.cx)*view.scale,H/2-(p[1]-view.cy)*view.scale];}
+function world(x,y){return [view.cx+(x-W/2)/view.scale,view.cy-(y-H/2)/view.scale];}
+function local(e){const r=cv.getBoundingClientRect();return [e.clientX-r.left,e.clientY-r.top];}
+function uiRects(){const s=stage.getBoundingClientRect();return ['.stage-toolbar','#readout','.stage-bottom'].map(q=>{const r=stage.querySelector(q).getBoundingClientRect();return {x:r.left-s.left-5,y:r.top-s.top-5,w:r.width+10,h:r.height+10};});}
+function fit(){
+  const ui=uiRects(),top=Math.max(82,ui[0].y+ui[0].h+18,W<1000?ui[1].y+ui[1].h+20:0),bottom=ui[2].y-20;
+  const xmin=-3.85,xmax=Math.max(2.45,state.circle?state.r+.5:2.45),ymin=state.aux?-2.08:-1.35,ymax=Math.max(1.6,state.circle?2+state.r+.5:2.5);
+  view.scale=clamp(Math.min((W-64)/(xmax-xmin),Math.max(120,bottom-top)/(ymax-ymin)),12,1000);
+  view.cx=(xmin+xmax)/2;view.cy=(ymin+ymax)/2+((top+bottom)/2-H/2)/view.scale;invalidate();
+}
+function resize(){
+  const r=stage.getBoundingClientRect(),changed=W!==r.width||H!==r.height;W=r.width;H=r.height;
+  const budget=state.quality==='sharp'?3500000:2000000,cap=state.quality==='save'?1:state.quality==='sharp'?2:matchMedia('(pointer:coarse)').matches?1.35:1.65;
+  dpr=Math.max(.5,Math.min(devicePixelRatio||1,cap,Math.sqrt(budget/(W*H))));cv.width=Math.max(1,Math.round(W*dpr));cv.height=Math.max(1,Math.round(H*dpr));
+  if(changed||needsFit){needsFit=false;fit();}invalidate();
+}
+function invalidate(){if(!frame&&!document.hidden)frame=requestAnimationFrame(render);}
+function line(a,b,c,width=2,dash=[]){const p=screen(a),q=screen(b);ctx.beginPath();ctx.strokeStyle=c;ctx.lineWidth=width;ctx.setLineDash(dash);ctx.moveTo(...p);ctx.lineTo(...q);ctx.stroke();ctx.setLineDash([]);}
+function ray(a,u,c,width=2.1){
+  // Clip the forward ray to the canvas, including when A is outside after panning.
+  const p=screen(a),d=[u[0]*view.scale,-u[1]*view.scale];let enter=0,exit=Infinity;
+  for(let i=0;i<2;i++){
+    const size=i===0?W:H;if(Math.abs(d[i])<1e-12){if(p[i]<0||p[i]>size)return;continue;}
+    let lo=-p[i]/d[i],hi=(size-p[i])/d[i];if(lo>hi)[lo,hi]=[hi,lo];enter=Math.max(enter,lo);exit=Math.min(exit,hi);
+  }
+  if(exit<enter||!Number.isFinite(exit))return;
+  // A=(-2,0) is on x²/4+y²=1. The second intersection parameter is
+  // t = ux/(ux²/4+uy²). A forward exit exists only when ux > 0.
+  const ellipseExit=Math.max(0,u[0]/(u[0]*u[0]/4+u[1]*u[1]));
+  const at=t=>[a[0]+t*u[0],a[1]+t*u[1]];
+  const solidEnd=Math.min(exit,ellipseExit);
+  if(solidEnd>enter+1e-12)line(at(enter),at(solidEnd),c,width);
+  const dashStart=Math.max(enter,ellipseExit);
+  if(exit>dashStart+1e-12)line(at(dashStart),at(exit),c,width,[8,6]);
+}
+function shape(path,x,y,sx,sy,c,width,dash=[],fill=0){ctx.save();const p=screen([x,y]);ctx.translate(...p);ctx.scale(view.scale*sx,-view.scale*sy);ctx.lineWidth=width/(view.scale*Math.abs(sx));ctx.setLineDash(dash.map(x=>x/(view.scale*Math.abs(sx))));ctx.strokeStyle=c;if(fill){ctx.globalAlpha=fill;ctx.fillStyle=c;ctx.fill(path);ctx.globalAlpha=1;}ctx.stroke(path);ctx.restore();}
+function dot(p,c,size=4.5,open=false){const q=screen(p);ctx.beginPath();ctx.arc(...q,size,0,2*Math.PI);ctx.strokeStyle=c;ctx.lineWidth=2;if(open){ctx.fillStyle='#131A22';ctx.fill();ctx.stroke();}else{ctx.fillStyle=c;ctx.fill();}}
+function isVisible(key){if(key==='R'||key==='radius')return state.circle;if(key==='P'||key==='length')return values.valid&&(state.projection||state.trace);if(key==='T1'||key==='T2')return state.contact&&state.tangents&&state.circle;return true;}
+function grid(){
+  const lo=world(0,H),hi=world(W,0),target=55/view.scale,pow=10**Math.floor(Math.log10(target)),unit=[1,2,5,10].find(v=>v*pow>=target)*pow;
+  ctx.lineWidth=1;ctx.strokeStyle='#2A34416E';ctx.beginPath();
+  for(let x=Math.ceil(lo[0]/unit)*unit;x<=hi[0];x+=unit){const p=screen([x,0]);ctx.moveTo(p[0],0);ctx.lineTo(p[0],H);}
+  for(let y=Math.ceil(lo[1]/unit)*unit;y<=hi[1];y+=unit){const p=screen([0,y]);ctx.moveTo(0,p[1]);ctx.lineTo(W,p[1]);}ctx.stroke();
+  line([lo[0],0],[hi[0],0],'#748699',1.4);line([0,lo[1]],[0,hi[1]],'#748699',1.4);
+  ctx.fillStyle='#A9B6C4';ctx.font='12px Segoe UI';ctx.textAlign='center';
+  const zero=screen([0,0]);for(let x=Math.ceil(lo[0]/unit)*unit;x<hi[0];x+=unit){if(Math.abs(x)<1e-9)continue;let p=screen([x,0]);ctx.fillText(String(+x.toFixed(3)),p[0],clamp(zero[1]+17,17,H-8));}
+  ctx.textAlign='right';for(let y=Math.ceil(lo[1]/unit)*unit;y<hi[1];y+=unit){if(Math.abs(y)<1e-9)continue;let p=screen([0,y]);ctx.fillText(String(+y.toFixed(3)),clamp(zero[0]-9,24,W-7),p[1]+4);}
+  ctx.font='italic 18px Georgia';ctx.fillText('x',W-14,clamp(zero[1]-10,20,H-10));ctx.fillText('y',clamp(zero[0]+22,24,W-7),24);
+}
+function rightAngle(at,a,b){const p=screen(at),x=screen(a),y=screen(b),ux=[x[0]-p[0],x[1]-p[1]],uy=[y[0]-p[0],y[1]-p[1]],dx=Math.hypot(...ux),dy=Math.hypot(...uy);if(dx<16||dy<16)return;let size=10;for(let i=0;i<2;i++){ux[i]*=size/dx;uy[i]*=size/dy;}ctx.beginPath();ctx.strokeStyle=color.ink;ctx.lineWidth=1.4;ctx.moveTo(p[0]+ux[0],p[1]+ux[1]);ctx.lineTo(p[0]+ux[0]+uy[0],p[1]+ux[1]+uy[1]);ctx.lineTo(p[0]+uy[0],p[1]+uy[1]);ctx.stroke();}
+function render(){
+  frame=0;metrics.renders++;ctx.setTransform(dpr,0,0,dpr,0,0);ctx.clearRect(0,0,W,H);
+  if(state.grid)grid();
+  if(state.aux){shape(unitCircle,-RHO,0,RHO,RHO,'#A692E880',1.5,[7,7]);line(points.E,points.O,'#A692E866',2);}
+  if(state.trace){shape(upperTrace,0,0,1,1,color.orange,3.5);shape(lowerTrace,0,0,1,1,color.orange,3.5);dot([-30/73,80/73],color.orange,4,true);dot([-30/73,-80/73],color.orange,4,true);dot(points.O,color.orange,4,true);}
+  if(state.ellipse)shape(ellipsePath,0,0,1,1,color.blue,2.8,[],state.opacity);
+  if(state.circle&&state.r>EPS)shape(unitCircle,0,2,state.r,state.r,color.orange,2.5,[],state.opacity);
+  if(state.tangents){values.dirs.forEach(u=>ray(points.A,u,color.orange,2.1));}
+  if(state.chord&&values.valid){line(points.M,points.N,color.violet,3.3);}
+  if(state.projection&&values.valid){line(points.O,points.P,color.blue,2.5);line(points.Q,points.P,color.violet,2.5);rightAngle(points.P,points.O,points.E);}
+  if(state.contact&&state.tangents&&state.circle){line(points.D,points.T1,'#FF7A4599',1.5,[4,5]);line(points.D,points.T2,'#FF7A4599',1.5,[4,5]);rightAngle(points.T1,points.D,points.A);rightAngle(points.T2,points.D,points.A);}
+  if(state.circle){line(points.D,points.R,'#FF7A4570',1.2,[3,5]);dot(points.R,color.orange,6);const q=screen(points.R);ctx.beginPath();ctx.arc(...q,11,0,2*Math.PI);ctx.strokeStyle='#FF7A4570';ctx.lineWidth=1.8;ctx.stroke();}
+  for(const l of labels){if(l.length||l.key==='R'||!isVisible(l.key))continue;const p=points[l.key];if(selected.has(l.key)){const q=screen(p);ctx.beginPath();ctx.arc(...q,10,0,2*Math.PI);ctx.fillStyle='#FF7A4540';ctx.fill();}dot(p,selected.has(l.key)?color.orange:color[l.kind],l.key==='P'?6:l.key.startsWith('T')?3.5:4.8);}
+  syncLabels();
+}
+const overlap=(a,b,gap=3)=>a.x<b.x+b.w+gap&&a.x+a.w+gap>b.x&&a.y<b.y+b.h+gap&&a.y+a.h+gap>b.y;
+function syncLabels(){
+  for(const l of labels){l.visible=isVisible(l.key)&&(l.length?state.lengths:state.labels);l.el.hidden=!l.visible;l.hit=null;l.el.classList.toggle('sel',selected.has(l.key));l.el.classList.toggle('dragging',gesture?.key===l.key&&gesture?.moved);}
+  for(const l of labels){if(l.visible&&(metricsDirty||l.dirty)){l.w=l.el.offsetWidth;l.h=l.el.offsetHeight;metrics.labelMeasurements++;l.dirty=false;}}metricsDirty=false;
+  const obstacles=uiRects(),placed=[],anchors=labels.filter(l=>!l.length&&l.visible).map(l=>screen(points[l.key]));
+  for(const l of labels){if(!l.visible)continue;let p=l.length?(l.key==='radius'?[(points.D[0]+points.R[0])/2,2]:[(points.Q[0]+points.P[0])/2,points.P[1]/2]):points[l.key];let s=screen(p);if(s[0]<-25||s[0]>W+25||s[1]<-25||s[1]>H+25){l.el.hidden=true;l.visible=false;continue;}
+    const candidates=[l.offset,[12,-l.h-12],[-l.w-12,-l.h-12],[12,12],[-l.w-12,12],[-l.w/2,-l.h-22],[-l.w/2,23],[22,-l.h/2],[-l.w-22,-l.h/2],[12,-l.h-58],[-l.w-12,-l.h-58],[12,52],[-l.w-12,52]];
+    let best=null,score=Infinity;for(let i=0;i<candidates.length;i++){const o=candidates[i],box={x:clamp(s[0]+o[0],8,Math.max(8,W-l.w-8)),y:clamp(s[1]+o[1],8,Math.max(8,H-l.h-8)),w:l.w,h:l.h};let cost=i*.7+Math.hypot(box.x+l.w/2-s[0],box.y+l.h/2-s[1])*.01;for(const r of obstacles)if(overlap(box,r))cost+=10000;for(const r of placed)if(overlap(box,r,5))cost+=1000;for(const a of anchors)if(a[0]>box.x-4&&a[0]<box.x+box.w+4&&a[1]>box.y-4&&a[1]<box.y+box.h+4)cost+=150;if(cost<score){score=cost;best=box;}}
+    l.el.style.transform='translate3d('+best.x+'px,'+best.y+'px,0)';l.hit=best;placed.push(best);
+  }
+}
+function updateSelection(){const list=$('selList'),box=$('pickBox');list.replaceChildren();box.replaceChildren();if(!selected.size)list.textContent='点图中的点或字母';for(const key of selected){let chip=document.createElement('span');chip.className='chip';chip.textContent=key;list.append(chip);let row=document.createElement('div');row.className='pr';let name=document.createElement('span'),value=document.createElement('code');name.textContent=key;value.textContent=key==='P'&&!values.valid?'未定义':'('+points[key].map(n=>fmt(n,3)).join(', ')+')';row.append(name,value);box.append(row);}}
+function toggle(key){if(!key||!points[key])return;selected.has(key)?selected.delete(key):selected.add(key);metricsDirty=true;updateSelection();invalidate();}
+// Hit once at pointerdown; use that decision until release or cancellation.
+function pick(p,type){
+  const near=(key,t)=>isVisible(key)&&dist(p,screen(points[key]))<t;
+  if(near('R',type==='mouse'?11:16))return 'R';if(near('P',type==='mouse'?10:14))return 'P';
+  for(const l of labels){if(!l.length&&l.visible&&l.hit&&p[0]>=l.hit.x&&p[0]<=l.hit.x+l.hit.w&&p[1]>=l.hit.y&&p[1]<=l.hit.y+l.hit.h)return l.key;}
+  let key=null,best=type==='mouse'?22:40;for(const l of labels){if(l.length||!isVisible(l.key))continue;let d=dist(p,screen(points[l.key]));if(d<best){best=d;key=l.key;}}return key;
+}
+function angleToR(a){const m=Math.tan(clamp(a,-AMAX,AMAX)/2);return Math.sqrt(clamp(4-32*m/3,0,8));}
+function pointAngle(p){const w=world(...p);return Math.atan2(w[1],w[0]+RHO);}
+function stop(){for(const id of pointers.keys()){try{if(cv.hasPointerCapture(id))cv.releasePointerCapture(id);}catch{}}pointers.clear();gesture=null;cv.style.cursor='grab';invalidate();}
+function pinchStart(){const a=[...pointers.values()];gesture={mode:'pinch',distance:dist(a[0],a[1]),center:[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2]};}
+cv.addEventListener('pointerdown',e=>{
+  e.preventDefault();if(e.isTrusted){if(e.pointerType==='mouse')metrics.trustedMouse++;else if(e.pointerType==='touch')metrics.trustedTouch++;}
+  const p=local(e);pointers.set(e.pointerId,p);cv.setPointerCapture(e.pointerId);
+  if(gesture?.mode==='radius'||gesture?.mode==='point'||gesture?.mode==='blocked')return;
+  if(pointers.size===2){pinchStart();return;}if(pointers.size>2)return;
+  const key=pick(p,e.pointerType),circleHit=state.circle&&Math.abs(dist(world(...p),points.D)-state.r)*view.scale<(e.pointerType==='mouse'?10:18);
+  const mode=e.button===2||e.shiftKey?'pan':key==='R'||(!key&&circleHit)?'radius':key==='P'?'point':'pan';
+  gesture={mode,id:e.pointerId,key,start:p,last:p,moved:false,time:performance.now(),rOffset:state.r-dist(world(...p),points.D),angleOffset:2*Math.atan(values.m)-pointAngle(p)};cv.style.cursor=mode==='pan'?'grabbing':'ew-resize';
+});
+cv.addEventListener('pointermove',e=>{
+  const p=local(e);if(!pointers.has(e.pointerId)){const k=pick(p,e.pointerType),ch=state.circle&&Math.abs(dist(world(...p),points.D)-state.r)*view.scale<10;cv.style.cursor=k==='P'||k==='R'||ch?'ew-resize':k?'pointer':'grab';return;}
+  pointers.set(e.pointerId,p);if(!gesture)return;let g=gesture;
+  if(g.mode==='blocked')return;
+  if(g.mode==='pinch'){if(pointers.size!==2)return;const a=[...pointers.values()],c=[(a[0][0]+a[1][0])/2,(a[0][1]+a[1][1])/2],d=dist(a[0],a[1]);zoom(d/Math.max(g.distance,1),...g.center);view.cx-=(c[0]-g.center[0])/view.scale;view.cy+=(c[1]-g.center[1])/view.scale;g.center=c;g.distance=d;invalidate();return;}
+  if(g.id!==e.pointerId)return;if(!g.moved&&dist(p,g.start)<=9)return;
+  if(!g.moved){g.moved=true;g.last=g.start;}if(g.mode==='radius')setR(dist(world(...p),points.D)+g.rOffset);
+  else if(g.mode==='point')setR(angleToR(pointAngle(p)+g.angleOffset));
+  else {view.cx-=(p[0]-g.last[0])/view.scale;view.cy+=(p[1]-g.last[1])/view.scale;invalidate();}g.last=p;
+});
+function release(e,cancel=false){if(!pointers.has(e.pointerId))return;let g=gesture;pointers.delete(e.pointerId);try{if(cv.hasPointerCapture(e.pointerId))cv.releasePointerCapture(e.pointerId);}catch{}
+  if(g&&(g.mode==='radius'||g.mode==='point')&&g.id!==e.pointerId)return;
+  if(g&&g.id===e.pointerId&&!g.moved&&!cancel&&performance.now()-g.time<700&&e.button!==2)toggle(g.key);
+  gesture=pointers.size?{mode:'blocked'}:null;cv.style.cursor='grab';invalidate();
+}
+cv.addEventListener('pointerup',e=>release(e));cv.addEventListener('pointercancel',e=>release(e,true));cv.addEventListener('lostpointercapture',e=>{if(pointers.has(e.pointerId))release(e,true);});cv.addEventListener('contextmenu',e=>e.preventDefault());cv.addEventListener('touchmove',e=>{if(e.cancelable)e.preventDefault();},{passive:false});
+function zoom(factor,x=W/2,y=H/2){const p=world(x,y);view.scale=clamp(view.scale*factor,12,1000);view.cx=p[0]-(x-W/2)/view.scale;view.cy=p[1]+(y-H/2)/view.scale;invalidate();}
+cv.addEventListener('wheel',e=>{e.preventDefault();if(gesture)return;zoom(Math.exp(clamp(-e.deltaY*.0015,-.5,.5)),...local(e));},{passive:false});
+// Common page controls. Proof navigation preserves model, view, layers and selection.
+function isDrawer(){return matchMedia('(max-width:1100px), (pointer:coarse)').matches||document.body.classList.contains('focused');}
+function syncPanel(){const overlay=isDrawer();panel.inert=overlay&&!drawer;$('menu').setAttribute('aria-expanded',String(drawer));if(overlay&&drawer){panel.setAttribute('role','dialog');panel.setAttribute('aria-modal','true');}else {panel.removeAttribute('role');panel.removeAttribute('aria-modal');}}
+function setDrawer(open){if(!isDrawer())return;stop();drawer=open;panel.classList.toggle('open',open);document.body.classList.toggle('drawer-open',open);syncPanel();if(open){returnFocus=document.activeElement;$('close').focus();}else if(returnFocus&&!returnFocus.closest('#panel'))returnFocus.focus();}
+function selectTab(which){tab=which;for(const t of ['lesson','settings']){$('tab-'+t).setAttribute('aria-selected',String(t===which));$('tab-'+t).tabIndex=t===which?0:-1;$(t+'-panel').hidden=t!==which;}$('panel').querySelector('.panel-scroll').scrollTop=0;}
+function proof(i){selectTab('lesson');if(isDrawer())setDrawer(true);document.querySelectorAll('[data-lesson]').forEach(el=>el.classList.remove('proof-focus'));const el=$('proof-'+i);el.classList.add('proof-focus');el.scrollIntoView({block:'start',behavior:matchMedia('(prefers-reduced-motion:reduce)').matches?'instant':'smooth'});}
+$('menu').onclick=()=>setDrawer(!drawer);$('close').onclick=()=>setDrawer(false);$('scrim').onclick=()=>setDrawer(false);
+$('focus').onclick=()=>{stop();drawer=false;panel.classList.remove('open');document.body.classList.remove('drawer-open');document.body.classList.toggle('focused');const on=document.body.classList.contains('focused');$('focus').setAttribute('aria-pressed',String(on));$('focus').textContent=on?'退出专注':'专注模式';syncPanel();};
+for(const t of ['lesson','settings']){$('tab-'+t).onclick=()=>selectTab(t);$('tab-'+t).onkeydown=e=>{if(['ArrowLeft','ArrowRight','Home','End'].includes(e.key)){e.preventDefault();const next=e.key==='Home'?'lesson':e.key==='End'?'settings':t==='lesson'?'settings':'lesson';selectTab(next);$('tab-'+next).focus();}};}
+document.addEventListener('keydown',e=>{if(e.key==='Escape'){if(drawer)setDrawer(false);else {stop();selected.clear();metricsDirty=true;updateSelection();invalidate();}}if(e.key==='Tab'&&drawer){const a=[...panel.querySelectorAll('button,input,summary')].filter(el=>!el.closest('[hidden]')&&el.offsetParent!==null&&el.tabIndex>=0);if(e.shiftKey&&document.activeElement===a[0]){e.preventDefault();a.at(-1).focus();}else if(!e.shiftKey&&document.activeElement===a.at(-1)){e.preventDefault();a[0].focus();}}});
+$('sR').addEventListener('input',e=>setR(+e.target.value));document.querySelectorAll('[data-r]').forEach(b=>b.onclick=()=>setR(b.dataset.r==='max'?MAX:+b.dataset.r));
+document.querySelectorAll('[data-layer]').forEach(c=>c.onchange=()=>{state[c.dataset.layer]=c.checked;metricsDirty=true;invalidate();});
+for(const [id,key] of [['cLabels','labels'],['cLengths','lengths']])$(id).onchange=e=>{state[key]=e.target.checked;metricsDirty=true;invalidate();};
+$('sFont').oninput=e=>{state.font=+e.target.value;document.documentElement.style.setProperty('--lab-size',state.font+'px');$('sFontval').textContent=state.font+' px';metricsDirty=true;invalidate();};
+$('sOpacity').oninput=e=>{state.opacity=+e.target.value/100;$('sOpacityval').textContent=e.target.value+'%';invalidate();};
+$('clear').onclick=()=>{selected.clear();metricsDirty=true;updateSelection();invalidate();};
+document.querySelectorAll('[data-quality]').forEach(b=>b.onclick=()=>{state.quality=b.dataset.quality;document.querySelectorAll('[data-quality]').forEach(c=>{c.classList.toggle('active',c===b);c.setAttribute('aria-pressed',String(c===b));});resize();});
+document.querySelectorAll('[data-proof]').forEach(b=>b.onclick=()=>proof(+b.dataset.proof));$('stage-next').onclick=()=>proof(0);
+$('fit').onclick=()=>{stop();fit();};$('reset').onclick=()=>{stop();fit();};$('zoomIn').onclick=()=>{stop();zoom(1.25);};$('zoomOut').onclick=()=>{stop();zoom(.8);};
+function layoutChange(){if(drawer)setDrawer(false);stop();syncPanel();metricsDirty=true;resize();}
+new ResizeObserver(resize).observe(stage);window.addEventListener('orientationchange',()=>{needsFit=true;layoutChange();});matchMedia('(orientation:portrait)').addEventListener('change',()=>{needsFit=true;layoutChange();});matchMedia('(max-width:1100px), (pointer:coarse)').addEventListener('change',layoutChange);
+window.addEventListener('blur',stop);document.addEventListener('visibilitychange',()=>{if(document.hidden){stop();if(frame)cancelAnimationFrame(frame);frame=0;}else invalidate();});
+$('hint').textContent=matchMedia('(pointer:coarse)').matches?'拖圆周或 P · 空白平移 · 双指缩放 · 点字母多选':'拖圆周或 P · 空白平移 · 滚轮缩放 · 点字母多选';
+if(location.hash==='#geo-debug')window.__S={state,view,points,labels,metrics,selected,setR,compute,screen,world,fit,angleToR,stop,get values(){return values;},get gesture(){return gesture;},get dpr(){return dpr;},get dimensions(){return {width:W,height:H};},get renderCount(){return metrics.renders;}};
+syncPanel();setR(1.4);resize();
+})();
+
+</script></body></html>

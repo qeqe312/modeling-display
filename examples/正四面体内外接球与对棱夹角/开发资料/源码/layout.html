@@ -1,0 +1,57 @@
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">◎</div><div><div class="eyebrow">GEOMETRY LAB <span>/ TETRAHEDRON</span></div><h1>正四面体内外接球与对棱夹角</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">四项判断 · 完整解题</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位视角</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题 · 第 5 题</span><span class="source">2023—2024 · 高一下</span></div>
+        <div class="question"><div class="source-line">四川广安 · 阶段练习</div><p>设正四面体 <i>ABCD</i> 的棱长为 <i>a</i>（<i>a</i> &gt; 0），下列对正四面体的有关描述：</p><ol class="statements"><li>该正四面体的外接球的表面积是 <span class="math">(3/2)πa<sup>2</sup></span>；</li><li>该正四面体的内切球的体积是 <span class="math">(√6/216)πa³</span>；</li><li>该正四面体的体积是 <span class="math">(√2/12)a³</span>；</li><li>该正四面体相对棱所成角为 90°。</li></ol><p>其中正确的个数是（　）。</p><div class="options" id="options"><div>A. <span>1</span></div><div>B. <span>2</span></div><div data-answer="C">C. <span>4</span></div><div>D. <span>3</span></div></div></div>
+        <div class="interaction-note">结论：四项均正确，选 C。注意面积随 a²、体积随 a³ 缩放；相对棱不相交，要把方向平移到同一点再看角。</div>
+        <div class="section-heading"><span>完整推导</span><span id="lesson-progress">全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" data-lesson="0" id="proof-0"><div class="lesson-title"><span class="step-number">01</span><h2>外接球表面积 ·（1）正确</h2></div><p>取面 <i>BCD</i> 的重心为 <i>F</i>。正四面体的高 <i>AF</i> 垂直于面 <i>BCD</i>，且 <i>BF</i> 为等边三角形中线的 2/3。</p><div class="formula">BF＝a/√3<br>h＝AF＝√(a²−a²/3)＝√6a/3</div><p>球心 <i>O</i> 是正四面体的重心，位于 <i>AF</i> 上，将高按 <i>AO : OF</i>＝3 : 1 分割。因此外接球半径为高的 3/4。</p><div class="formula">R＝AO＝3h/4＝√6a/4<br>S<sub>外</sub>＝4πR²＝(3/2)πa²</div><p class="verdict">与题干第（1）项 (3/2)πa² 一致，正确。面积随 a² 缩放，注意与下面体积的 a³ 区别。</p></article>
+          <article class="lesson-card" data-lesson="1" id="proof-1"><div class="lesson-title"><span class="step-number">02</span><h2>内切球体积 ·（2）正确</h2></div><p>正四面体的内切球与外接球共用球心 <i>O</i>。由对称性，<i>O</i> 到四个面的距离相等；<i>F</i> 是面 <i>BCD</i> 的切点。</p><div class="formula">r＝OF＝h/4＝√6a/12＝R/3<br>V<sub>内</sub>＝(4/3)πr³<br>＝(4/3)π(√6a/12)³<br>＝(√6/216)πa³</div><p>紫色小球与四个面相切。a＝1 时，r≈0.204124，V<sub>内</sub>≈0.035626。</p><p class="verdict">与题干第（2）项完全一致，正确。</p></article>
+          <article class="lesson-card" data-lesson="2" id="proof-2"><div class="lesson-title"><span class="step-number">03</span><h2>正四面体体积 ·（3）正确</h2></div><p>面 <i>BCD</i> 是边长为 <i>a</i> 的等边三角形；以该面为底，高为 <i>AF</i>。</p><div class="formula">S<sub>BCD</sub>＝√3a²/4<br>V<sub>正四面体</sub>＝(1/3)S<sub>BCD</sub>·h<br>＝(1/3)·(√3a²/4)·(√6a/3)<br>＝(√2/12)a³</div><p>a＝1 时，V≈0.117851。也可将四面体分成以 O 为顶点的四个小棱锥，V＝(1/3)·S<sub>总</sub>·r。</p><p class="verdict">与题干第（3）项一致，正确。不要把正四面体体积与内切球体积混为一谈。</p></article>
+          <article class="lesson-card answer-card" data-lesson="3" id="proof-3"><div class="lesson-title"><span class="step-number">04</span><h2>相对棱夹角 ·（4）正确</h2></div><p>以底面中心 F 为原点，x 轴平行 BC，y 轴沿 FD，z 轴沿 FA 向上；记 h＝√6a/3。AB 与 CD 没有公共顶点，是异面直线；其所成角按方向平移后的锐角或直角定义。</p><div class="formula">向量 AB＝(−a/2, −√3a/6, −h)<br>向量 CD＝(−a/2, √3a/2, 0)<br>AB·CD＝a²/4−a²/4＝0<br>θ＝90°</div><p>同理 AC·BD＝0、AD·BC＝0，三组相对棱均垂直。模型高亮 AB 与 CD；经过 O 的两条虚线分别与它们平行，直角标记画在虚线交点，绝非两条原棱的交点。</p><div class="answer">4<span>个正确</span><span class="answer-badge">选 C</span></div><p class="verdict">（1）（2）（3）（4）均正确。</p></article>
+        </div>
+        <details class="coordinate-details"><summary>查看建模坐标与归一化读数</summary><p>以底面中心 F 为原点，x 轴平行 BC（从 B 指向 C），y 轴沿 FD，z 轴沿 FA 向上，底面 BCD 为 z＝0。记 h＝√6a/3，r＝h/4。</p><div class="coordinate-table"><span>A</span><code>(0, 0, h)</code><span>B</span><code>(−a/2, −√3a/6, 0)</code><span>C</span><code>(a/2, −√3a/6, 0)</code><span>D</span><code>(0, √3a/3, 0)</code><span>O</span><code>(0, 0, r)</code><span>F</span><code>(0, 0, 0)</code></div><p>显示按 a＝1 归一化；选择坐标单位为 a。渲染映射为 (x,y,z)→6(x,z−r,−y)，只换基与平移，将球心 O 居中显示。</p><p>R/a≈0.612372；r/a≈0.204124；h/a≈0.816497；S<sub>外</sub>/a²≈4.712389；V<sub>内</sub>/a³≈0.035626；V/a³≈0.117851。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>正四面体实体面</span><input type="checkbox" id="cSolid" checked></label>
+        <label class="switch-row"><span><span class="dot blue"></span>外接球 · 经过四个顶点</span><input type="checkbox" id="cSphere" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>内切球 · 与四个面相切</span><input type="checkbox" id="cInner" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>相对棱 AB、CD 高亮</span><input type="checkbox" id="cOpposite" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>球心 O、高 AF 与半径</span><input type="checkbox" id="cGuide" checked></label>
+        <label class="switch-row"><span>平移方向线与直角标记</span><input type="checkbox" id="cAngles" checked></label>
+        <label class="switch-row"><span>空间坐标轴 · 原点 F</span><input type="checkbox" id="cAxes"></label>
+        <div class="section-heading"><span>文字标注</span></div>
+        <label class="switch-row"><span>顶点与辅助点字母</span><input type="checkbox" id="cLabels" checked></label>
+        <label class="switch-row"><span>边长与半径标注</span><input type="checkbox" id="cLengths" checked></label>
+        <label class="range-label" for="sFont"><span>顶点字号</span><output id="sFontval">22 px</output></label><input type="range" id="sFont" min="14" max="32" value="22" step="1">
+        <label class="range-label" for="sOpacity"><span>两球面透明度（填色强度）</span><output id="sOpacityval">8%</output></label><input type="range" id="sOpacity" min="0" max="20" value="8" step="1">
+        <div class="section-heading"><span>顶点高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点模型中的顶点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div>
+        <p class="settings-hint">本题为固定模型，没有动点。球面填色强度 8% 对应 opacity＝0.08；滑条同时控制内外球面，轮廓仍保留。选择坐标按 a＝1 显示。</p>
+      </section>
+    </div>
+    <div class="panel-footer"><span class="status-dot"></span>可离线使用<span class="footer-right">精确模型 · a＝1 归一化</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互正四面体与内外接球模型">
+    <canvas id="cv" aria-label="单指或鼠标拖动旋转；双指缩放平移；点击顶点高亮" tabindex="0"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="快捷视角"><button class="active" data-view="spatial" aria-pressed="true">立体</button><button data-view="front" aria-pressed="false">正视</button><button data-view="top" aria-pressed="false">俯视</button></div><button id="fit" class="icon-button" aria-label="将模型居中适配视口" title="模型居中">⌖</button></div>
+    <div id="readout" class="readout" aria-live="polite"><div class="readout-heading"><span id="readout-title">归一化读数 · a＝1</span><span class="readout-dot"></span></div><div class="readout-row"><span id="rKey1">外半径 R/a</span><strong id="rValue1">0.612372</strong></div><div class="readout-row"><span id="rKey2">内半径 r/a</span><strong id="rValue2">0.204124</strong></div><div class="readout-row"><span id="rKey3">对棱夹角</span><strong id="rValue3">90°</strong></div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 4 个正确 · 选择 C</span><h2 id="caption-title">两球共心，R＝3r；相对棱的方向互相垂直</h2><p id="caption-body">蓝色外球经过四个顶点，紫色内球与四个面相切。AB、CD 不相交，经过 O 的虚线展示平移后的直角。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导" title="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="四项判断公式，点击查看完整推导">
+      <button data-proof="0"><span class="overview-label">01 · 外球面积 / 正确</span><strong>S＝(3/2)πa²</strong><span class="overview-detail">R＝√6a/4</span></button>
+      <button data-proof="1"><span class="overview-label">02 · 内球体积 / 正确</span><strong>V＝√6πa³/216</strong><span class="overview-detail">r＝√6a/12</span></button>
+      <button data-proof="2"><span class="overview-label">03 · 四面体体积 / 正确</span><strong>V＝√2a³/12</strong><span class="overview-detail">底面积 × 高 ÷ 3</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">04 · 相对棱 / 正确</span><strong>θ＝90°</strong><span class="overview-detail">方向点积为 0 · 选 C</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>外接球</span><span><span class="dot violet"></span>内切球 / CD</span><span><span class="dot orange"></span>AB / 平移方向</span></div><div id="hint">拖动旋转 · 滚轮缩放 · 右键平移 · 点顶点多选</div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div>
+<div id="scrim" aria-hidden="true"></div>

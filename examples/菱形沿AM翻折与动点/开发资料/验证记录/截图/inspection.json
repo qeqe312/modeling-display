@@ -1,0 +1,124 @@
+[
+  {
+    "name": "电脑",
+    "viewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "hasTouch": false,
+    "isMobile": false,
+    "coarsePointer": false,
+    "screenshots": {
+      "model": "电脑-模型.png",
+      "lesson": "电脑-题目讲解.png",
+      "settings": "电脑-显示设置.png",
+      "answer": "电脑-完整答案.png",
+      "sphere": "电脑-最大体积外接球.png",
+      "internal": "翻折-内部位置.png",
+      "endpoint": "翻折-展开端点.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 29.999999999999993,
+    "geometries": 16,
+    "layout": {
+      "vertexLabelOverlaps": 0,
+      "viewportOverflow": false,
+      "baseHeight": -0.45,
+      "azimuth": 0.42,
+      "elevation": 0.46
+    },
+    "htmlSHA256": "ad4c794c47f0699bbbb7f734532b1c4627ce4cd21b9a60e003921929a359f08f"
+  },
+  {
+    "name": "平板竖屏",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "平板竖屏-模型.png",
+      "lesson": "平板竖屏-题目讲解.png",
+      "settings": "平板竖屏-显示设置.png",
+      "answer": "平板竖屏-完整答案.png",
+      "sphere": "平板竖屏-最大体积外接球.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 29.999999999999993,
+    "geometries": 16,
+    "layout": {
+      "vertexLabelOverlaps": 0,
+      "viewportOverflow": false,
+      "baseHeight": -0.45,
+      "azimuth": 0.42,
+      "elevation": 0.46
+    },
+    "htmlSHA256": "ad4c794c47f0699bbbb7f734532b1c4627ce4cd21b9a60e003921929a359f08f"
+  },
+  {
+    "name": "平板横屏",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "平板横屏-模型.png",
+      "lesson": "平板横屏-题目讲解.png",
+      "settings": "平板横屏-显示设置.png",
+      "answer": "平板横屏-完整答案.png",
+      "sphere": "平板横屏-最大体积外接球.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 29.999999999999993,
+    "geometries": 16,
+    "layout": {
+      "vertexLabelOverlaps": 0,
+      "viewportOverflow": false,
+      "baseHeight": -0.45,
+      "azimuth": 0.42,
+      "elevation": 0.46
+    },
+    "htmlSHA256": "ad4c794c47f0699bbbb7f734532b1c4627ce4cd21b9a60e003921929a359f08f"
+  },
+  {
+    "name": "手机",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "手机-模型.png",
+      "lesson": "手机-题目讲解.png",
+      "settings": "手机-显示设置.png",
+      "answer": "手机-完整答案.png",
+      "sphere": "手机-最大体积外接球.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 29.999999999999993,
+    "geometries": 16,
+    "layout": {
+      "vertexLabelOverlaps": 0,
+      "viewportOverflow": false,
+      "baseHeight": -0.45,
+      "azimuth": 0.42,
+      "elevation": 0.46
+    },
+    "htmlSHA256": "ad4c794c47f0699bbbb7f734532b1c4627ce4cd21b9a60e003921929a359f08f"
+  }
+]

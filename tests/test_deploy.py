@@ -26,6 +26,92 @@ class DeploymentTests(unittest.TestCase):
         deploy.apply_plan(plan)
         return plan
 
+    def source_fixture(self, files):
+        for directory in ('references', 'assets', 'examples', 'scripts'):
+            (self.repo / directory).mkdir()
+        for rel, data in {**{name: b'document' for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')}, **files}.items():
+            path = self.repo / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
+
+    def test_collect_preserves_example_images_sources_and_documents(self):
+        retained = {
+            'examples/demo/开发资料/验证记录/截图/model.PNG': b'\x89PNG\r\n\x00\xff',
+            'examples/demo/reference.jpg': b'jpeg',
+            'examples/demo/开发资料/源码/model.html': b'<html>model</html>',
+            'examples/demo/开发资料/源码/model.js': b'const model = {};',
+            'examples/demo/开发资料/check_math.mjs': b'check();',
+            'examples/demo/开发资料/build_demo.py': b'build()',
+            'examples/demo/开发资料/README.md': b'rebuild instructions',
+            'examples/demo/开发资料/验证记录/browser-report.json': b'{"passed": 1}',
+        }
+        excluded = {
+            'assets/preview.png': b'image',
+            'references/preview.JPG': b'image',
+            'scripts/preview.webp': b'image',
+            'scripts/helper.js': b'javascript',
+        }
+        self.source_fixture({**retained, **excluded})
+        collected = deploy.collect(self.repo)
+        self.assertEqual(collected, {**{name: b'document' for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')}, **retained})
+        self.install(collected)
+        for rel, data in retained.items():
+            self.assertEqual((self.target / rel).read_bytes(), data)
+
+    def test_collect_excludes_runtime_build_cache_and_temporary_logs(self):
+        excluded = {
+            'examples/demo/开发资料/.运行时/preview.log': b'log',
+            'examples/demo/开发资料/.运行时/preview.pid': b'123',
+            'examples/demo/开发资料/.运行时/state.json': b'{}',
+            'examples/demo/开发资料/.build-isolated/model.html': b'temporary build',
+            'examples/demo/开发资料/.build-isolated/model.png': b'temporary image',
+            'examples/demo/开发资料/__pycache__/check.pyc': b'bytecode',
+            'examples/demo/开发资料/.git/config': b'git config',
+            'examples/demo/开发资料/.pytest_cache/cache.json': b'cache',
+            'assets/.cache/generated.js': b'cache',
+            'references/.build-isolated/generated.md': b'temporary build',
+            'examples/demo/preview.log': b'log',
+            'examples/demo/preview.log.1': b'rotated log',
+            'examples/demo/preview.LOG': b'log',
+            'examples/demo/model.html.tmp': b'temporary',
+            'examples/demo/model.html.temp': b'temporary',
+            'examples/demo/model.html.bak': b'temporary',
+            'examples/demo/model.html.swp': b'temporary',
+        }
+        self.source_fixture(excluded)
+        collected = deploy.collect(self.repo)
+        self.assertEqual(collected, {name: b'document' for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')})
+
+    def test_collect_rejects_source_image_symlink(self):
+        self.source_fixture({})
+        outside = self.base / 'outside.png'
+        outside.write_bytes(b'outside image')
+        link = self.repo / 'examples' / 'reference.png'
+        try:
+            link.symlink_to(outside)
+        except OSError:
+            self.skipTest('OS does not permit symlink creation')
+        with self.assertRaises(ValueError):
+            deploy.collect(self.repo)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows source junction regression')
+    def test_collect_windows_source_junction_rejected(self):
+        self.source_fixture({})
+        outside = self.base / 'outside'
+        outside.mkdir()
+        (outside / 'reference.png').write_bytes(b'outside image')
+        link = self.repo / 'examples' / 'linked'
+        environment = dict(os.environ, GEO3D_LINK=str(link), GEO3D_DEST=str(outside))
+        subprocess.run(['powershell.exe', '-NoProfile', '-Command',
+                        'New-Item -ItemType Junction -Path $env:GEO3D_LINK -Target $env:GEO3D_DEST | Out-Null'],
+                       env=environment, check=True, capture_output=True,
+                       creationflags=subprocess.CREATE_NO_WINDOW)
+        try:
+            with self.assertRaises(ValueError):
+                deploy.collect(self.repo)
+        finally:
+            link.rmdir()
+
     def test_extra_files_preserved_and_stale_requires_opt_in(self):
         self.install({"SKILL.md": b"old", "old.md": b"managed"})
         (self.target / "notes.txt").write_bytes(b"user")

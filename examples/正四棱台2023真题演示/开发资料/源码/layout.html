@@ -1,0 +1,62 @@
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">◎</div><div><div class="eyebrow">GEOMETRY LAB <span>/ MOTION</span></div><h1>正四棱台 · 单动点演示</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">完整解题 · 拖动探索</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位视角</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2023 · 解答题</span></div>
+        <div class="question"><p>正四棱台 <i>ABCD–A′B′C′D′</i> 中，<i>AB＝2A′B′</i>，点 <i>P</i> 在棱 <i>CC′</i> 上。</p><p><b>（1）</b>记棱锥 <i>P–BCD</i> 的体积为 <i>V₁</i>，棱台被它分出的另一部分体积为 <i>V₂</i>。当 <i>PC＝PC′</i> 时，求 <i>V₁ : V₂</i>。</p><p><b>（2）</b>若侧棱与底面所成角为 π/3，当平面 <i>A′BD</i> ⊥ 平面 <i>PBD</i> 时，求直线 <i>PA</i> 与平面 <i>PBC</i> 所成角的正弦值。</p></div>
+        <div class="interaction-note">两问的解题位置都是 CC′ 的中点。直接拖动橙色 P，观察垂直条件与读数怎样变化；精确调节在“显示设置”中。</div>
+        <div class="section-heading"><span>完整推导</span><span id="lesson-progress">全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" data-lesson="0" id="proof-0"><div class="lesson-title"><span class="step-number">01</span><h2>第（1）问：整体减去小棱锥</h2></div><p>设上底边长为 <i>a</i>，下底边长为 <i>2a</i>，棱台高为 <i>h</i>。本问不需要用到侧棱与底面的夹角。</p><div class="formula">V＝h / 3 · (a²＋4a²＋√(a²·4a²))<br>＝7a²h / 3</div><p>△<i>BCD</i> 占下底正方形的一半，面积为 <i>2a²</i>。<i>P</i> 是 <i>CC′</i> 的中点，所以它到底面的距离为 <i>h / 2</i>。</p><div class="formula">V₁＝1 / 3 · 2a² · h / 2＝a²h / 3<br>V₂＝V－V₁＝2a²h<br><b>V₁ : V₂＝1 : 6</b></div><p class="proof-note">V₂ 是剩余部分，不能把 V₁ 与整体 V 的比 1 : 7 当作答案。</p></article>
+          <article class="lesson-card" data-lesson="1" id="proof-1"><div class="lesson-title"><span class="step-number">02</span><h2>第（2）问：归一化并建立坐标</h2></div><p>长度同比缩放不影响角度，取 <i>a＝1</i>。以底面中心为原点，<i>x、y</i> 轴平行于底边，<i>z</i> 轴竖直向上。侧棱的水平投影长为 <i>√2 / 2</i>。</p><div class="formula">h＝(√2 / 2) tan 60°＝√6 / 2</div><p>设 <i>t＝PC / CC′</i>（0 ≤ t ≤ 1），则：</p><div class="formula">P＝C＋t(C′－C)<br>＝(1－t / 2, 1－t / 2, ht)</div><div class="coordinate-table"><span>A</span><code>(−1, −1, 0)</code><span>B</span><code>(1, −1, 0)</code><span>C</span><code>(1, 1, 0)</code><span>D</span><code>(−1, 1, 0)</code><span>A′</span><code>(−1/2, −1/2, h)</code><span>C′</span><code>(1/2, 1/2, h)</code></div></article>
+          <article class="lesson-card" data-lesson="2" id="proof-2"><div class="lesson-title"><span class="step-number">03</span><h2>垂直条件确定 P 的位置</h2></div><p>由两个平面内不共线向量的叉积，可分别取平面 <i>A′BD</i> 与平面 <i>PBD</i> 的法向量：</p><div class="formula">n₁＝(2h, 2h, 2)<br>n₂＝(2ht, 2ht, 2t－4)</div><p>两平面垂直，等价于它们的法向量点积为 0。代入 <i>h²＝3 / 2</i>：</p><div class="formula">n₁·n₂＝8h²t＋4t－8<br>＝16t－8＝0<br><b>t＝1 / 2，P 为 CC′ 中点</b></div><p>拖动 P 时，右上角显示的是两平面的锐夹角；回到中点，夹角恰为 90°。</p></article>
+          <article class="lesson-card answer-card" data-lesson="3" id="proof-3"><div class="lesson-title"><span class="step-number">04</span><h2>用法向量求线面角</h2></div><p>中点 <i>P＝(3/4, 3/4, h/2)</i>。平面 <i>PBC</i> 可取法向量 <i>n＝(2h, 0, 1)</i>，从而：</p><div class="formula">PA＝(−7/4, −7/4, −h/2)<br>|PA|＝√26 / 2，|n|＝√7<br>|PA·n|＝4h＝2√6</div><p>记所求线面角为 θ。图中 <i>F</i> 是 <i>A</i> 到平面 <i>PBC</i> 的垂足，<i>PF</i> 是 <i>PA</i> 在该平面上的投影，θ＝∠<i>APF</i>。</p><div class="formula">sin θ＝|PA·n| / (|PA| · |n|)<br>＝4√6 / √182＝<b>4√273 / 91</b></div><div class="answer compact-answer">0.7263<span class="answer-badge">θ ≈ 46.57°</span></div><p>两问答案：<b>（1）1 : 6；（2）4√273 / 91。</b></p><p class="proof-note">拖动后的实时线面角见右上角。若 P 与 C 重合，P、B、C 不能确定平面，读数显示“未定义”。</p></article>
+        </div>
+        <details class="coordinate-details"><summary>查看其余建模坐标与动态关系</summary><div class="coordinate-table"><span>B′</span><code>(1/2, −1/2, h)</code><span>D′</span><code>(−1/2, 1/2, h)</code><span>F</span><code>(5/7, −1, 4h/7)</code></div><p>模型取 a＝1、h＝√6/2。一般位置 V₁＝2th/3，V₂＝(7−2t)h/3，故 V₁ : V₂＝2t : (7−2t)。F 位于平面 PBC 的延伸部分。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>动点 P</span><span>沿棱 CC′ 运动</span></div>
+        <p class="motion-tip">拖动模型中的橙色 P 或字母 P，也可以使用滑条。抓住 P 时视角锁定，松手恢复。</p>
+        <label class="range-label" for="sT"><span>位置 t＝PC / CC′</span><output id="sTval">0.500</output></label><input type="range" id="sT" min="0" max="1" step="0.001" value="0.5">
+        <div class="motion-buttons" role="group" aria-label="动点快捷位置"><button class="button" data-t="0">C 端点</button><button class="button active" data-t="0.5">中点</button><button class="button" data-t="1">C′ 端点</button></div>
+        <div class="motion-readings"><div><span>PC : PC′</span><strong id="mRatio">1 : 1</strong></div><div><span>V₁ : V₂</span><strong id="mVolume">1 : 6</strong></div><div><span>两面锐夹角</span><strong id="mAngle">90.0°</strong></div><div><span>sin θ</span><strong id="mSin">0.7263</strong></div></div>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>棱台底面与侧面</span><input type="checkbox" id="cSolid" checked></label>
+        <label class="switch-row"><span><span class="dot blue"></span>平面 A′BD</span><input type="checkbox" id="cPlane1" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>平面 PBD</span><input type="checkbox" id="cPlane2" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>线面角 PA / 平面 PBC</span><input type="checkbox" id="cLineAngle" checked></label>
+        <label class="switch-row"><span><span class="dot green"></span>棱锥 P–BCD</span><input type="checkbox" id="cVolume"></label>
+        <label class="switch-row"><span><span class="dot green"></span>侧棱与底面夹角 60°</span><input type="checkbox" id="cAngles"></label>
+        <label class="switch-row"><span>空间坐标轴</span><input type="checkbox" id="cAxes"></label>
+        <div class="section-heading"><span>文字标注</span></div>
+        <label class="switch-row"><span>顶点字母</span><input type="checkbox" id="cLabels" checked></label>
+        <label class="switch-row"><span>边长数值</span><input type="checkbox" id="cLengths"></label>
+        <label class="range-label" for="sFont"><span>顶点字号</span><output id="sFontval">22 px</output></label><input type="range" id="sFont" min="14" max="32" value="22" step="1">
+        <label class="range-label" for="sOpacity"><span>棱台面透明度</span><output id="sOpacityval">8%</output></label><input type="range" id="sOpacity" min="0" max="30" value="8" step="1">
+        <div class="section-heading"><span>顶点高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点模型中的顶点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div>
+        <p class="settings-hint">隐藏辅助图层可清楚观察主体。点击下方公式只定位推导，保留你调整过的图层与动点位置。</p>
+      </section>
+    </div>
+    <div class="panel-footer"><span class="status-dot"></span>可离线使用<span class="footer-right">约束动点 · 实时读数</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互三维模型">
+    <canvas id="cv" aria-label="拖动 P 沿 CC′ 运动；拖动空白旋转；双指缩放平移；点击顶点高亮" tabindex="0"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="快捷视角"><button class="active" data-view="spatial" aria-pressed="true">立体</button><button data-view="front" aria-pressed="false">正视</button><button data-view="top" aria-pressed="false">俯视</button></div><button id="fit" class="icon-button" aria-label="将模型居中适配视口" title="模型居中">⌖</button></div>
+    <div id="readout" class="readout" aria-live="off"><div class="readout-heading"><span id="readout-title">当前 P · 实时读数</span><span class="readout-dot"></span></div><div class="readout-row"><span>位置 t</span><strong id="rT">0.500</strong></div><div class="readout-row"><span>两面夹角</span><strong id="rAngle">90.0°</strong></div><div class="readout-row"><span>sin θ</span><strong id="rSin">0.7263</strong></div><div id="midFlag" class="mid-flag">P 为中点 · 两面垂直</div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 全部展开</span><h2 id="caption-title">一个中点，同时解开两问</h2><p id="caption-body">橙色 P 可沿 CC′ 拖动。下面是题设条件下的答案，当前动点读数见右上角。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导" title="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="完整解题公式，点击查看相应推导">
+      <button data-proof="0"><span class="overview-label">01 · 体积比</span><strong>V₁ : V₂ = 1 : 6</strong><span class="overview-detail">P 为 CC′ 中点</span></button>
+      <button data-proof="1"><span class="overview-label">02 · 棱台高度</span><strong>h = √6 / 2</strong><span class="overview-detail">取上底边长 a = 1</span></button>
+      <button data-proof="2"><span class="overview-label">03 · 垂直条件</span><strong>t = 1 / 2</strong><span class="overview-detail">n₁ · n₂ = 0</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">04 · 线面角</span><strong>sin θ = 4√273 / 91</strong><span class="overview-detail">≈ 0.7263</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>A′BD</span><span><span class="dot orange"></span>PBD / 动点</span><span><span class="dot violet"></span>PBC / 投影</span></div><div id="hint">拖动 P 沿棱运动 · 空白旋转 · 滚轮缩放 · 顶点多选</div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div>
+<div id="scrim" aria-hidden="true"></div>

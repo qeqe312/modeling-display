@@ -1,0 +1,23 @@
+{
+  "date": "2026-10-04",
+  "migration": {
+    "name": "正四棱台2023真题演示",
+    "previewUrl": "http://127.0.0.1:59583/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA.html",
+    "scriptsParse": true,
+    "offlinePages": [
+      {
+        "file": "examples\\正四棱台2023真题演示\\成品\\正四棱台2023真题演示.html",
+        "startup": true,
+        "networkResources": 0,
+        "drawerSettings": true
+      },
+      {
+        "file": "examples\\正四棱台2023真题演示\\成品\\离线双文件版\\正四棱台2023真题演示.html",
+        "startup": true,
+        "networkResources": 0,
+        "drawerSettings": true
+      }
+    ]
+  },
+  "note": "72 files moved and hash-verified before path/name updates; model interaction source unchanged; former regression reports retained."
+}

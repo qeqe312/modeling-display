@@ -1,0 +1,137 @@
+[
+  {
+    "frames": 2,
+    "geometries": 32,
+    "drawCalls": 50,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 1210,
+      "height": 920,
+      "left": 390,
+      "top": 80,
+      "bottom": 253.6875,
+      "labelTop": 0
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "desktop",
+    "viewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "hasTouch": false,
+    "isMobile": false,
+    "coarsePointer": false,
+    "screenshots": {
+      "model": "desktop.png",
+      "settings": "desktop-settings.png",
+      "answer": "desktop-answer.png",
+      "axes": "desktop-axes.png"
+    },
+    "errors": [],
+    "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc",
+    "browserVersion": "154.0.8037.93"
+  },
+  {
+    "frames": 2,
+    "geometries": 32,
+    "drawCalls": 50,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 820,
+      "height": 1108,
+      "left": 0,
+      "top": 72,
+      "bottom": 274.6875,
+      "labelTop": 0
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "portrait",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "portrait.png",
+      "lesson": "portrait-proof.png",
+      "settings": "portrait-settings.png",
+      "answer": "portrait-answer.png",
+      "axes": "portrait-axes.png"
+    },
+    "errors": [],
+    "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc",
+    "browserVersion": "154.0.8037.93"
+  },
+  {
+    "frames": 2,
+    "geometries": 32,
+    "drawCalls": 50,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 1180,
+      "height": 748,
+      "left": 0,
+      "top": 72,
+      "bottom": 253.6875,
+      "labelTop": 0
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "landscape",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "landscape.png",
+      "lesson": "landscape-proof.png",
+      "settings": "landscape-settings.png",
+      "answer": "landscape-answer.png",
+      "axes": "landscape-axes.png"
+    },
+    "errors": [],
+    "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc",
+    "browserVersion": "154.0.8037.93"
+  },
+  {
+    "frames": 2,
+    "geometries": 32,
+    "drawCalls": 50,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 390,
+      "height": 776,
+      "left": 0,
+      "top": 68,
+      "bottom": 305,
+      "labelTop": 134.390625
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "phone",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "phone.png",
+      "lesson": "phone-proof.png",
+      "settings": "phone-settings.png",
+      "answer": "phone-answer.png",
+      "axes": "phone-axes.png"
+    },
+    "errors": [],
+    "pageSha256": "c638bc14335b7497c922af638c68a5ad1a610c7acec620f31da447c4ac9807cc",
+    "browserVersion": "154.0.8037.93"
+  }
+]

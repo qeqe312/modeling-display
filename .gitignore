@@ -18,6 +18,8 @@ __pycache__/
 *.pyc
 .modeling-display-manifest.json
 .modeling-display-backups/
+examples/**/开发资料/.运行时/
+examples/**/开发资料/.build-*/
 
 # 系统 / 编辑器
 .DS_Store

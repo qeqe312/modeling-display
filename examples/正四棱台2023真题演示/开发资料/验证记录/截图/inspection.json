@@ -1,0 +1,84 @@
+[
+  {
+    "name": "电脑",
+    "viewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "hasTouch": false,
+    "isMobile": false,
+    "coarsePointer": false,
+    "screenshots": {
+      "model": "电脑-模型.png",
+      "lesson": "电脑-题目讲解.png",
+      "settings": "电脑-显示设置.png",
+      "internal": "动点-内部位置.png",
+      "endpoint": "动点-C端点.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 46.574852958354334,
+    "geometries": 19
+  },
+  {
+    "name": "平板竖屏",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "平板竖屏-模型.png",
+      "lesson": "平板竖屏-题目讲解.png",
+      "settings": "平板竖屏-显示设置.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 46.574852958354334,
+    "geometries": 19
+  },
+  {
+    "name": "平板横屏",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "平板横屏-模型.png",
+      "lesson": "平板横屏-题目讲解.png",
+      "settings": "平板横屏-显示设置.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 46.574852958354334,
+    "geometries": 19
+  },
+  {
+    "name": "手机",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "手机-模型.png",
+      "lesson": "手机-题目讲解.png",
+      "settings": "手机-显示设置.png"
+    },
+    "errors": [],
+    "frames": 2,
+    "idleFrames": 0,
+    "angle": 46.574852958354334,
+    "geometries": 19
+  }
+]

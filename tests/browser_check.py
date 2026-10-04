@@ -175,23 +175,23 @@ def touch_checks(browser, path):
 def main():
     with tempfile.TemporaryDirectory(prefix="geo3d-browser-") as tmp, sync_playwright() as playwright:
         base = Path(tmp)
-        example = next((ROOT / "examples").glob("*.html"))
-        page_path = build(example, base / "offline")
-        inline_path = build(example, base / "inline", True)
+        # Historical-engine regression is independent of the current examples,
+        # whose layouts and debug interfaces are checked by their own scripts.
         template = fill_template((ROOT / "assets/template.html").read_text(encoding="utf-8"))
         source = base / "template.html"
         source.write_text(template, encoding="utf-8")
-        template_path = build(source, base / "template-output")
+        page_path = build(source, base / "offline")
+        inline_path = build(source, base / "inline", True)
         executable = os.environ.get("GEO3D_BROWSER")
         browser = playwright.chromium.launch(headless=True, executable_path=executable, chromium_sandbox=True)
         context = browser.new_context(viewport={"width": 1400, "height": 900}, offline=True)
-        for path in (page_path, template_path):
+        for path in (page_path, inline_path):
             page, errors = open_debug(context, path)
             exercise(page)
             check(not errors, f"page errors: {errors}")
             page.close()
         touch_checks(browser, page_path)
-        touch_checks(browser, template_path)
+        touch_checks(browser, inline_path)
         for path in (page_path, inline_path):
             page = context.new_page()
             page.goto(path.as_uri())

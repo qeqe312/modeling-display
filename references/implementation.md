@@ -1,448 +1,167 @@
-# 技术实现细节
+# 实现规范：复用已认可的引擎
 
-本文件是 `SKILL.md` 的实现分册。代码片段供实现参考，具体页面必须经过独立数学及浏览器验证。
-坐标约定：**y 轴向上**，模型沿 y 居中，`V.A` = A，`V.Ap` = A′。
+纯二维题采用 [Canvas 平面实现](plane-geometry.md) 与[椭圆二维示例](../examples/椭圆动圆切线与定距离（二维）/REFERENCE.md)。本文件以下的相机、世界射线与 Mesh 说明面向空间三维；页面、标签、抽屉和按需渲染原则也适用于二维。
 
----
+三维实现按 [示例索引](../examples/README.md) 选择固定、沿棱运动或翻折模型，不从历史模板重新发明交互。结构/外观见 [page-spec.md](page-spec.md)，逐文件换题方法见 [example-guide.md](example-guide.md)。这里解释影响正确性或流畅度的实现不变量。
 
-## 1. 相机：自写球坐标
+## 1. 模块与更新职责
 
-不使用 `examples/` 下的 OrbitControls（r148 后该目录已删除）。自写约 30 行，且能自由实现旋转/缩放/平移三合一。
-
-```js
-var cam = { azim: Math.PI * 0.24, elev: 0.34, dist: 6.6 };
-var target = new THREE.Vector3(0, 0, 0);
-
-function applyCamera() {
-  cam.elev = Math.max(-1.5, Math.min(1.5, cam.elev));   // 钳制，防止翻面
-  var ce = Math.cos(cam.elev);
-  camera.position.set(
-    target.x + cam.dist * ce * Math.sin(cam.azim),
-    target.y + cam.dist * Math.sin(cam.elev),
-    target.z + cam.dist * ce * Math.cos(cam.azim)
-  );
-  camera.lookAt(target);
-}
-```
-
-**操作映射**
-
-| 操作 | 手势 | 实现 |
+| 部分 | 固定模型参考 | 单动点参考 |
 |---|---|---|
-| 旋转 | 左键拖拽 / 单指 | `cam.azim -= dx * 0.008; cam.elev += dy * 0.008` |
-| 缩放 | 滚轮 / 双指捏合 | `cam.dist *= (1 + Math.sign(deltaY) * 0.09)` |
-| 平移 | 右键或 Shift+左键 / 双指拖 | `right`/`up` 取 `camera.matrix` 第 0/1 列，`target.addScaledVector(right, -dx*k)`，`k = cam.dist * 0.0016` |
+| 文案与 DOM | layout.html | layout.html |
+| 视觉与响应式 | style.css | style.css（尾部增加运动组件） |
+| 数学/对象/标签/读数 | app.js 的题目相关段 | model.js |
+| 相机/输入/抽屉/渲染 | app.js 的【D】及后续部分 | engine.js |
+| 组装顺序 | app.js | model.js → engine.js，合成一个 script |
 
-**必须** `canvas.addEventListener('contextmenu', e => e.preventDefault())`，否则右键平移会弹出菜单。
+动点 `model.js` 打开 IIFE，`engine.js` 关闭同一 IIFE；二者共享词法变量，不能拆成各自的 ES module 或两个独立 script。`源码/app.js` 是构建结果，不是动点例的编辑来源。
 
----
+建议区分：教学坐标 `STANDARD`、渲染顶点 `V`、显示 `state`、`groups`、`selected:Set`、标签缓存 `labels`、相机 `cam/target`。字段名可改，但 HTML、事件、测试必须同步。
 
-## 2. 命中检测：屏幕空间（不要用 Raycaster）
+## 2. 数学坐标与模型适配
 
-手指远比顶点小球粗，射线打在小球上基本打不中。
+教学坐标选择便于证明的标准建系；渲染坐标可平移居中、换基。明确写出正向与逆向映射，选择列表显示教学坐标。
+
+示例的映射不同：外接球 `(x,y,z)→(x−1.5,z−2.5,2−y)`；棱台 `(x,y,z)→(x,z−h/2,−y)`。不能把这些偏移照抄到新题。模型尺寸、适配包围半径、相机距离上下限、线半径也需要重新计算。
+
+相机沿用三个示例的球坐标环绕方式，保持世界竖直方向向上：
 
 ```js
-function pickVertex(px, py, w, h, tol) {
-  var best = null, bestD = Infinity;
+cam.elev = Math.max(-1.49, Math.min(1.49, cam.elev));
+camera.up.set(0, 1, 0);
+camera.position.set(
+  target.x + cam.dist*Math.cos(cam.elev)*Math.sin(cam.azim),
+  target.y + cam.dist*Math.sin(cam.elev),
+  target.z + cam.dist*Math.cos(cam.elev)*Math.cos(cam.azim)
+);
+camera.lookAt(target);
+camera.updateMatrixWorld();
+```
 
-  function test(key, pos, t) {
-    var p = pos.clone().project(camera);      // 世界 → NDC
-    if (p.z > 1) return;                      // 在相机背后
-    var x = (p.x * 0.5 + 0.5) * w;            // NDC → 像素
-    var y = (-p.y * 0.5 + 0.5) * h;           // 注意 y 翻转
-    var d = Math.hypot(x - px, y - py);
-    if (d < t && d < bestD) { bestD = d; best = key; }
-  }
+FOV 默认40°。快捷视角默认300ms平滑过渡，减少动画偏好时立即设置。手动输入取消未完成的过渡。`resize()` 用实测 `.stage-bottom` 高度、顶部控件预留及模型包围半径计算 fit，并用 `setViewOffset` 把视觉中心移到可用区域；不能仅用全画布宽高导致模型压住公式。
 
-  Object.keys(V).forEach(function (k) { test(k, V[k], tol); });
+鼠标与单指空白拖动共用 `cam.azim -= dx * .006`、`cam.elev += dy * .006`，位移使用 CSS 像素；仰角到达 ±1.49 rad 后反向拖动应立即恢复。保留 9px 拖动阈值，并补齐起点位移。除非用户另有要求，不改用轨迹球、相机滚转或连续翻转。
 
-  // ★ 动点用放大容差单独判一次，且优先于普通顶点：
-  //   它常贴着端点（如 P 贴着 C、C′），不优先会出现"想拖 P 却选中 C′"
-  test('P', computeP(), Math.max(tol, TOL_P));
+### 默认朝向与坐标同步
 
-  // ★ 标签矩形命中区（见第 5 节，解决"点字母点不中"）
-  if (best !== 'P' && pLabelRect) {
-    var r = pLabelRect;
-    if (px >= r.x0 && px <= r.x1 && py >= r.y0 && py <= r.y1) best = 'P';
-  }
-  return best;
+先确定模型的默认摆放：有明确底面时将该底面作为最低面；没有明确底面时优先选择一个顶点朝下。尽量避免最低支撑是一条棱，再选择能清楚显示关键结构的方位、仰角与距离。模型朝向和相机位置需要一起考虑，不能只调相机而忽略模型在世界竖直方向上的摆放。
+
+初始状态、“立体”和“复位视角”共用所选默认视角；“居中”保留 `cam.azim` 与 `cam.elev`，只更新适配所需的 target、距离及视口偏移。用户手动旋转时不吸附默认朝向。
+
+换基时明确教学坐标到渲染坐标的正逆映射，同步变换几何、坐标轴与辅助对象；选择列表、公式和读数仍使用教学坐标。例如正四面体以底面中心 F 为教学原点，映射为 `(x,y,z)→6(x,z−r,−y)`，使 BCD 水平且 A 朝上；该例的原点、倍率和偏移均不作为其他题目的固定要求。
+
+## 3. 几何缓存
+
+固定模型：一次建立几何，切图层只改 `visible`，改变透明度只改材质。材质按颜色/透明度复用，小球与选择光晕共享几何。
+
+动态模型：拓扑不变时保持 BufferGeometry 和 Mesh 实例不变。
+
+- 三角面：复用9个浮点坐标，写 `position.array`，置 `needsUpdate=true`；根据材质是否需要法线处理法线更新。
+- 棱线：复用单位 TubeGeometry（单位y线段、半径1、径向6段），以 position、quaternion、scale 设置端点、长度与线半径。零长度时隐藏。
+- 角弧：预分配线段/缓冲，随参数更新位置。轨迹变拓扑时可采用对象池，过量对象隐藏；仅不可复用的对象才创建/释放。
+- 动态缓冲若不重算 bounds，可像棱台例明确 `frustumCulled=false`；否则需要更新边界，避免旧 bounds 错误裁剪。
+- 顶点组与主体面组分离。隐藏面不应让顶点或主要棱线消失。
+
+禁止把“每次 setT 删除 group 并创建 TubeGeometry/SphereGeometry”当作默认实现；也不能只 dispose 而继续逐帧分配。
+
+## 4. 唯一参数入口
+
+棱上点的约束先定义为 `P(t)=C+t(C′−C)`，`t∈[0,1]`。其它轨迹需要自己的参数化、合法域与反解。
+
+```js
+function setT(raw) {
+  if (!Number.isFinite(raw)) return;
+  state.t = Math.max(0, Math.min(1, raw));
+  // 用题目参数化更新 P 与教学坐标。
+  // 重新计算读数；更新既有动态 Mesh / buffer。
+  // 同步 slider、快捷状态、运动读数、选中 P 的坐标。
+  // 若对象定义性改变，更新图层/标签有效性。
+  invalidate();
 }
 ```
 
-**容差集中定义**（不要在多处硬编码数字）：
+滑条 input、快捷按钮和模型拖动均调用此入口。计算用原始数值，格式化只发生在显示阶段；滑条步长造成的显示量化必须与位置精度说明一致。
+
+## 5. 透视正确的棱上反解
+
+从指针位置建立完整相机射线，包含投影矩阵的 view offset。不要只用 `projectionMatrix[0/5]` 手算方向，否则会丢掉偏移。
 
 ```js
-function pickTol(base, pointerType) {
-  return (pointerType === 'touch' || pointerType === 'pen') ? base + 20 : base + 4;
+// rayO/rayD/u/w 为缓存 Vector3；px/py 是相对 canvas 的 CSS 像素。
+rayO.copy(camera.position);
+rayD.set(2*px/width-1, 1-2*py/height, .5)
+  .unproject(camera).sub(rayO).normalize();
+u.subVectors(V.Cp,V.C);
+w.subVectors(rayO,V.C);
+const uu=u.lengthSq(), ud=u.dot(rayD);
+const den=uu-ud*ud;
+if (!Number.isFinite(den) || den<1e-9) return null;
+const rawT=(w.dot(u)-ud*w.dot(rayD))/den;
+return Number.isFinite(rawT) ? rawT : null;
+```
+
+这是单位射线与棱所在直线最近点的参数。先保留 rawT，在 `setT` 才限制范围；抓字母或球边缘时记录 `dragOffset=state.t−rawTAtDown`，移动使用 `rawT+dragOffset`，避免按下跳点。
+
+接近平行/无效视口时返回 null、保持原位置，不产生突跳。原例的 aspect<0.35 或 >3 保护是实现选择；若新布局有更极端比例，应调整或改用适合该视口的方法并验证，不能声称拖动仍有效。
+
+屏幕投影线段的比例在透视下不等于空间参数，不能代替解析反解。相机 pan、zoom、preset、view offset 后都需要往返验证。
+
+## 6. 手势状态机
+
+统一 Pointer Events 与 pointer capture，顺序为：右键/Shift平移、直接抓动点、空白旋转；第二指在普通相机操作中进入 pinch。
+
+| 状态 | move 行为 | 结束条件 |
+|---|---|---|
+| point | 只允许所属 pointer 更新参数；保持整个相机不变 | 主指松开/取消；若还有手指留在屏幕，阻断至手指全部离开 |
+| rotate | 超过9px后调整 azim/elev，首次补全从起点的位移 | 松开；未移动且<700ms才切换按下时命中的顶点 |
+| pan | 按相机 right/up、视口高度和距离计算位移 | 松开 |
+| pinch | 两指距离缩放，中心位移平移 | 降为一指后标记已移动，禁止误触点选 |
+| blocked | 不移动点或相机 | 全部手指释放 |
+
+点拖动时新手指与滚轮不能接管相机。松手不能二次 pick：保留 pointerdown 的 key。pointercancel 不触发选择；失焦、切方向、打开抽屉、文档隐藏均清理手势与捕获。
+
+画布 `touch-action:none`，仅画布对可取消的 touchmove 防默认；不要阻止抽屉滚动或全页面用户缩放。右键 contextmenu 需拦截。
+
+## 7. 点选与标签
+
+普通球投影的默认容差为鼠标22px、触摸/pen40px，标签命中取实际显示矩形并包含相对画布偏移。端点处 P 球与静态端点重合时，应先识别 P 的近球核心，再识别各字母矩形，再考虑扩大容差，避免端点标签把动点抢走或过大 P 容差吞掉所有其它标签。
+
+标签记录包含 key、position、visible、width/height、hit。文本/字号/显隐/选择样式改变后置 `metricsDirty`，下一次渲染批量测量。常规拖动中只读缓存，不交替修改DOM和读取offset尺寸。
+
+`syncLabels()`：投影深度裁剪 → 基于中心外推 → 按实际矩形松弛避让 → 约束在可用模型区域 → 写 translate3d 与 hit。重合点需要确定的分离方向。隐藏标签清空 hit，避免幽灵命中。
+
+多选采用 Set；再次轻点取消该点，轻点空白保持已有选择。清空按钮与 Escape 清除高亮。选择列表坐标随动点更新，但不会改标签字母或创建新几何。
+
+## 8. 按需渲染与精细度
+
+```js
+function invalidate() {
+  if (!frame && !contextLost && !document.hidden)
+    frame=requestAnimationFrame(render);
 }
-var TOL_P = pickTol(22, 'mouse');   // → 鼠标 26px / 触摸 46px
-// 普通顶点直接用 40(触摸) / 22(鼠标)
-```
-
-**共享的可变状态**（供 pickVertex 读标签矩形）：
-```js
-var selKeys = [];              // 选中顶点 key 数组（多选）
-function isSel(k) { return selKeys.indexOf(k) >= 0; }
-var pLabelRect = null;         // 由 syncLabels 每帧更新
-var TOL_P = pickTol(22, 'mouse');
-```
-
----
-
-## 3. 拖动动点：射线–棱最近点解析解
-
-### 为什么不能用屏幕线段投影
-
-把棱的两端投影到屏幕连成线段、取指针的投影参数 —— **透视投影下三维棱上的等分点在屏幕上并不等分**。
-透视投影下误差随相机、深度与采样位置变化，不把单次实验误差当成固定百分比；两端点投影本身仍应对应 t=0 和 t=1。
-
-### 正确做法
-
-```js
-var _rayO = new THREE.Vector3(), _rayD = new THREE.Vector3();
-var _segU = new THREE.Vector3(), _rayW = new THREE.Vector3();
-
-// 屏幕像素 → 世界射线方向
-function rayDirFromScreen(px, py, w, h) {
-  var fy = camera.projectionMatrix.elements[5];   // = 1/tan(fov/2)，别自己重算
-  var fx = camera.projectionMatrix.elements[0];   // = fy / aspect
-  var ndcX = (px / w) * 2 - 1;
-  var ndcY = -((py / h) * 2 - 1);                 // 屏幕 y 向下，NDC y 向上
-  _rayO.setFromMatrixPosition(camera.matrixWorld);
-  _rayD.set(ndcX / fx, ndcY / fy, -1)
-    .applyMatrix4(new THREE.Matrix4().extractRotation(camera.matrixWorld))
-    .normalize();
-  return _rayD;
-}
-
-// 反算：屏幕点 → 棱 CC′ 上的参数 t
-function screenToT(px, py, r) {
-  var w = r.width, h = r.height;
-  var aspect = w / h;
-  if (!isFinite(aspect) || aspect < 0.35 || aspect > 3.0) return null;  // 畸形视口拦截
-
-  var d = rayDirFromScreen(px, py, w, h);
-  _segU.subVectors(V.Cp, V.C);                    // u = C′ − C
-  _rayW.subVectors(_rayO, V.C);                   // w = 相机位置 − C
-
-  var uu = _segU.dot(_segU), ud = _segU.dot(d), dd = d.dot(d);
-  var uw = _rayW.dot(_segU), dw = _rayW.dot(d);
-  var det = uu * (-dd) - (-ud) * ud;              // = −uu·dd + ud²
-  if (!isFinite(det) || Math.abs(det) < 1e-9) return null;   // 棱与视线平行 → 退化
-
-  var t = ((-dd) * uw + ud * dw) / det;           // ★ 符号极易写错，改动后必须重跑验算
-  if (!isFinite(t)) return null;
-  return Math.max(0, Math.min(1, t));             // 夹取到 [0,1]，拖出范围要贴住端点
-}
-```
-
-### 精度（504 采样点 × 6 视角 × 4 视口）
-
-| 方法 | 最大误差 |
-|---|---|
-| 屏幕线段投影（**不要用**） | 2.875e-2 |
-| 射线最近点（**用这个**） | **2.887e-15** |
-
-以上是历史特定配置的实验结果，未保留原始测试数据，不作为所有相机与视口的保证。当前可复现验算见 `tests/math.mjs`。
-
-### 三重退化保护（缺一个就会跳变）
-1. `det → 0`（棱几乎与视线平行）→ 返回 `null`，**不要**返回乱跳的 t
-2. `aspect < 0.35` 或 `> 3.0`（面板展开/折叠过渡态）→ 返回 `null`
-3. t 一律 clip 到 `[0,1]`
-
----
-
-## 4. 手势三路分流（顺序即优先级）
-
-```js
-var gesture = null;      // null | 'rotate' | 'pan' | 'pinch' | 'dragP'
-var ptrs = new Map();    // pointerId → {x, y}
-var dragP = null, tapInfo = null;
-```
-
-### pointerdown
-```js
-if (ptrs.size === 1) {
-  var r = canvas.getBoundingClientRect();
-  var hot = pickVertex(e.clientX - r.left, e.clientY - r.top, r.width, r.height, TOL_P);
-
-  // ① 最高优先级：按住动点
-  if (hot === 'P' && e.button !== 2 && !e.shiftKey) {
-    gesture = 'dragP';
-    tapInfo = null;
-    // ★ heldKey：记下"按下时抓住的是谁"，松手时直接复用，不二次命中
-    dragP = { r: r, startT: state.t, lastT: state.t, movedEnough: false, heldKey: 'P' };
-    setPHot(true);
-    canvas.style.cursor = 'grabbing';
-    return;
-  }
-  // ② 平移 / 旋转
-  gesture = (e.button === 2 || e.shiftKey) ? 'pan' : 'rotate';
-  tapInfo = { x: e.clientX, y: e.clientY, t: performance.now(),
-              moved: false, type: e.pointerType, key: hot };   // ★ 同样记 key
-  canvas.style.cursor = (gesture === 'pan') ? 'move' : 'grabbing';
-
-} else if (ptrs.size === 2) {
-  // ③ 双指
-  gesture = 'pinch';
-  tapInfo = null;          // 双指一定不是点选
-  dragP = null;
-  pinchStart = pinchGeom();
-  camStartDist = cam.dist;
-  targetStart.copy(target);
+function render(now) {
+  frame=0;
+  // 只有进行中的相机过渡才更新其状态。
+  renderer.render(scene,camera);
+  syncLabels();
+  if (tween) invalidate();
 }
 ```
 
-### pointermove（分支顺序不可乱）
-```js
-// 未按下时的悬停探测：鼠标端唯一的"此处可拖"暗示
-if (!ptrs.has(e.pointerId)) {
-  if (e.pointerType === 'mouse' && !gesture) {
-    var rr = canvas.getBoundingClientRect();
-    var hk = pickVertex(e.clientX - rr.left, e.clientY - rr.top, rr.width, rr.height, TOL_P);
-    setPHot(hk === 'P');
-    canvas.style.cursor = 'grab';
-  }
-  return;
-}
+输入事件合并到一个pending帧，静止时不持续轮询。页面隐藏、WebGL丢失时停止；恢复后请求一帧。不要为动点添加永久脉动动画来维持全速渲染。
 
-if (gesture === 'dragP') {          // ★ 必须排在 pinch/pan/rotate 之前
-  var t = screenToT(e.clientX - dragP.r.left, e.clientY - dragP.r.top, dragP.r);
-  if (t !== null) {
-    if (Math.abs(t - dragP.startT) > 0.02) dragP.movedEnough = true;  // t 空间阈值
-    setT(t, true);
-    dragP.lastT = t;
-  }
-  return;
-}
-// 以下是 pinch / pan / rotate
-```
+两示例的精细度调的是像素比，不是几何细分：
 
-### pointerup
-```js
-function endPointer(e) {
-  var wasSingle = (ptrs.size === 1);
-  var wasDragP  = (gesture === 'dragP');
-  ptrs.delete(e.pointerId);
+`DPR=min(deviceDPR,模式上限,√(像素预算/(宽×高)))`
 
-  if (wasDragP) {
-    if (dragP && !dragP.movedEnough) doTapKey(dragP.heldKey);   // ★ 复用，不重新判定
-    dragP = null;
-    setPHot(false);
-    if (ptrs.size === 0) { gesture = null; canvas.style.cursor = 'grab'; }
-    return;
-  }
+默认：自动200万像素、fine上限1.65/coarse1.35；清晰350万、上限2；省电上限1。根据设备/模型可调整预算，但不要默认使用无限制 deviceDPR。画布 resize 与 PixelRatio 同步，不能只改CSS导致模糊。
 
-  // 点选：单指 + 几乎没动 + 按下够短
-  if (wasSingle && gesture === 'rotate' && tapInfo && !tapInfo.moved &&
-      performance.now() - tapInfo.t < 700) {
-    if (tapInfo.key) doTapKey(tapInfo.key);                  // ★ 优先复用按下时的判定
-    else doTap(e.clientX, e.clientY, tapInfo.type);          // 有位移时按松手位置重判
-  }
+## 9. 抽屉、读数与错误
 
-  if (ptrs.size === 0) { gesture = null; tapInfo = null; pinchStart = null; canvas.style.cursor = 'grab'; }
-  else if (ptrs.size === 1) {
-    // 双指退回单指：重置基准并标记已移动，防止误触发点选
-    var rest = ptrs.values().next().value;
-    gesture = 'rotate';
-    tapInfo = { x: rest.x, y: rest.y, t: performance.now(), moved: true, type: 'touch' };
-  }
-}
-```
+共用 `tabSelect`/`setDrawer`；抽屉开启为 dialog/aria-modal，管理焦点、Tab边界与关闭后焦点返回。关闭时使用 inert 防隐藏控件受焦；切方向自动关闭。
 
-### 旋转的位移阈值
-- 位移 **> 9px** 才认定是拖拽
-- **越过阈值时必须补上"起点→当前"的完整位移**，否则前 9px 白拖，手感发涩
-- 未越阈值时**不施加旋转**，否则轻点顶点画面会跳
+`focusProof()` 只切讲解 tab、打开必要的抽屉、突出并滚动对应卡片，不重置 state、cam、target、selected 或 t。手机临时隐藏的“复位视角”可以由其它入口完成同类操作。
 
-### 点选状态切换（统一入口）
-```js
-function doTapKey(key) {
-  if (!key) return;
-  var i = selKeys.indexOf(key);
-  if (i >= 0) selKeys.splice(i, 1);   // 再点已选 = 取消这一个（toggle）
-  else        selKeys.push(key);      // 点新顶点 = 追加，旧高亮保持
-  applyPickStyles();
-}
-```
+读数注明当前/题设位置。法向量、投影或角度在退化状态下未定义时，显示“未定义”，同时隐藏无意义的对象与标签；不要显示 NaN 或为了视觉连续而编造数学值。
 
----
-
-## 5. 标签：同步、避让、命中区
-
-### 为什么需要避让
-侧向平视时上底面与视线近乎共面，`A′`–`B′` 投影间距实测仅 **11.6px**，任何字号都会叠字。
-
-### syncLabels 要点
-```js
-function syncLabels() {
-  if (!state.labels) { pLabelRect = null; return; }   // 关标签时清空，防止幽灵命中区
-
-  var pts = [];
-  labelEls.forEach(function (o) {
-    var pos = o.getPos();
-    var p = pos.clone().project(camera);
-    if (p.z > 1) { o.el.classList.add('hide'); return; }
-    o.el.classList.remove('hide');
-
-    var x = (p.x * 0.5 + 0.5) * rect.width;
-    var y = (-p.y * 0.5 + 0.5) * rect.height;
-
-    // 沿"背离模型中心"方向外推
-    var dx = x - rect.width / 2, dy = y - rect.height / 2;
-    var len = Math.hypot(dx, dy) || 1;
-    var off = labelSize * 1.35;
-
-    pts.push({
-      el: o.el,
-      key: o.key,                    // ★★★ 必须带上！漏了会导致 pLabelRect 恒为 null
-      bx: x + dx / len * off, by: y + dy / len * off,   // 基准位置
-      x:  x + dx / len * off, y:  y + dy / len * off    // 实际位置（避让会改）
-    });
-  });
-
-  // 松弛迭代：把过近的标签沿连线方向推开
-  var minD = labelSize * 1.05 + 18;   // ★ 阈值要按"标签实际宽度"取，不能只按字号
-  for (var iter = 0; iter < 12; iter++) {
-    for (var i = 0; i < pts.length; i++) {
-      for (var j = i + 1; j < pts.length; j++) {
-        var ax = pts[i].x - pts[j].x, ay = pts[i].y - pts[j].y;
-        var d = Math.hypot(ax, ay);
-        if (d < minD && d > 0.01) {
-          var push = (minD - d) / 2;
-          ax /= d; ay /= d;
-          pts[i].x += ax * push; pts[i].y += ay * push;
-          pts[j].x -= ax * push; pts[j].y -= ay * push;
-        }
-      }
-    }
-  }
-
-  // 限制漂移半径并落地
-  var lim = labelSize * 1.35 * 2.2;
-  pts.forEach(function (o) {
-    var dx = o.x - o.bx, dy = o.y - o.by, d = Math.hypot(dx, dy);
-    if (d > lim) { o.x = o.bx + dx / d * lim; o.y = o.by + dy / d * lim; }
-
-    o.el.style.transform = 'translate(-50%,-50%) translate(' + o.x + 'px,' + o.y + 'px)';
-
-    o.hit = {   // 命中矩形
-      x0: o.x - o.el.offsetWidth  / 2, x1: o.x + o.el.offsetWidth  / 2,
-      y0: o.y - o.el.offsetHeight / 2, y1: o.y + o.el.offsetHeight / 2
-    };
-    if (o.key === 'P') pLabelRect = o.hit;    // ★ 供 pickVertex 用
-  });
-}
-```
-
-**避让阈值教训**：最小间距必须按标签**实际宽度**取 `labelSize × 1.05 + 18`。
-第一版按字号取 `× 1.15`，最坏情况只改善到 25.3px，仍小于 22px 字号下约 38px 的标签宽度。
-
-**实测**（1200×720）：最坏视角 11.6px → 41.1px ✅；默认视角 55.3px 与俯视 70.0px 保持不变（无需避让时不位移）。
-
-### 每帧调用顺序
-```js
-function loop() {
-  requestAnimationFrame(loop);
-  if (gesture === 'dragP' && pMesh) {          // 拖动时球体脉动，明确"抓住了"
-    pPulse += 0.16;
-    var s = 1.35 + Math.sin(pPulse) * 0.13;
-    pMesh.scale.setScalar(isSel('P') ? s * 1.7 : s);
-  }
-  renderer.render(scene, camera);
-  syncLabels();                                 // 必须在 render 之后
-}
-```
-
----
-
-## 6. 几何与材料构建
-
-```js
-var COL = { /* 见 references/visual-theme.md */ };
-
-function tube(a, b, r, color) {
-  var geo = new THREE.TubeGeometry(new THREE.LineCurve3(a.clone(), b.clone()), 1, r, 6, false);
-  return new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color: color }));
-}
-
-function glassMat(color, opacity) {
-  return new THREE.MeshBasicMaterial({
-    color: color, transparent: true, opacity: opacity,
-    side: THREE.DoubleSide, depthWrite: false
-  });
-}
-function triMesh(p1, p2, p3, color, opacity) {
-  var geo = new THREE.BufferGeometry().setFromPoints([p1, p2, p3]);
-  geo.setIndex([0, 1, 2]); geo.computeVertexNormals();
-  return new THREE.Mesh(geo, glassMat(color, opacity));
-}
-function polyMesh(pts, color, opacity) {   // 凸多边形扇形三角化
-  var geo = new THREE.BufferGeometry().setFromPoints(pts);
-  var idx = [];
-  for (var i = 1; i < pts.length - 1; i++) idx.push(0, i, i + 1);
-  geo.setIndex(idx); geo.computeVertexNormals();
-  return new THREE.Mesh(geo, glassMat(color, opacity));
-}
-```
-
-**顶点小球必须独立成组**（`gVerts`），不能挂在"几何体实体"开关下——否则隐藏实体后顶点就点不到了。
-
-**光晕对象池**：`ringPool` 按需增长、多余隐藏。绝不能每帧新建几何体（拖滑块会卡死）。
-
----
-
-## 7. 常用可视化组件
-
-| 组件 | 做法 |
-|---|---|
-| **平面** | 三点确定，`triMesh(p1,p2,p3,color,opacity)`，透明 0.30~0.40、`DoubleSide`、`depthWrite:false`。两平面的**公共棱单独加粗**强调 |
-| **线面角** | 从直线端点 A 向平面作垂足 `H = A − ((A−P)·n̂)n̂`，画 A→H 垂线 + P→H 射影，`∠APH` 即所求角。比只画角标直观得多 |
-| **二面角** | `acos(|n1·n2| / (|n1||n2|))`，动点驱动时实时刷新；满足临界条件（如垂直）时读数区变色 + 出标记 |
-| **夹角可视化** | 如"侧棱与底面 60°"：画 A → A′(底面投影) → A′ 直角三角形 |
-
----
-
-## 8. 动点重建机制
-
-动点 `t` 变化时需要刷新所有依赖它的对象（动点位置、两个平面、棱锥、线面角）。
-
-**用"重建 group + dispose 旧几何"的方式，不要试图原地改 BufferGeometry**：
-
-```js
-function rebuild(group, builder) {
-  while (group.children.length) {
-    var c = group.children.pop();
-    if (c.geometry) c.geometry.dispose();
-    if (c.material) c.material.dispose();
-  }
-  builder(group);
-}
-
-function setT(t, fromUser) {
-  state.t = t;
-  var sT = document.getElementById('sT');
-  if (sT) sT.value = t;              // ★ 滑块与拖拽双向同步，共用这一个入口
-  buildDynamic();                    // 重建动态几何
-  refreshReadout();                  // 刷新读数
-}
-```
-
-**滑块与拖拽必须共用同一个 `setT`**，不要各写一套。否则"跳到中点"按钮触发时两边会失配。
-
----
-
-## 9. 读数格式化
-
-```js
-function fmt(v) {
-  var s = v.toFixed(2).replace(/\.?0+$/, '');
-  return s === '' ? '0' : s;        // ★ "0.00" 会被替换成空串，必须兜底
-}
-```
-
-## 题目读数配置
-
-`assets/template.html` 的【A】包含 `READOUT`：`angle(P)` 返回角度或 `null`，`critical(angle)` 返回是否提示临界条件，`coordinate(position)` 将模型坐标转换为教学坐标数组。换题时修改这些回调；静态模型把 `MOVER.enabled` 设为 false，不需要角度时把 `READOUT.angle` 与 `READOUT.critical` 设为 null。`P` 是引擎内部动点保留键，显示名由 `LABEL_NAME.P` 与 `MOVER.label` 配置。
-
-比例按 `P=lerp(from,to,t)` 定义：`P到起点 : P到终点 = t : (1-t)`。不能把视觉上较长的投影段误当成实际长度。普通顶点名及坐标通过 DOM 的 `textContent` 渲染。
+缺库、WebGL初始化失败或contextlost显示可读提示。`#geo-debug` 可暴露受控状态和测量句柄，普通页面不暴露；测试代码不能因此修改正式页面的默认行为。

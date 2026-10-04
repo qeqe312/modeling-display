@@ -1,205 +1,85 @@
-# 配色与视觉规范
+# 默认视觉规范
 
-**本项目只用暗色主题。** 不做亮色版本，也不要"顺手加一个亮色开关"。
+二维与三维默认沿用已认可示例的暗色设计。用户明确要求其他设计时可调整，但需重新核对可读性。结构与尺寸见 [page-spec.md](page-spec.md)；精确可运行 CSS 以示例 `开发资料/源码/style.css` 为参考。
 
-目标：**投屏/平板在教室灯光下看得清，且不同题目的页面观感统一。**
+## 色板
 
-全部颜色用 CSS 变量集中管理。整块替换 `<style>` 时按 `</style>` 索引定位，**不要用文本精确匹配**——`<style>` 块内的实际空白常与预期不符，精确匹配会失败。
+| Token | 值 | 用途 |
+|---|---|---|
+| --bg | #0D1117 | 页面背景 |
+| --surface | #161B22 | 面板与卡片 |
+| --surface-2 / --surface-3 | #1C232C / #232B36 | 内容块、按钮激活 |
+| --line / --line-soft | #2A3441 / #212A34 | 主/弱分隔 |
+| --ink / --ink-2 / --ink-3 | #E6EDF3 / #A9B6C4 / #8B99A8 | 正文、次级、说明 |
+| --brand / --brand-lt | #6BA8E8 / #17293E | 主结构、蓝容器 |
+| --accent / --accent-lt | #FF7A45 / #2E1A11 | 动点/选择/答案、橙容器 |
+| --violet / --violet-lt | #A692E8 / #1E1B2E | 辅助构造、紫容器 |
+| --green / --green-lt | #8FBF5A / #1A2413 | 可选体积或特定几何提示 |
 
----
-
-## 1. 暗色色板（唯一版本）
+主视口背景：
 
 ```css
-:root {
-  --bg:        #0D1117;   /* 页面最底层 */
-  --surface:   #161B22;   /* 面板、卡片 */
-  --surface-2: #1C232C;   /* 内容块、代码块 */
-  --surface-3: #232B36;   /* 浮起元素（按钮 active） */
-  --line:      #2A3441;   /* 主分隔线 */
-  --line-soft: #212A34;   /* 弱分隔线 */
-
-  --ink:       #E6EDF3;   /* 主文字 */
-  --ink-2:     #A9B6C4;   /* 次级文字 */
-  --ink-3:     #8B99A8;   /* 三级文字 / 分组标题（★ 不能更暗，见 §5） */
-
-  --brand:     #6BA8E8;   /* 学术蓝：结构、主色（深底上必须提亮） */
-  --brand-lt:  #17293E;   /* 蓝的深色容器 */
-  --accent:    #FF7A45;   /* 动点橙：动点、强调、选中 */
-  --accent-lt: #2E1A11;   /* 橙的深色容器 */
-  --green:     #8FBF5A;   /* 第1问卡片 */
-  --green-lt:  #1A2413;
-  --violet:    #A692E8;   /* 第2问卡片（紫，避开蓝橙） */
-  --violet-lt: #1E1B2E;
-
-  /* 深底上"黑色投影"几乎不可见 → 改"内描边（顶部高光）+ 外投影" */
-  --shadow-s:  0 1px 2px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.03);
-  --shadow-m:  0 4px 16px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.04);
-  --radius:    12px;
-
-  --glow-accent: rgba(255,122,69,.30);
-  --glow-brand:  rgba(107,168,232,.28);
+#stage {
+  background:radial-gradient(ellipse at 50% 42%,
+    #1B232E 0%,#131A22 62%,#0B0F14 100%);
 }
 ```
 
-**画布背景**（`#stage`）加一层很淡的径向渐变，让 3D 区域有"舞台"感，比纯色更聚焦：
+WebGL使用 `alpha:true`，`renderer.setClearColor(0x131A22,0)`，让CSS渐变可见。不能沿用历史不透明clear alpha=1，否则会盖住渐变。
+
+## 3D 对象
+
+- 亮蓝 `0x6BA8E8` 表示主体/主平面，橙 `0xFF7A45` 表示动点/相关线，紫 `0xA692E8` 表示辅助投影，边线默认亮蓝白 `0xB9C9DD`。
+- 默认主要辅助平面控制在蓝/橙/紫三类语义。绿适合额外体积对象或条件提示，按需打开；不能仅为凑颜色而改变题目含义。
+- 直线用 TubeGeometry 或共享单位tube变换，不依赖 WebGL 原生 linewidth。
+- 示例球面/棱台主体面默认 opacity=0.08，辅助面大约0.07–0.19；它们是该模型的选择，可按新题线面密度微调。不要恢复旧模板0.22–0.54的较高不透明度默认，导致多面遮住棱线。
+- 透明面使用合适的 `DoubleSide`/`FrontSide` 与 `depthWrite:false`；相交面需要检查绘制顺序和可读性，不用增加不必要的后处理。
+- 几何线半径、顶点大小与模型比例相关，不能把外接球绝对半径照抄到很小的棱台。
+
+界面沿用“透明度”滑条文案，但示例的数值直接绑定材质 `opacity`（不透明度），8%对应0.08，不能反转成0.92。新题复用时保持这一视觉和数值关系，说明它控制哪一类面。
+
+## DOM 标签
+
 ```css
-background: radial-gradient(ellipse at 50% 42%, #1B232E 0%, #131A22 62%, #0B0F14 100%);
+#labels{pointer-events:none}
+#labels .lab{
+  position:absolute;top:0;left:0;
+  font:600 var(--lab-size,22px)/1.25 Georgia,serif;
+  color:#BBD7F5;background:#161B22;
+  border:1px solid #39546F;border-radius:8px;
+  padding:2px 9px;white-space:nowrap;
+  will-change:transform;box-shadow:0 2px 5px #0005;
+}
+#labels .lab.orange{color:#FFB392;border-color:#76513D}
+#labels .lab.violet{color:#C4B6F2;border-color:#564A75}
+#labels .lab.sel{
+  color:#20130D;background:#FF7A45;border-color:#FFB392;
+  box-shadow:0 0 0 3px #FF7A4530;
+}
 ```
 
----
+边长标签用15px，手机13px；胶囊不依赖模糊滤镜或外部字体。标签的 transform 由投影定位唯一控制，CSS 动画不能覆盖它。默认不需要呼吸动画；拖动反馈可以改光晕/光标/读数状态，而不持续增加渲染帧。
 
-## 2. 3D 对象配色
+## 卡片与状态
 
-颜色与 UI 强调色**必须是同一套**（动点橙 = 强调橙），学生视觉上才能建立关联。
+面板、题卡、推导、说明与读数以深色分层及细边线区分，主要圆角10–13px。推导卡间距14px。答案与结果卡可用橙色深底，但普通正文不要全都变成高饱和强调色。
+
+色彩关系必须在画布对象、标签、图例、开关dot和读数之间一致。显隐用状态而不是颜色猜测；关键条件可以同时使用文字与颜色。
+
+选中高亮采用橙底深色文字，白字对橙底对比度不足。细指针才启用hover，触屏用active；键盘 focus-visible 使用清楚描边。
+
+## 可读性检查
+
+正文和说明文字对实际背景默认至少4.5:1，较大文字可按其实际字号/字重使用3:1阈值。颜色、透明背景或选中样式改变后重新测量，不凭屏幕感觉判断。
 
 ```js
-var COL = {
-  edge:   0xB9C9DD,   // 棱线：亮蓝白（深色线条在暗底上会彻底消失）
-  solid:  0x4A5A70,   // 半透明实体面
-  plane1: 0x5EA0E0,   // 平面1（蓝）
-  plane2: 0xFF7A45,   // 平面2（橙，与动点同色系）
-  q1:     0x8FBF5A,   // 第1问对象
-  q3:     0xE86A6A,   // 线面角
-  q3face: 0x9B8BE8,
-  ang60:  0x8FBF5A,
-  axes:   0x6BA8E8,
-  p:      0xFF7A45    // 动点，与 --accent 一致
-};
-var SEL_COLOR = 0xFF7A45;   // 选中高亮
-```
-
-**`renderer.setClearColor(0x131A22, 1)`** —— 画布不透明，必须与 `#stage` 渐变同色系。
-
-### 半透明面透明度
-
-深底上的低透明度深色**直接看不见**，所以透明度要比常见的亮色版高：
-
-| 对象 | 透明度 |
-|---|---|
-| 底面 | 0.46 |
-| 顶面 | 0.54 |
-| 侧面 | 0.22 |
-| 平面1 / 平面2 | 0.38 / 0.34 |
-| 棱锥 | 0.42 |
-
----
-
-## 3. 顶点标签：**胶囊样式（已定，不要改）**
-
-标签用**深色胶囊底 + 描边**，不用"纯描边文字"。理由：胶囊底能保证字母压在半透明平面、棱线、渐变背景上时都清晰可读；描边字在这些叠加场景下会发虚。
-
-```css
-#labels .lab {
-  position: absolute;
-  font-size: var(--lab-size, 22px);
-  font-weight: 600;
-  color: #BBD7F5;                          /* 亮蓝文字 */
-  background: rgba(22,27,34,.88);          /* 深色胶囊底 */
-  border: 1px solid rgba(107,168,232,.30);
-  border-radius: 7px;
-  padding: 1px 8px;
-  line-height: 1.3;
-  white-space: nowrap;
-  will-change: transform;
-  box-shadow: 0 2px 8px rgba(0,0,0,.55);
-  backdrop-filter: blur(3px);
+function luminance(hex){
+  const rgb=hex.replace('#','').match(/../g).map(s=>parseInt(s,16)/255)
+    .map(v=>v<=.04045?v/12.92:((v+.055)/1.055)**2.4);
+  return rgb[0]*.2126+rgb[1]*.7152+rgb[2]*.0722;
 }
+function contrast(a,b){const x=luminance(a),y=luminance(b);
+  return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
 ```
 
-**动点标签**（橙色系，区别于静态顶点）：
-```css
-#labels .lab.p {
-  color: #FFB392;
-  background: rgba(38,24,17,.92);
-  border-color: rgba(255,122,69,.55);
-  box-shadow: 0 0 10px rgba(255,122,69,.20), 0 2px 8px rgba(0,0,0,.5);
-}
-/* 拖拽把柄：触摸端没有悬停态，靠这个暗示"可拖" */
-#labels .lab.p::after { content:'⠿'; margin-left:6px; opacity:.6; font-size:.78em; }
-```
-
-**四种状态**：
-
-| 状态 | 类名 | 表现 |
-|---|---|---|
-| 普通 | `.lab` | 深色胶囊 + 亮蓝字 |
-| 动点 | `.lab.p` | 深色胶囊 + 亮橙字 + ⠿ 把柄 |
-| 被选中 | `.lab.sel` | **橙底深色字（`#20130D`）** + 外发光 |
-| 拖动中 | `.lab.p.hot` | 橙底深色字（`#20130D`） + 呼吸光环 |
-
-**动效铁律**：呼吸/脉动动画**只能用 `box-shadow`，绝对不能碰 `transform`**——
-`syncLabels` 每帧都在写 `el.style.transform`，CSS 动画一旦也动 transform 就会互相覆盖。
-
-```css
-@keyframes labPulse {
-  0%,100% { box-shadow:0 0 0 4px rgba(255,122,69,.42), 0 0 16px rgba(255,122,69,.35); }
-  50%     { box-shadow:0 0 0 11px rgba(255,122,69,.06), 0 0 20px rgba(255,122,69,.20); }
-}
-```
-
----
-
-## 4. 配色原则
-
-1. 背景用**冷黑**（`#0D1117`），不用纯黑——纯黑下卡片没有层次，且 OLED 上是"死黑"
-2. **3D 元素颜色与 UI 强调色同一套**，动点橙 = 强调橙
-3. 平面颜色**最多 3 个**：蓝（主）/ 橙（动）/ 紫（辅）。再多就分不清了
-4. 棱线与实体面同色系，不抢平面的戏
-5. 强调色在深底上必须**提亮**，否则发闷
-
-**卡片质感**：`--radius: 12px` + 双层柔和投影（含 `inset` 顶部高光）+ 1px 边框。
-不要用生硬的 `box-shadow: 0 2px 4px rgba(0,0,0,.3)`。
-
----
-
-## 5. 改配色前后的两个强制检查
-
-### ① 图例色点必须与 3D 配色同步
-面板里 `<span class="dot" style="background:#...">` 常写字面量颜色。
-改了 3D 配色却不改色点，**"颜色说明"就会撒谎**。两处必须一起改。
-
-### ② 对比度核算（WCAG）
-三级文字用于 11px 分组标题，字号小更需要达标。
-`--ink-3` 曾用过 `#6E7D8D`，只有 **4.10**（对 surface）/ **3.76**（对 surface2），**低于 AA 的 4.5**；改成 `#8B99A8` 后为 **5.95 / 5.44** ✅。
-
-```js
-function hex(h){h=h.replace('#','');return [0,2,4].map(i=>parseInt(h.substr(i,2),16));}
-function lum(c){const s=c.map(v=>{v/=255;return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4);});
-  return 0.2126*s[0]+0.7152*s[1]+0.0722*s[2];}
-function ratio(a,b){const l1=lum(hex(a)),l2=lum(hex(b));const hi=Math.max(l1,l2),lo=Math.min(l1,l2);
-  return (hi+0.05)/(lo+0.05);}
-
-// 逐组检查：
-//   正文 ink / 次级 ink-2 / 三级 ink-3  ×  {surface, surface-2, bg}
-//   强调色 × 各自的 -lt 容器（brand、accent、green、violet）
-// 目标：全部 >= 4.5（AA）；正文最好 >= 7（AAA）
-```
-
-**当前基线**（改配色后应不低于此）：
-
-| 组合 | 对比度 | 等级 |
-|---|---|---|
-| 正文 / surface | 14.64 | AAA |
-| 正文 / bg | 16.02 | AAA |
-| 次级 / surface | 8.38 | AAA |
-| 三级 / surface | 5.95 | AA |
-| 三级 / surface2 | 5.44 | AA |
-| accent / surface | 6.69 | AA |
-| green / green-lt | 7.48 | AAA |
-| violet / violet-lt | 6.31 | AA |
-
----
-
-## 6. 其他需要一并保持的暗色写法
-
-| 元素 | 值 |
-|---|---|
-| 滚动条 | `#39434F`，hover `#4A5765`，`border: 3px solid var(--surface)` |
-| 面板遮罩 | `rgba(0,0,0,.55)` |
-| 抽屉投影 | `rgba(0,0,0,.65)` |
-| 浮层底（提示条/读数区） | `rgba(22,27,34,.9x)` + `backdrop-filter: blur()` |
-| 代码块/行内 code | `background: var(--surface-2)`，文字 `var(--accent)` |
-| 难度标签 | `background:#3A1D1D; color:#E88B8B` |
-| 临界状态读数区 | `background: rgba(46,26,17,.97)` + 橙外发光 |
-| **高亮文字** | 橙底使用 `#20130D` 深色文字；白字对橙底的对比度不足，不要恢复成白字 |
+上述函数只适用于不透明颜色；有alpha时需先合成实际背景。图形边界与文字对比度是不同检查，不把“文字通过AA”当作所有细线都清晰。

@@ -1,0 +1,117 @@
+[
+  {
+    "frames": 2,
+    "geometries": 28,
+    "drawCalls": 37,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 1210,
+      "height": 920,
+      "left": 390,
+      "top": 80,
+      "bottom": 253.6875
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "desktop",
+    "viewport": {
+      "width": 1600,
+      "height": 1000
+    },
+    "hasTouch": false,
+    "isMobile": false,
+    "coarsePointer": false,
+    "screenshots": {
+      "model": "desktop.png",
+      "settings": "desktop-settings.png"
+    },
+    "errors": []
+  },
+  {
+    "frames": 2,
+    "geometries": 28,
+    "drawCalls": 37,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 820,
+      "height": 1108,
+      "left": 0,
+      "top": 72,
+      "bottom": 274.6875
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "portrait",
+    "viewport": {
+      "width": 820,
+      "height": 1180
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "portrait.png",
+      "lesson": "portrait-proof.png",
+      "settings": "portrait-settings.png"
+    },
+    "errors": []
+  },
+  {
+    "frames": 2,
+    "geometries": 28,
+    "drawCalls": 37,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 1180,
+      "height": 748,
+      "left": 0,
+      "top": 72,
+      "bottom": 253.6875
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "landscape",
+    "viewport": {
+      "width": 1180,
+      "height": 820
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "landscape.png",
+      "lesson": "landscape-proof.png",
+      "settings": "landscape-settings.png"
+    },
+    "errors": []
+  },
+  {
+    "frames": 2,
+    "geometries": 28,
+    "drawCalls": 37,
+    "pixelRatio": 1,
+    "stage": {
+      "width": 390,
+      "height": 776,
+      "left": 0,
+      "top": 68,
+      "bottom": 305
+    },
+    "allCardsUnfolded": true,
+    "idleFrames": 0,
+    "device": "phone",
+    "viewport": {
+      "width": 390,
+      "height": 844
+    },
+    "hasTouch": true,
+    "isMobile": true,
+    "coarsePointer": true,
+    "screenshots": {
+      "model": "phone.png",
+      "lesson": "phone-proof.png",
+      "settings": "phone-settings.png"
+    },
+    "errors": []
+  }
+]

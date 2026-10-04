@@ -1,0 +1,63 @@
+<header class="app-header">
+  <div class="identity"><div class="brand-mark" aria-hidden="true">◎</div><div><div class="eyebrow">GEOMETRY LAB <span>/ PLANE</span></div><h1>椭圆 · 动圆切线与定距离</h1></div></div>
+  <div class="header-actions"><span class="topic-tag">二维探索 · 完整解题</span><button id="menu" class="button menu-button" aria-controls="panel" aria-expanded="false">题目 / 设置</button><button id="focus" class="button focus-button" aria-pressed="false">专注模式</button><button id="reset" class="button">复位画面</button></div>
+</header>
+<div id="app">
+  <aside id="panel" aria-label="题目与展示设置">
+    <div class="drawer-heading"><span>题目与展示设置</span><button id="close" class="icon-button" aria-label="关闭面板">×</button></div>
+    <div class="panel-tabs" role="tablist" aria-label="面板内容"><button id="tab-lesson" role="tab" aria-selected="true" aria-controls="lesson-panel" tabindex="0">题目与讲解</button><button id="tab-settings" role="tab" aria-selected="false" aria-controls="settings-panel" tabindex="-1">显示设置</button></div>
+    <div class="panel-scroll">
+      <section id="lesson-panel" role="tabpanel" aria-labelledby="tab-lesson">
+        <div class="section-heading"><span>原题</span><span class="source">2022 高三 · 铜鼓月考</span></div>
+        <div class="question"><p>已知椭圆 <i>C</i>：<span class="math">x²/a²＋y²/b²＝1</span>（<i>a＞b＞0</i>）的左顶点为 <i>A(−2, 0)</i>，焦距为 <i>2√3</i>。动圆 <i>D</i> 的圆心坐标是 <i>(0, 2)</i>，过点 <i>A</i> 作圆 <i>D</i> 的两条切线，分别交椭圆于 <i>M、N</i> 两点，记直线 <i>AM、AN</i> 的斜率分别为 <i>k₁、k₂</i>。</p><p><b>（1）</b>求证：<i>k₁k₂＝1</i>；</p><p><b>（2）</b>若 <i>O</i> 为坐标原点，作 <i>OP ⊥ MN</i>，垂足为 <i>P</i>。是否存在定点 <i>Q</i>，使得 <i>|PQ|</i> 为定值？</p></div>
+        <div class="interaction-note">直接拖动橙色圆周或半径手柄 R，观察两条切线和垂足 P。也可沿亮橙轨迹拖 P，反向改变动圆半径。</div>
+        <div class="section-heading"><span>完整推导</span><span>全部展开</span></div>
+        <div class="lesson-list">
+          <article class="lesson-card" id="proof-0" data-lesson="0"><div class="lesson-title"><span class="step-number">01</span><h2>由条件确定椭圆</h2></div><p>左顶点给出 <i>a＝2</i>，焦距是两焦点的距离 <i>2c＝2√3</i>，因此 <i>c＝√3</i>。由 <i>a²＝b²＋c²</i>：</p><div class="formula">b²＝4−3＝1<br><b>C：x²/4＋y²＝1</b></div><p>固定点为 <i>A(−2, 0)</i>、<i>D(0, 2)</i>、<i>O(0, 0)</i>；圆心 D 不动，只有半径 r 变化。</p></article>
+          <article class="lesson-card" id="proof-1" data-lesson="1"><div class="lesson-title"><span class="step-number">02</span><h2>切线条件给出斜率乘积</h2></div><p>设过 A 的切线为 <i>y＝k(x＋2)</i>。圆心到切线的距离等于半径 r：</p><div class="formula">|2k−2|/√(k²＋1)＝r<br>（4−r²）k²−8k＋4−r²＝0</div><p>两条切线的有限斜率 k₁、k₂ 正是方程的两根。由韦达定理：</p><div class="formula"><b>k₁k₂＝1</b><br>s＝k₁＋k₂＝8/(4−r²)</div><p class="proof-note">题意有效范围：0＜r＜2√2 且 r≠2。r＝0 或 2√2 时两条切线重合；r＝2 时一条切线为 x＝−2，斜率未定义，且与椭圆仅交于 A。页面允许展示这些边界，但不把它们当作题设的有效位置。</p></article>
+          <article class="lesson-card" id="proof-2" data-lesson="2"><div class="lesson-title"><span class="step-number">03</span><h2>直线 MN 恒过定点 E</h2></div><p>将 <i>y＝k(x＋2)</i> 代入椭圆，排除已知交点 A。第二交点的坐标为：</p><div class="formula">x＝2(1−4k²)/(1＋4k²)<br>y＝4k/(1＋4k²)</div><p>由 <i>k₁k₂＝1</i>，k₁、k₂ 都满足 <i>k²−sk＋1＝0</i>。对上述交点计算：</p><div class="formula">−3x＋4sy<br>＝(−6＋24k²＋16sk)/(1＋4k²)<br>＝(10＋40k²)/(1＋4k²)＝10</div><p>故 M、N 均在这条直线上。它们不同，因而：</p><div class="formula"><b>MN：−3x＋4sy＝10</b><br>即 y＝[3(4−r²)/32](x＋10/3)</div><p>令 y＝0，得到固定交点 <i>E(−10/3, 0)</i>。拖动圆周，直线 MN 始终围绕 E 转动。画面只显示弦段 MN；E 位于它所在直线的延长线上。</p></article>
+          <article class="lesson-card answer-card" id="proof-3" data-lesson="3"><div class="lesson-title"><span class="step-number">04</span><h2>直角三角形的斜边中点</h2></div><p>E、P 在 MN 上，而 <i>OP ⊥ MN</i>，所以 <i>∠OPE＝90°</i>。P 位于以 OE 为直径的圆上。取 OE 中点：</p><div class="formula"><b>Q＝(−5/3, 0)</b><br>|PQ|＝|OQ|＝|EQ|＝|OE|/2</div><div class="answer compact-answer">5/3<span class="answer-badge">≈ 1.6667</span></div><p><b>存在定点 Q(−5/3, 0)，使 |PQ| 恒为 5/3。</b></p><p class="proof-note">紫色虚线是证明用的完整辅助圆；亮橙色才是本题 P 可达到的两段弧。r 的限制使 P 不会遍历整圆，O 及两弧端点均不属于有效轨迹。</p></article>
+        </div>
+        <details class="coordinate-details"><summary>查看垂足坐标与实际轨迹范围</summary><p>记 <i>m＝3(4−r²)/32</i>，则：</p><div class="formula">P＝(−10m²/[3(1＋m²)],<br>　　 10m/[3(1＋m²)])<br>(x＋5/3)²＋y²＝25/9</div><p>m∈(−3/8, 3/8) 且 m≠0。P 的两弧端点极限为 (−30/73, ±80/73)，r→2 时 P→O。这三点都不能作为题设的有效位置。切线接触点 T₁、T₂ 是辅助构造，与椭圆上的 M、N 不同。</p></details>
+      </section>
+      <section id="settings-panel" role="tabpanel" aria-labelledby="tab-settings" hidden>
+        <div class="section-heading"><span>动圆半径 r</span><span>圆心 D 固定</span></div>
+        <p class="motion-tip">拖圆周、R 标签或亮橙轨迹上的 P。调整时锁定画面；松手后恢复平移缩放。滑条与画布双向同步。</p>
+        <label class="range-label" for="sR"><span>半径 r（0 到 2√2）</span><output id="sRval"></output></label><input type="range" id="sR" min="0" max="2.8284271247461903" step="0.001" value="1.4">
+        <div class="motion-buttons" role="group" aria-label="半径快捷位置"><button class="button" data-r="0.8">r＝0.8</button><button class="button" data-r="1.4">r＝1.4</button><button class="button" data-r="2.45">r＝2.45</button><button class="button" data-r="0">r＝0</button><button class="button" data-r="2">r＝2</button><button class="button" data-r="max">r＝2√2</button></div>
+        <div class="motion-readings"><div><span>k₁（AM）</span><strong id="mK1"></strong></div><div><span>k₂（AN）</span><strong id="mK2"></strong></div><div><span>k₁k₂</span><strong id="mProduct"></strong></div><div><span>MN 斜率 m</span><strong id="mSlope"></strong></div><div><span>P 坐标</span><strong id="mP"></strong></div><div><span>|PQ|</span><strong id="mLength"></strong></div><p id="motionStatus" class="proof-note"></p></div>
+        <div class="section-heading"><span>模型图层</span><span>按需显示</span></div>
+        <label class="switch-row"><span><span class="dot blue"></span>椭圆 C</span><input id="cEllipse" data-layer="ellipse" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>动圆 D 与半径手柄</span><input id="cCircle" data-layer="circle" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>切线射线（椭圆外为虚线）</span><input id="cTangents" data-layer="tangents" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>弦 MN</span><input id="cChord" data-layer="chord" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>垂线 OP、定长 PQ</span><input id="cProjection" data-layer="projection" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot orange"></span>P 的实际轨迹（两段弧）</span><input id="cTrace" data-layer="trace" type="checkbox" checked></label>
+        <label class="switch-row"><span><span class="dot violet"></span>以 OE 为直径的辅助圆</span><input id="cAux" data-layer="aux" type="checkbox" checked></label>
+        <label class="switch-row"><span>切点 T₁、T₂ 与垂直半径</span><input id="cContact" data-layer="contact" type="checkbox"></label>
+        <label class="switch-row"><span>坐标轴与等距网格</span><input id="cGrid" data-layer="grid" type="checkbox" checked></label>
+        <div class="section-heading"><span>文字标注</span></div>
+        <label class="switch-row"><span>点的字母</span><input id="cLabels" type="checkbox" checked></label>
+        <label class="switch-row"><span>半径、定长数值</span><input id="cLengths" type="checkbox"></label>
+        <label class="range-label" for="sFont"><span>点标签字号</span><output id="sFontval">22 px</output></label><input id="sFont" type="range" min="14" max="32" step="1" value="22">
+        <label class="range-label" for="sOpacity"><span>圆与椭圆填充透明度</span><output id="sOpacityval">8%</output></label><input id="sOpacity" type="range" min="0" max="30" step="1" value="8">
+        <div class="section-heading"><span>点的高亮</span><span>支持多选</span></div><div id="selList" class="selection-list">点图中的点或字母</div><div id="pickBox" class="pick-box"></div><button id="clear" class="button full-width">清空高亮</button>
+        <div class="section-heading"><span>画面精细度</span></div><div class="quality-control" role="group" aria-label="画面精细度"><button class="button active" data-quality="auto" aria-pressed="true">自动</button><button class="button" data-quality="save" aria-pressed="false">省电</button><button class="button" data-quality="sharp" aria-pressed="false">清晰</button></div>
+        <p class="settings-hint">所有坐标使用题目的平面直角坐标系，横纵单位等长。底部公式只定位推导，保留半径、图层、缩放与高亮。</p>
+      </section>
+    </div>
+    <div class="panel-footer"><span class="status-dot"></span>单文件 · 可离线<span class="footer-right">二维约束 · 实时读数</span></div>
+  </aside>
+  <main id="stage" aria-label="可交互二维解析几何模型">
+    <canvas id="cv" tabindex="0" aria-label="拖圆周改变半径；拖空白平移；滚轮或双指缩放；点字母多选"></canvas><div id="labels" aria-hidden="true"></div>
+    <div class="stage-toolbar"><div class="view-switch" role="group" aria-label="画面操作"><button id="fit" title="显示完整构造">全图</button><button id="zoomIn" aria-label="放大">＋</button><button id="zoomOut" aria-label="缩小">−</button></div></div>
+    <div id="readout" class="readout moving-point"><div class="readout-heading"><span>当前动圆 · 实时读数</span><span class="readout-dot"></span></div><div class="readout-row"><span>半径 r</span><strong id="rRadius"></strong></div><div class="readout-row"><span>k₁k₂</span><strong id="rProduct"></strong></div><div class="readout-row"><span>|PQ|</span><strong id="rLength"></strong></div><div id="validFlag" class="mid-flag"></div></div>
+    <div class="stage-bottom"><div class="step-caption"><div><span id="caption-index">完整解题 · 二维探索</span><h2>圆在变，弦过定点，距离不变</h2><p>橙色圆周可拖动；亮橙弧是 P 的实际轨迹，紫色虚线圆是证明用的辅助圆。</p></div><button id="stage-next" class="caption-next" aria-label="查看完整推导">↗</button></div><nav class="solution-overview" aria-label="关键公式，点击定位推导">
+      <button data-proof="0"><span class="overview-label">01 · 椭圆方程</span><strong>x²/4＋y²＝1</strong><span class="overview-detail">a＝2，b＝1</span></button>
+      <button data-proof="1"><span class="overview-label">02 · 斜率乘积</span><strong>k₁k₂＝1</strong><span class="overview-detail">切线条件＋韦达定理</span></button>
+      <button data-proof="2"><span class="overview-label">03 · 直线 MN 过定点</span><strong>E(−10/3, 0)</strong><span class="overview-detail">MN 所在直线围绕 E 转动</span></button>
+      <button data-proof="3" class="overview-answer"><span class="overview-label">04 · 定点与定长</span><strong>|PQ|＝5/3</strong><span class="overview-detail">Q(−5/3, 0)</span></button>
+    </nav><div class="stage-meta"><div class="legend"><span><span class="dot blue"></span>椭圆</span><span><span class="dot orange"></span>动圆 / 轨迹</span><span><span class="dot violet"></span>弦 / 辅助圆</span></div><div id="hint"></div></div></div>
+    <div id="error" class="error-notice" role="alert" hidden></div>
+  </main>
+</div><div id="scrim" aria-hidden="true"></div>

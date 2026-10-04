@@ -1,0 +1,358 @@
+{
+  "date": "2026-10-04T14:19:04.977195+08:00",
+  "htmlSHA256": "d39edbbbf6d8c407f86a0549ce712c00a5f3614f6cec64efb12cb60527011dc1",
+  "records": [
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "模型",
+      "path": "截图/电脑-模型.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "题目讲解",
+      "path": "截图/电脑-题目讲解.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "完整答案",
+      "path": "截图/电脑-完整答案.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "显示设置",
+      "path": "截图/电脑-显示设置.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "另一段轨迹",
+      "path": "截图/电脑-另一段轨迹.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "退化圆",
+      "path": "截图/电脑-退化圆.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "竖直切线",
+      "path": "截图/电脑-竖直切线.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1600,
+        1000
+      ],
+      "touch": false,
+      "state": "切线重合",
+      "path": "截图/电脑-切线重合.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "模型",
+      "path": "截图/平板竖屏-模型.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "题目讲解",
+      "path": "截图/平板竖屏-题目讲解.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "完整答案",
+      "path": "截图/平板竖屏-完整答案.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "显示设置",
+      "path": "截图/平板竖屏-显示设置.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "另一段轨迹",
+      "path": "截图/平板竖屏-另一段轨迹.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "退化圆",
+      "path": "截图/平板竖屏-退化圆.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "竖直切线",
+      "path": "截图/平板竖屏-竖直切线.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        820,
+        1180
+      ],
+      "touch": true,
+      "state": "切线重合",
+      "path": "截图/平板竖屏-切线重合.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "模型",
+      "path": "截图/平板横屏-模型.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "题目讲解",
+      "path": "截图/平板横屏-题目讲解.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "完整答案",
+      "path": "截图/平板横屏-完整答案.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "显示设置",
+      "path": "截图/平板横屏-显示设置.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "另一段轨迹",
+      "path": "截图/平板横屏-另一段轨迹.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "退化圆",
+      "path": "截图/平板横屏-退化圆.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "竖直切线",
+      "path": "截图/平板横屏-竖直切线.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        1180,
+        820
+      ],
+      "touch": true,
+      "state": "切线重合",
+      "path": "截图/平板横屏-切线重合.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "模型",
+      "path": "截图/手机-模型.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "题目讲解",
+      "path": "截图/手机-题目讲解.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "完整答案",
+      "path": "截图/手机-完整答案.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "显示设置",
+      "path": "截图/手机-显示设置.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "另一段轨迹",
+      "path": "截图/手机-另一段轨迹.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "退化圆",
+      "path": "截图/手机-退化圆.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "竖直切线",
+      "path": "截图/手机-竖直切线.png",
+      "labelOverlaps": [],
+      "errors": []
+    },
+    {
+      "viewport": [
+        390,
+        844
+      ],
+      "touch": true,
+      "state": "切线重合",
+      "path": "截图/手机-切线重合.png",
+      "labelOverlaps": [],
+      "errors": []
+    }
+  ]
+}

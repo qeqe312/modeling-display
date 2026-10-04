@@ -1,0 +1,29 @@
+{
+  "date": "2026-10-04 14:12:00",
+  "timeZone": "Asia/Shanghai",
+  "samples": 1005,
+  "tolerance": 1e-9,
+  "maxResidual": 9.53828514922858e-12,
+  "maxRayResidual": 7.771561172376096e-16,
+  "ellipse": "x²/4+y²=1",
+  "A": [
+    -2,
+    0
+  ],
+  "D": [
+    0,
+    2
+  ],
+  "E": [
+    -3.3333333333333335,
+    0
+  ],
+  "Q": [
+    -1.6666666666666667,
+    0
+  ],
+  "PQ": 1.6666666666666667,
+  "validRadius": "0<r<sqrt(8), r!=2",
+  "actualPLocus": "Two open arcs with endpoint limits (-30/73, +/-80/73); O excluded",
+  "independent": true
+}
