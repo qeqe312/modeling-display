@@ -1,6 +1,6 @@
 # 开发资料
 
-本目录维护正四棱台单动点示例。先读[参照导读](../REFERENCE.md)，再按下表定位源码；构建直接读取本例保留版本，不依赖其他题目或已淘汰版本。
+本目录维护正四棱台单动点示例。先读[参照导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA/REFERENCE.md)（[本地](../REFERENCE.md)），再按下表定位源码；构建直接读取本例保留版本，不依赖其他题目或已淘汰版本。
 
 | 文件 | 职责 |
 |---|---|
@@ -18,7 +18,7 @@
 | `使用说明.md` | 成品说明的维护源 |
 | `preview_server.py` | 可选本机预览；运行文件在忽略的 `.运行时/` |
 
-从仓库根目录、当前 Python/Node 环境执行；开发环境与浏览器设置见 [CONTRIBUTING.md](../../../CONTRIBUTING.md)。使用者如需绝对解释器路径，自行替换命令前缀。
+从仓库根目录、当前 Python/Node 环境执行；开发环境与浏览器设置见 [CONTRIBUTING.md](https://github.com/qeqe312/modeling-display/blob/main/CONTRIBUTING.md)（[本地](../../../CONTRIBUTING.md)）。使用者如需绝对解释器路径，自行替换命令前缀。
 
 ```bash
 python "examples/正四棱台2023真题演示/开发资料/build_demo.py"

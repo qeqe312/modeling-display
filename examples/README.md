@@ -2,15 +2,17 @@
 
 这里保存用户指定的 skill 示例，每题分别保留成品和完整开发资料。演示默认采用“完整解题＋显示设置”布局，电脑使用侧栏，平板竖屏使用底部抽屉、横屏使用左侧抽屉。
 
-| 示例 | 打开成品 | 参照导读 | 示例用途 |
-|---|---|---|---|
-| 外接球题建模示例 | [外接球题建模示例.html](外接球题建模示例/成品/外接球题建模示例.html) | [REFERENCE.md](外接球题建模示例/REFERENCE.md) | 固定模型、完整推导、外接球与显示设置 |
-| 正四棱台2023真题演示 | [正四棱台2023真题演示.html](正四棱台2023真题演示/成品/正四棱台2023真题演示.html) | [REFERENCE.md](正四棱台2023真题演示/REFERENCE.md) | 单动点约束拖动、滑条同步、相机锁定与实时读数 |
-| 正四面体内外接球与对棱夹角 | [正四面体内外接球与对棱夹角.html](正四面体内外接球与对棱夹角/成品/正四面体内外接球与对棱夹角.html) | [REFERENCE.md](正四面体内外接球与对棱夹角/REFERENCE.md) | 两球共心、四面相切、对棱平移方向与四项判断 |
-| 菱形沿AM翻折与动点 | [菱形沿AM翻折与动点.html](菱形沿AM翻折与动点/成品/菱形沿AM翻折与动点.html) | [REFERENCE.md](菱形沿AM翻折与动点/REFERENCE.md) | 固定折痕翻折、圆弧直接拖动、中点联动、播放与角度同步 |
-| 椭圆动圆切线与定距离（二维） | [椭圆动圆切线与定距离.html](椭圆动圆切线与定距离（二维）/成品/椭圆动圆切线与定距离.html) | [REFERENCE.md](椭圆动圆切线与定距离（二维）/REFERENCE.md) | Canvas 2D、等单位坐标、切线射线实虚线、圆周/轨迹拖动与定点定长 |
+标题链接进入 GitHub 文件页，“本地”链接供克隆后的相对路径访问。导读可直接在线阅读；HTML 成品下载后在浏览器打开。Markdown 预览器无法打开相对链接时，使用标题的网页入口。
 
-改编题目时先阅读对应的 `REFERENCE.md`，了解可参考的页面组织、模型实现与验证入口，再结合[页面规范](../references/page-spec.md)和[示例参照指南](../references/example-guide.md)确定新题的结构。
+| 示例 | HTML 文件（下载后打开） | 参照导读 | 示例用途 |
+|---|---|---|---|
+| 外接球题建模示例 | [外接球题建模示例.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E6%88%90%E5%93%81/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B.html)（[本地](外接球题建模示例/成品/外接球题建模示例.html)） | [REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/REFERENCE.md)（[本地](外接球题建模示例/REFERENCE.md)） | 固定模型、完整推导、外接球与显示设置 |
+| 正四棱台2023真题演示 | [正四棱台2023真题演示.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA/%E6%88%90%E5%93%81/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA.html)（[本地](正四棱台2023真题演示/成品/正四棱台2023真题演示.html)） | [REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA/REFERENCE.md)（[本地](正四棱台2023真题演示/REFERENCE.md)） | 单动点约束拖动、滑条同步、相机锁定与实时读数 |
+| 正四面体内外接球与对棱夹角 | [正四面体内外接球与对棱夹角.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E9%9D%A2%E4%BD%93%E5%86%85%E5%A4%96%E6%8E%A5%E7%90%83%E4%B8%8E%E5%AF%B9%E6%A3%B1%E5%A4%B9%E8%A7%92/%E6%88%90%E5%93%81/%E6%AD%A3%E5%9B%9B%E9%9D%A2%E4%BD%93%E5%86%85%E5%A4%96%E6%8E%A5%E7%90%83%E4%B8%8E%E5%AF%B9%E6%A3%B1%E5%A4%B9%E8%A7%92.html)（[本地](正四面体内外接球与对棱夹角/成品/正四面体内外接球与对棱夹角.html)） | [REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E9%9D%A2%E4%BD%93%E5%86%85%E5%A4%96%E6%8E%A5%E7%90%83%E4%B8%8E%E5%AF%B9%E6%A3%B1%E5%A4%B9%E8%A7%92/REFERENCE.md)（[本地](正四面体内外接球与对棱夹角/REFERENCE.md)） | 两球共心、四面相切、对棱平移方向与四项判断 |
+| 菱形沿AM翻折与动点 | [菱形沿AM翻折与动点.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E8%8F%B1%E5%BD%A2%E6%B2%BFAM%E7%BF%BB%E6%8A%98%E4%B8%8E%E5%8A%A8%E7%82%B9/%E6%88%90%E5%93%81/%E8%8F%B1%E5%BD%A2%E6%B2%BFAM%E7%BF%BB%E6%8A%98%E4%B8%8E%E5%8A%A8%E7%82%B9.html)（[本地](菱形沿AM翻折与动点/成品/菱形沿AM翻折与动点.html)） | [REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E8%8F%B1%E5%BD%A2%E6%B2%BFAM%E7%BF%BB%E6%8A%98%E4%B8%8E%E5%8A%A8%E7%82%B9/REFERENCE.md)（[本地](菱形沿AM翻折与动点/REFERENCE.md)） | 固定折痕翻折、圆弧直接拖动、中点联动、播放与角度同步 |
+| 椭圆动圆切线与定距离（二维） | [椭圆动圆切线与定距离.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%A4%AD%E5%9C%86%E5%8A%A8%E5%9C%86%E5%88%87%E7%BA%BF%E4%B8%8E%E5%AE%9A%E8%B7%9D%E7%A6%BB%EF%BC%88%E4%BA%8C%E7%BB%B4%EF%BC%89/%E6%88%90%E5%93%81/%E6%A4%AD%E5%9C%86%E5%8A%A8%E5%9C%86%E5%88%87%E7%BA%BF%E4%B8%8E%E5%AE%9A%E8%B7%9D%E7%A6%BB.html)（[本地](椭圆动圆切线与定距离（二维）/成品/椭圆动圆切线与定距离.html)） | [REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%A4%AD%E5%9C%86%E5%8A%A8%E5%9C%86%E5%88%87%E7%BA%BF%E4%B8%8E%E5%AE%9A%E8%B7%9D%E7%A6%BB%EF%BC%88%E4%BA%8C%E7%BB%B4%EF%BC%89/REFERENCE.md)（[本地](椭圆动圆切线与定距离（二维）/REFERENCE.md)） | Canvas 2D、等单位坐标、切线射线实虚线、圆周/轨迹拖动与定点定长 |
+
+改编题目时先阅读对应的 `REFERENCE.md`，了解可参考的页面组织、模型实现与验证入口，再结合[页面规范](https://github.com/qeqe312/modeling-display/blob/main/references/page-spec.md)（[本地](../references/page-spec.md)）和[示例参照指南](https://github.com/qeqe312/modeling-display/blob/main/references/example-guide.md)（[本地](../references/example-guide.md)）确定新题的结构。
 
 ```text
 examples/
@@ -50,7 +52,7 @@ examples/
 
 菱形翻折题：AB＝2、∠ABC＝60°，沿 AM 翻折。**答案 A、C**：非退化时两面垂直，CN＝1，AM 与 CN 夹角恒为30°。V＝(√3/3)sinφ 在90°最大；此时 R＝√2、OC＝1，C 在外接球内。
 
-椭圆二维题：k₁k₂＝1，直线MN恒过E(−10/3,0)，Q(−5/3,0)，|PQ|＝5/3。切线从A出发，椭圆内实线、外部虚线；MN不画延长线。复用经验见[二维实现说明](../references/plane-geometry.md)。
+椭圆二维题：k₁k₂＝1，直线MN恒过E(−10/3,0)，Q(−5/3,0)，|PQ|＝5/3。切线从A出发，椭圆内实线、外部虚线；MN不画延长线。复用经验见[二维实现说明](https://github.com/qeqe312/modeling-display/blob/main/references/plane-geometry.md)（[本地](../references/plane-geometry.md)）。
 
 原来位于本目录根部的旧版正四棱台 HTML 和旧预览图已由新版替代。
 

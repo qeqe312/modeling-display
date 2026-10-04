@@ -2,8 +2,8 @@
 
 用途：固定顶点的立体几何题，展示完整解答、外接球、关键直径及辅助线。新题无动点时优先从本例换题。
 
-- [离线单文件成品](成品/外接球题建模示例.html)
-- [统一页面规范](../../references/page-spec.md) · [换题步骤](../../references/example-guide.md) · [验收标准](../../references/verification.md)
+- [离线单文件成品](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E6%88%90%E5%93%81/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B.html)（[本地](成品/外接球题建模示例.html)）
+- [统一页面规范](https://github.com/qeqe312/modeling-display/blob/main/references/page-spec.md)（[本地](../../references/page-spec.md)） · [换题步骤](https://github.com/qeqe312/modeling-display/blob/main/references/example-guide.md)（[本地](../../references/example-guide.md)） · [验收标准](https://github.com/qeqe312/modeling-display/blob/main/references/verification.md)（[本地](../../references/verification.md)）
 
 ## 原题与数学基准
 
@@ -11,7 +11,7 @@ P、A、B、C 是球 O 表面上的四点，PA⊥平面 ABC，∠ABC=90°，PA=5
 
 教学坐标：B=(0,0,0)，A=(3,0,0)，C=(0,4,0)，P=(3,0,5)。M=(1.5,2,0)，O=(1.5,2,2.5)。渲染变换 `(x,y,z) → (x−1.5,z−2.5,2−y)`；不要将这个变换和缩放常数沿用到新题。
 
-AC=5，PC=5√2，R=5√2/2。O 是 PC 中点，OA=OB=OC=OP=R，表面积 4πR²=50π。使用 [check_math.mjs](开发资料/check_math.mjs) 独立验算，不以页面显示值作为证明。
+AC=5，PC=5√2，R=5√2/2。O 是 PC 中点，OA=OB=OC=OP=R，表面积 4πR²=50π。使用 [check_math.mjs](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/check_math.mjs)（[本地](开发资料/check_math.mjs)） 独立验算，不以页面显示值作为证明。
 
 ## 默认画面与状态
 
@@ -30,13 +30,13 @@ HTML 的部分 checkbox 初始未 `checked`；`showFullSolution()` 会在初始�
 
 | 文件/入口 | 责任 | 换题时关注 |
 |---|---|---|
-| [layout.html](开发资料/源码/layout.html) | 页头、两个 tab、原题/推导/设置、舞台浮层 | 题名、题干、`proof-0…3`、`data-proof`、读数与图层文字 |
-| [style.css](开发资料/源码/style.css) | 共享暗色与响应式样式 | 优先保留；后置完整解题规则覆盖早期旧声明 |
-| [app.js](开发资料/源码/app.js) | 数学坐标、几何缓存、标签、相机、事件、抽屉 | 顶点表/渲染坐标、场景组、state、checks、球材质、读数 |
+| [layout.html](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E6%BA%90%E7%A0%81/layout.html)（[本地](开发资料/源码/layout.html)） | 页头、两个 tab、原题/推导/设置、舞台浮层 | 题名、题干、`proof-0…3`、`data-proof`、读数与图层文字 |
+| [style.css](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E6%BA%90%E7%A0%81/style.css)（[本地](开发资料/源码/style.css)） | 共享暗色与响应式样式 | 优先保留；后置完整解题规则覆盖早期旧声明 |
+| [app.js](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E6%BA%90%E7%A0%81/app.js)（[本地](开发资料/源码/app.js)） | 数学坐标、几何缓存、标签、相机、事件、抽屉 | 顶点表/渲染坐标、场景组、state、checks、球材质、读数 |
 | `showFullSolution / focusProof` | 初始展开与概览定位 | 新题推导卡数量改变时同步边界；定位不能重置设置 |
 | `invalidate / render / resize` | 按需渲染及模型适配 | 保留机制；按新题重算模型包围半径和中心 |
 | `pickVertex / measureLabels / syncLabels` | 命中与标签缓存 | 点名和坐标需替换，保留命中与尺寸缓存 |
-| [build_demo.py](开发资料/build_demo.py) | 从本例源码重建单双文件 | 此脚本只适用于当前示例目录层级 |
+| [build_demo.py](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/build_demo.py)（[本地](开发资料/build_demo.py)） | 从本例源码重建单双文件 | 此脚本只适用于当前示例目录层级 |
 
 图层映射：`cSolid→solid`，`cSphere→sphere`，`cDiameter→diameter`，`cGuide→guide`，`cAngles→angles`，`cAxes→axes`。其他通用项为 `cLabels/cLengths`、`sFont/sOpacity`、`data-quality` 与顶点选择集合。新增或删除图层时同步 DOM、state 和实际 scene group。
 
@@ -46,16 +46,16 @@ HTML 的部分 checkbox 初始未 `checked`；`showFullSolution()` 会在初始�
 
 | 视口 | 模型 | 完整讲解 | 显示设置 |
 |---|---|---|---|
-| 电脑 1600×1000 | [截图](开发资料/验证记录/截图/desktop.png)（含常驻讲解） | 同左 | [截图](开发资料/验证记录/截图/desktop-settings.png) |
-| 平板竖屏 820×1180 | [截图](开发资料/验证记录/截图/portrait.png) | [底部抽屉](开发资料/验证记录/截图/portrait-proof.png) | [底部抽屉](开发资料/验证记录/截图/portrait-settings.png) |
-| 平板横屏 1180×820 | [截图](开发资料/验证记录/截图/landscape.png) | [左侧抽屉](开发资料/验证记录/截图/landscape-proof.png) | [左侧抽屉](开发资料/验证记录/截图/landscape-settings.png) |
-| 手机 390×844 | [截图](开发资料/验证记录/截图/phone.png) | [截图](开发资料/验证记录/截图/phone-proof.png) | [截图](开发资料/验证记录/截图/phone-settings.png) |
+| 电脑 1600×1000 | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/desktop.png)（[本地](开发资料/验证记录/截图/desktop.png)）（含常驻讲解） | 同左 | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/desktop-settings.png)（[本地](开发资料/验证记录/截图/desktop-settings.png)） |
+| 平板竖屏 820×1180 | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/portrait.png)（[本地](开发资料/验证记录/截图/portrait.png)） | [底部抽屉](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/portrait-proof.png)（[本地](开发资料/验证记录/截图/portrait-proof.png)） | [底部抽屉](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/portrait-settings.png)（[本地](开发资料/验证记录/截图/portrait-settings.png)） |
+| 平板横屏 1180×820 | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/landscape.png)（[本地](开发资料/验证记录/截图/landscape.png)） | [左侧抽屉](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/landscape-proof.png)（[本地](开发资料/验证记录/截图/landscape-proof.png)） | [左侧抽屉](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/landscape-settings.png)（[本地](开发资料/验证记录/截图/landscape-settings.png)） |
+| 手机 390×844 | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/phone.png)（[本地](开发资料/验证记录/截图/phone.png)） | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/phone-proof.png)（[本地](开发资料/验证记录/截图/phone-proof.png)） | [截图](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/%E6%88%AA%E5%9B%BE/phone-settings.png)（[本地](开发资料/验证记录/截图/phone-settings.png)） |
 
 ![电脑默认画面](开发资料/验证记录/截图/desktop.png)
 
 ## 复现与证据
 
-以下是示例维护入口，在仓库根目录、当前 Python/Node 环境运行，会重写本例源码工作 HTML、成品及验证记录。若只想隔离复现，先按 [换题指南](../../references/example-guide.md) 复制源码、运行通用组装器和打包器，不运行示例维护构建器。
+以下是示例维护入口，在仓库根目录、当前 Python/Node 环境运行，会重写本例源码工作 HTML、成品及验证记录。若只想隔离复现，先按 [换题指南](https://github.com/qeqe312/modeling-display/blob/main/references/example-guide.md)（[本地](../../references/example-guide.md)） 复制源码、运行通用组装器和打包器，不运行示例维护构建器。
 
 ```bash
 python "examples/外接球题建模示例/开发资料/build_demo.py"
@@ -64,8 +64,8 @@ python "examples/外接球题建模示例/开发资料/check_browser.py"
 python "examples/外接球题建模示例/开发资料/inspect_demo.py"
 ```
 
-浏览器由 `GEO3D_BROWSER`（或 `BROWSER_EXECUTABLE_PATH`）可选指定；未指定则用 Playwright Chromium，首次需按 [验证文档](../../references/verification.md) 安装开发依赖与浏览器。脚本默认测试本例成品，也接受替代成品目录以验证重建输出。
+浏览器由 `GEO3D_BROWSER`（或 `BROWSER_EXECUTABLE_PATH`）可选指定；未指定则用 Playwright Chromium，首次需按 [验证文档](https://github.com/qeqe312/modeling-display/blob/main/references/verification.md)（[本地](../../references/verification.md)） 安装开发依赖与浏览器。脚本默认测试本例成品，也接受替代成品目录以验证重建输出。
 
-已有 [browser-report.json](开发资料/验证记录/browser-report.json) 记录 114 项检查，缓存几何数量 31、静止额外渲染帧 0。这是具体历史版本的证据，不是新题的固定数量门槛。来源为 Chrome/Chromium、鼠标与可信 CDP 触摸、模拟平板视口；实体 iPad/Safari 尚未覆盖。
+已有 [browser-report.json](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/%E5%BC%80%E5%8F%91%E8%B5%84%E6%96%99/%E9%AA%8C%E8%AF%81%E8%AE%B0%E5%BD%95/browser-report.json)（[本地](开发资料/验证记录/browser-report.json)） 记录 114 项检查，缓存几何数量 31、静止额外渲染帧 0。这是具体历史版本的证据，不是新题的固定数量门槛。来源为 Chrome/Chromium、鼠标与可信 CDP 触摸、模拟平板视口；实体 iPad/Safari 尚未覆盖。
 
 标签是有限轮次避让。更换题目、增加标签或改变字号后，仍须重新检查各视口和公式区，不承诺任意密度都无重叠。

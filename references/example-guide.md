@@ -2,6 +2,8 @@
 
 本指南让实现者沿用已验证的页面，按题目替换模型，而不是凭文字重新猜一套界面。默认规范可按题目微调；用户明确指定的设计优先，但数学、直接拖动、离线与验收要求仍适用。
 
+导读和规范标题使用完整 GitHub 地址，适用于 Markdown 编辑器/预览器的网页跳转；旁边“本地”保留相对文件入口。离线阅读或 Agent 复用时优先读取仓库内文件，预览器无法解析相对路径时按文件路径打开。
+
 ## 阅读顺序与参考选择
 
 1. `SKILL.md`：输入、交付边界和必须达到的效果。
@@ -12,13 +14,13 @@
 
 | 新题 | 首选参考 | JS 源文件 |
 |---|---|---|
-| 固定顶点、外接球、固定辅助线面 | [外接球导读](../examples/外接球题建模示例/REFERENCE.md) | `app.js` |
-| 单点沿棱运动、随参数改变的辅助图形与读数 | [正四棱台导读](../examples/正四棱台2023真题演示/REFERENCE.md) | `model.js` 后接 `engine.js` |
-| 正四面体、内外接球共心、面相切、相对棱夹角与多项判断 | [正四面体导读](../examples/正四面体内外接球与对棱夹角/REFERENCE.md) | `model.js` 后接 `engine.js`，固定模型 |
-| 沿折痕翻折、圆弧动点、从属中点与播放 | [菱形翻折导读](../examples/菱形沿AM翻折与动点/REFERENCE.md) | `model.js` 后接 `engine.js`，一个旋转参数 |
-| 纯二维解析几何、动圆、切线、交点与轨迹 | [椭圆二维导读](../examples/椭圆动圆切线与定距离（二维）/REFERENCE.md) | `app.js`，Canvas 2D，平移缩放 |
+| 固定顶点、外接球、固定辅助线面 | [外接球导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/REFERENCE.md)（[本地](../examples/外接球题建模示例/REFERENCE.md)） | `app.js` |
+| 单点沿棱运动、随参数改变的辅助图形与读数 | [正四棱台导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E6%A3%B1%E5%8F%B02023%E7%9C%9F%E9%A2%98%E6%BC%94%E7%A4%BA/REFERENCE.md)（[本地](../examples/正四棱台2023真题演示/REFERENCE.md)） | `model.js` 后接 `engine.js` |
+| 正四面体、内外接球共心、面相切、相对棱夹角与多项判断 | [正四面体导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%AD%A3%E5%9B%9B%E9%9D%A2%E4%BD%93%E5%86%85%E5%A4%96%E6%8E%A5%E7%90%83%E4%B8%8E%E5%AF%B9%E6%A3%B1%E5%A4%B9%E8%A7%92/REFERENCE.md)（[本地](../examples/正四面体内外接球与对棱夹角/REFERENCE.md)） | `model.js` 后接 `engine.js`，固定模型 |
+| 沿折痕翻折、圆弧动点、从属中点与播放 | [菱形翻折导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E8%8F%B1%E5%BD%A2%E6%B2%BFAM%E7%BF%BB%E6%8A%98%E4%B8%8E%E5%8A%A8%E7%82%B9/REFERENCE.md)（[本地](../examples/菱形沿AM翻折与动点/REFERENCE.md)） | `model.js` 后接 `engine.js`，一个旋转参数 |
+| 纯二维解析几何、动圆、切线、交点与轨迹 | [椭圆二维导读](https://github.com/qeqe312/modeling-display/blob/main/examples/%E6%A4%AD%E5%9C%86%E5%8A%A8%E5%9C%86%E5%88%87%E7%BA%BF%E4%B8%8E%E5%AE%9A%E8%B7%9D%E7%A6%BB%EF%BC%88%E4%BA%8C%E7%BB%B4%EF%BC%89/REFERENCE.md)（[本地](../examples/椭圆动圆切线与定距离（二维）/REFERENCE.md)） | `app.js`，Canvas 2D，平移缩放 |
 
-二维题另读 [二维实现与复用](plane-geometry.md)。它复用页面结构、标签、抽屉与按需渲染，使用等单位平面变换和约束反解；构建参考该例自己的 `build_demo.py`，不经过三维依赖打包。以下球坐标、Three.js 组装与打包步骤仅用于空间三维题。
+二维题另读 [二维实现与复用](https://github.com/qeqe312/modeling-display/blob/main/references/plane-geometry.md)（[本地](plane-geometry.md)）。它复用页面结构、标签、抽屉与按需渲染，使用等单位平面变换和约束反解；构建参考该例自己的 `build_demo.py`，不经过三维依赖打包。以下球坐标、Three.js 组装与打包步骤仅用于空间三维题。
 
 棱台的 `model.js` 打开 IIFE，`engine.js` 关闭同一个 IIFE。必须按此顺序拼成**同一个 script**；不能当作两个独立模块加载。该例 `app.js` 是构建生成的合并结果，优先改两份原始文件。
 
@@ -26,7 +28,7 @@
 
 翻折例也按 `model.js → engine.js` 组装。沿固定轴旋转时重新推导圆心、圆所在平面、旋转半径和合法角度；圆弧拖动用世界射线交圆平面后恢复角度，侧对观察者的退化投影采用连续分支处理。中点等从属对象由同一参数派生，不能放任它脱离题意轨迹。播放/暂停与角度滑条放在显示设置，只有用户启动播放时维持动画帧；暂停、页面隐藏和抓点后恢复按需渲染。
 
-三个示例采用相同的球坐标相机操作、旋转灵敏度与仰角限制，后续空间三维建模默认沿用。换题时重新选择默认摆放与观察角度：优先题目底面为底，没有明确底面时优先一个顶点朝下，尽量避免以棱为底；不要照抄另一题的默认角度、尺度或坐标原点。具体要求见 [相机与默认朝向](page-spec.md#7-相机操作与默认朝向)。
+三个示例采用相同的球坐标相机操作、旋转灵敏度与仰角限制，后续空间三维建模默认沿用。换题时重新选择默认摆放与观察角度：优先题目底面为底，没有明确底面时优先一个顶点朝下，尽量避免以棱为底；不要照抄另一题的默认角度、尺度或坐标原点。具体要求见 [相机与默认朝向](https://github.com/qeqe312/modeling-display/blob/main/references/page-spec.md#7-%E7%9B%B8%E6%9C%BA%E6%93%8D%E4%BD%9C%E4%B8%8E%E9%BB%98%E8%AE%A4%E6%9C%9D%E5%90%91)（[本地](page-spec.md#7-相机操作与默认朝向)）。
 
 ## 最小换题路径
 
@@ -106,4 +108,4 @@ python scripts/package_demo.py "work/新题名称.html" --output "geo3d/新题�
 - 新题的模型中心/半径、fit 和缩放范围重新计算，初始模型在公式区之上完整可见。
 - 设置映射均作用于对应模型；定位公式不改变用户设置。
 - 动点入口、合法轨迹、端点退化及滑条与直接拖动同步符合新题，不照搬旧轨迹反解。
-- 对最终成品完成 [验收矩阵](verification.md)，按实际范围报告结果；不能以读完源码替代执行测试。
+- 对最终成品完成 [验收矩阵](https://github.com/qeqe312/modeling-display/blob/main/references/verification.md)（[本地](verification.md)），按实际范围报告结果；不能以读完源码替代执行测试。

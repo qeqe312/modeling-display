@@ -1,8 +1,8 @@
 # 完整解题版开发资料
 
-本目录维护外接球固定模型示例；其他题目的入口见[示例索引](../../README.md)。
+本目录维护外接球固定模型示例；其他题目的入口见[示例索引](https://github.com/qeqe312/modeling-display/blob/main/examples/README.md)（[本地](../../README.md)）。
 
-首次参照或改编请先阅读[本题 REFERENCE.md](../REFERENCE.md)，再按下方文件说明定位布局、数学模型、交互和验证脚本。
+首次参照或改编请先阅读[本题 REFERENCE.md](https://github.com/qeqe312/modeling-display/blob/main/examples/%E5%A4%96%E6%8E%A5%E7%90%83%E9%A2%98%E5%BB%BA%E6%A8%A1%E7%A4%BA%E4%BE%8B/REFERENCE.md)（[本地](../REFERENCE.md)），再按下方文件说明定位布局、数学模型、交互和验证脚本。
 
 ## 文件说明
 
