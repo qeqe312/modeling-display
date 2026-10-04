@@ -36,7 +36,9 @@ python scripts/deploy.py --target codex
 
 `--check` 只预览，有差异退出码为 1；正常部署退出码为 0。省略 `--target` 部署到两处，并为 Codex 安装 `/geo3d` 提示词（是否可用取决于宿主版本）。`--target codex-prompt` 仅安装提示词。
 
-**仓库是唯一维护源**。默认部署保留用户额外文件；`--prune` 只删除上次部署清单中未修改的旧文件。覆盖和删除前备份到目标目录的 `.modeling-display-backups/`。目标不能是 Git checkout，不能与源重合，也不能经过符号链接或 Windows junction。缺少参数或未知参数会报错，不会意外部署到全部目标。支持 `--home <目录>` 进行便携安装或隔离测试。
+**仓库是唯一维护源**。部署同步全部 Git 跟踪的项目文件，包括 `AGENTS.md`、README、CHANGELOG、贡献指南、提示词、测试、GitHub 配置、图片与示例开发资料，不再按目录或扩展名精简。文件内容取自当前工作区，包含尚未提交的修改；新增文件先 `git add`，删除文件先 `git add -u`。未跟踪文件、被忽略的缓存和临时输出以及 `.git` 元数据不部署。脚本需要从 Git 仓库运行；部署 GitHub 最新版前先在维护仓库执行 `git pull --ff-only`，脚本本身不联网拉取。
+
+默认部署保留用户额外文件；`--prune` 只删除上次部署清单中未修改的旧文件。覆盖和删除前备份到目标目录的 `.modeling-display-backups/`。目标不能是 Git checkout，不能与源重合，也不能经过符号链接或 Windows junction。源文件存在未解决合并、符号链接、子模块或尚未暂存的删除时拒绝部署。缺少参数或未知参数会报错，不会意外部署到全部目标。支持 `--home <目录>` 进行便携安装或隔离测试。
 
 然后告诉 Agent：
 

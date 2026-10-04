@@ -7,6 +7,7 @@ import os
 from pathlib import Path, PurePosixPath
 import shutil
 import stat
+import subprocess
 import sys
 import tempfile
 
@@ -52,27 +53,36 @@ def validate_root(root, repo):
 
 
 def collect(repo):
-    files = {name: reject_links(repo / name).read_bytes()
-             for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')}
-    for name in ('references', 'assets', 'examples', 'scripts'):
-        directory = reject_links(repo / name)
-        for base, dirs, names in os.walk(directory, followlinks=False):
-            for child in dirs:
-                reject_links(Path(base) / child)
-            dirs[:] = sorted(d for d in dirs
-                             if d.lower() not in ('__pycache__', '.git', '.运行时',
-                                                  '.pytest_cache', '.mypy_cache', '.ruff_cache', '.cache')
-                             and not d.lower().startswith('.build-'))
-            for child in sorted(names):
-                path = reject_links(Path(base) / child)
-                suffix = path.suffix.lower()
-                if suffix in {'.pyc', '.log', '.tmp', '.temp', '.bak', '.swp'} or '.log' in [s.lower() for s in path.suffixes]:
-                    continue
-                if name != 'examples' and suffix in {'.png', '.jpg', '.jpeg', '.gif', '.webp', '.ico'}:
-                    continue
-                if name == 'scripts' and path.suffix != '.py':
-                    continue
-                files[path.relative_to(repo).as_posix()] = path.read_bytes()
+    """Copy current working-tree bytes for every Git-tracked project file."""
+    repo = reject_links(repo).resolve()
+
+    def git(*arguments):
+        result = subprocess.run(['git', '-C', str(repo), *arguments], capture_output=True)
+        if result.returncode:
+            message = result.stderr.decode('utf-8', errors='replace').strip()
+            raise ValueError(f'Cannot list Git project files: {message}')
+        return result.stdout
+
+    top = Path(os.fsdecode(git('rev-parse', '--show-toplevel')).strip()).resolve()
+    if top != repo:
+        raise ValueError('Deployment source must be the Git repository root')
+    files = {}
+    for entry in git('ls-files', '--stage', '--full-name', '-z').split(b'\0'):
+        if not entry:
+            continue
+        metadata, raw_path = entry.split(b'\t', 1)
+        mode, _, stage = metadata.split()
+        rel = raw_path.decode('utf-8')
+        if stage != b'0' or mode not in (b'100644', b'100755'):
+            raise ValueError(f'Unmerged file, symbolic link or submodule cannot be deployed: {rel}')
+        if rel == MANIFEST or rel.startswith('.modeling-display-backups/'):
+            raise ValueError(f'Project file conflicts with deployment metadata: {rel}')
+        path = safe_file(repo, rel)
+        if not path.is_file():
+            raise ValueError(f'Tracked file is missing: {rel}; restore it or stage its deletion with git add -u')
+        files[rel] = path.read_bytes()
+    if 'SKILL.md' not in files:
+        raise ValueError('Git project must track SKILL.md')
     return files
 
 

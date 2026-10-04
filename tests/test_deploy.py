@@ -33,6 +33,8 @@ class DeploymentTests(unittest.TestCase):
             path = self.repo / rel
             path.parent.mkdir(parents=True, exist_ok=True)
             path.write_bytes(data)
+        subprocess.run(['git', 'init', '-q', str(self.repo)], check=True, capture_output=True)
+        subprocess.run(['git', '-C', str(self.repo), 'add', '--all'], check=True, capture_output=True)
 
     def test_collect_preserves_example_images_sources_and_documents(self):
         retained = {
@@ -45,13 +47,25 @@ class DeploymentTests(unittest.TestCase):
             'examples/demo/开发资料/README.md': b'rebuild instructions',
             'examples/demo/开发资料/验证记录/browser-report.json': b'{"passed": 1}',
         }
-        excluded = {
+        retained.update({
+            'AGENTS.md': b'agent instructions',
+            'README.md': b'project readme',
+            'CHANGELOG.md': b'changes',
+            'CONTRIBUTING.md': b'contribution guide',
+            '.github/workflows/verify.yml': b'workflow',
+            '.gitignore': b'ignored/',
+            '.gitattributes': b'* text=auto',
+            'prompts/geo3d.md': b'prompt',
+            'tests/math.mjs': b'math checks',
+            'requirements-dev.txt': b'dependencies',
             'assets/preview.png': b'image',
             'references/preview.JPG': b'image',
             'scripts/preview.webp': b'image',
             'scripts/helper.js': b'javascript',
-        }
-        self.source_fixture({**retained, **excluded})
+        })
+        self.source_fixture(retained)
+        (self.repo / 'README.md').write_bytes(b'current uncommitted readme')
+        retained['README.md'] = b'current uncommitted readme'
         collected = deploy.collect(self.repo)
         self.assertEqual(collected, {**{name: b'document' for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')}, **retained})
         self.install(collected)
@@ -78,7 +92,11 @@ class DeploymentTests(unittest.TestCase):
             'examples/demo/model.html.bak': b'temporary',
             'examples/demo/model.html.swp': b'temporary',
         }
-        self.source_fixture(excluded)
+        self.source_fixture({})
+        for rel, data in excluded.items():
+            path = self.repo / rel
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(data)
         collected = deploy.collect(self.repo)
         self.assertEqual(collected, {name: b'document' for name in ('SKILL.md', 'LICENSE', 'SECURITY.md')})
 
@@ -91,16 +109,19 @@ class DeploymentTests(unittest.TestCase):
             link.symlink_to(outside)
         except OSError:
             self.skipTest('OS does not permit symlink creation')
+        subprocess.run(['git', '-C', str(self.repo), 'add', 'examples/reference.png'], check=True, capture_output=True)
         with self.assertRaises(ValueError):
             deploy.collect(self.repo)
 
     @unittest.skipUnless(os.name == 'nt', 'Windows source junction regression')
     def test_collect_windows_source_junction_rejected(self):
-        self.source_fixture({})
+        self.source_fixture({'examples/linked/reference.png': b'tracked image'})
         outside = self.base / 'outside'
         outside.mkdir()
         (outside / 'reference.png').write_bytes(b'outside image')
         link = self.repo / 'examples' / 'linked'
+        (link / 'reference.png').unlink()
+        link.rmdir()
         environment = dict(os.environ, GEO3D_LINK=str(link), GEO3D_DEST=str(outside))
         subprocess.run(['powershell.exe', '-NoProfile', '-Command',
                         'New-Item -ItemType Junction -Path $env:GEO3D_LINK -Target $env:GEO3D_DEST | Out-Null'],
@@ -111,6 +132,24 @@ class DeploymentTests(unittest.TestCase):
                 deploy.collect(self.repo)
         finally:
             link.rmdir()
+
+    def test_collect_requires_repository_root_and_skill(self):
+        with self.assertRaises(ValueError):
+            deploy.collect(self.repo)
+        self.source_fixture({})
+        with self.assertRaises(ValueError):
+            deploy.collect(self.repo / 'assets')
+        subprocess.run(['git', '-C', str(self.repo), 'rm', '--cached', 'SKILL.md'], check=True, capture_output=True)
+        with self.assertRaisesRegex(ValueError, 'track SKILL.md'):
+            deploy.collect(self.repo)
+
+    def test_collect_missing_tracked_file_requires_staged_deletion(self):
+        self.source_fixture({'README.md': b'readme'})
+        (self.repo / 'README.md').unlink()
+        with self.assertRaisesRegex(ValueError, 'Tracked file is missing'):
+            deploy.collect(self.repo)
+        subprocess.run(['git', '-C', str(self.repo), 'add', '-u'], check=True, capture_output=True)
+        self.assertNotIn('README.md', deploy.collect(self.repo))
 
     def test_extra_files_preserved_and_stale_requires_opt_in(self):
         self.install({"SKILL.md": b"old", "old.md": b"managed"})
@@ -200,6 +239,9 @@ class DeploymentTests(unittest.TestCase):
         self.assertEqual(deploy.main(["--home", str(home), "--target", "codex", "--check"]), 0)
         self.assertTrue((home / ".codex/skills/modeling-display/LICENSE").exists())
         self.assertTrue((home / ".codex/skills/modeling-display/assets/vendor/THREE-LICENSE.txt").exists())
+        installed = home / '.codex/skills/modeling-display'
+        for rel, data in deploy.collect(ROOT).items():
+            self.assertEqual((installed / rel).read_bytes(), data, rel)
 
     def test_invalid_arguments_have_no_effect(self):
         for arguments in (["--target"], ["--target", "typo"], ["--unknown"]):
